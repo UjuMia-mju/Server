@@ -1,0 +1,27 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build
+bin/
+obj/
+Debug/
+Release/
+x64/
+
+# C++
+*.obj
+*.pdb
+
+# Precompiled headers
+*.pch
+*.ipch
+
+# VS ipch
+.vs/*/ipch/
+
+# Libs
+Libraries/Libs/**/*.lib
