@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "DBConnectionPool.h"
 #include "DBBind.h"
+#include "TypeCast.h"
 
 enum
 {
@@ -33,8 +34,40 @@ void DoWorkerJob(ServerServiceRef& service)
 	}
 }
 
+using TL = TypeList<class A, class B, class C>;
+
+class A
+{
+public:
+	A()
+	{
+		INIT_TL(A);
+	}
+	virtual ~A() {}
+
+	DECLARE_TL;
+};
+
+class B : public A
+{
+public:
+	B() { INIT_TL(B); }
+};
+
+class C : public A
+{
+public:
+	C() { INIT_TL(C); }
+};
+
 int main()
 {
+	{
+		shared_ptr<B> b = MakeShared<B>();
+		shared_ptr<A> a = TypeCast<A>(b);
+		bool canCast = CanCast<A>(b);
+	}
+
 	//
 	//ASSERT_CRASH(GDBConnectionPool->Connect(1, L"DRIVER={MySQL ODBC 9.6 Unicode Driver};SERVER=localhost;PORT=3306;DATABASE=UjuMia;UID=root;PWD=Willylee0309!;"));
 
@@ -79,31 +112,31 @@ int main()
 	//}
 
 	// ---------------------------- 
-	GRoom->DoTimer(1000, [] {cout << "Hello 1000" << endl;});
-	GRoom->DoTimer(2000, [] {cout << "Hello 1000" << endl;});
-	GRoom->DoTimer(3000, [] {cout << "Hello 1000" << endl;});
+	//GRoom->DoTimer(1000, [] {cout << "Hello 1000" << endl;});
+	//GRoom->DoTimer(2000, [] {cout << "Hello 1000" << endl;});
+	//GRoom->DoTimer(3000, [] {cout << "Hello 1000" << endl;});
 
 
-	ClientPacketHandler::Init();
+	//ClientPacketHandler::Init();
 
-	ServerServiceRef service = MakeShared<ServerService>(
-		NetAddress(L"127.0.0.1", 7777),
-		MakeShared<IocpCore>(),
-		MakeShared<GameSession>,
-		100
-	);
+	//ServerServiceRef service = MakeShared<ServerService>(
+	//	NetAddress(L"127.0.0.1", 7777),
+	//	MakeShared<IocpCore>(),
+	//	MakeShared<GameSession>,
+	//	100
+	//);
 
-	ASSERT_CRASH(service->Start());
+	//ASSERT_CRASH(service->Start());
 
-	for (int32 i = 0; i < 5; i++)
-	{
-		GThreadManager->Launch([&service]()
-			{
-				DoWorkerJob(service);
-			});
-	}
+	//for (int32 i = 0; i < 5; i++)
+	//{
+	//	GThreadManager->Launch([&service]()
+	//		{
+	//			DoWorkerJob(service);
+	//		});
+	//}
 
-	DoWorkerJob(service);
+	//DoWorkerJob(service);
 
-	GThreadManager->Join();
+	//GThreadManager->Join();
 }
