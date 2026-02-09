@@ -1,0 +1,46 @@
+name: "🔄 Refactor"
+description: "코드 리팩토링 또는 성능 개선"
+labels: ["refactor"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 리팩토링 목적
+      description: 왜 리팩토링이 필요한지, 현재 문제점 설명.
+      placeholder: "TypeConversion 테이블을 컴파일 타임 constexpr 배열로 변경하여 런타임 초기화 오버헤드 제거."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 변경 사항
+      description: 구체적인 코드 변경을 체크박스 형태로 세분화.
+      placeholder: |
+        - [ ] MakeTable 재귀 → constexpr 배열 초기화
+        - [ ] Int2Type 템플릿 특수화 제거
+        - [ ] 변환 테이블 크기 템플릿 파라미터화 (Length 사용)
+        - [ ] 기존 테스트 통과 확인
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📊 예상 효과
+      description: 성능 개선, 코드 가독성 향상 등 정량/정성 평가.
+      placeholder: |
+        - 컴파일 시간 15% 단축
+        - 런타임 테이블 생성 제거 (메모리 1KB 절약)
+        - 잠재적 리스크: 템플릿 인스턴스화 증가
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🔍 대상 코드
+      description: 변경할 파일/함수 위치.
+      placeholder: |
+        - 파일: ServerCore/TypeCast.h
+        - 함수: TypeConversion::MakeTable()
+        - 라인: 100-150
+      render: shell
+  - type: textarea
+    attributes:
+      label: 🙋🏻 참고 자료
+      description: 관련 문서, PR, 또는 외부 자료.
+      placeholder: "C++20 constexpr 배열: https://en.cppreference.com/w/cpp/language/constexpr"

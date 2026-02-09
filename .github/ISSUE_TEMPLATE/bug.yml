@@ -1,0 +1,37 @@
+name: "🐛 Bug"
+description: "버그 또는 오류 신고"
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 버그 설명
+      description: 버그가 발생한 상황과 영향을 설명해 주세요.
+      placeholder: "TCP 연결 시 서버 크래시 발생. 로그 첨부."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🔄 재현 단계
+      description: 버그를 재현하는 정확한 단계를 작성해 주세요.
+      placeholder: |
+        1. 서버 실행 (./GameServer)
+        2. 100개 클라이언트 동시 연결
+        3. Accept 후 세그먼테이션 폴트
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📊 환경 정보
+      description: OS, C++ 버전, 컴파일러, 로그 등.
+      placeholder: |
+        - OS: Windows 12
+        - Compiler: MSVC (Microsoft Visual C++) 19.36 (Visual Studio 2022 v17.10)
+        - 로그: [로그 파일 첨부]
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🙋🏻 예상 결과
+      description: 정상 동작 시 기대되는 결과.
+      placeholder: "연결 성공 후 핸들링."
