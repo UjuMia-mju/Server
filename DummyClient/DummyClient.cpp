@@ -26,7 +26,7 @@ public:
 
 	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
 	{
-		PacketSessionRef session = PacketSessionRef();
+		PacketSessionRef session = GetPacketSessionRef();
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
 
 		ServerPacketHandler::HandlePacket(session, buffer, len);
@@ -52,7 +52,7 @@ int main()
 		NetAddress(L"127.0.0.1", 7777),
 		MakeShared<IocpCore>(),
 		MakeShared<ServerSession>,
-		1);
+		100);
 
 	ASSERT_CRASH(service->Start());
 

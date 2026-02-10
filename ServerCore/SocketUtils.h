@@ -9,6 +9,8 @@
 class SocketUtils
 {
 public:
+	// 정보: LPFN은 함수 주소를 저장하는 변수임. 
+	// (dll에 있는 함수를 가져와야 해서 정적 링크는 안되고 런타임 환경에서 가져오게 됨.)
 	static LPFN_CONNECTEX			ConnectEx;
 	static LPFN_DISCONNECTEX		DisconnectEx;
 	static LPFN_ACCEPTEX			AcceptEx;
@@ -36,6 +38,6 @@ private:
 template<typename T>
 static inline bool SetSocketOpt(SOCKET socket, int32 level, int32 optName, T optValue)
 {
-	return SOCKET_ERROR != ::setsockopt(socket, level, optName, (const char*)&optValue, sizeof(T));
+	return SOCKET_ERROR != ::setsockopt(socket, level, optName, reinterpret_cast<char*>(&optValue), sizeof(T));
 }
 
