@@ -31,7 +31,7 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	
 	
 	//TODO: Session이 삭제 되면서 접근 충돌 문제 해결
-	//session->Send(sendBuffer);
+	session->Send(sendBuffer);
 
 	return true;
 }

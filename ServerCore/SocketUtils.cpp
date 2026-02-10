@@ -13,14 +13,15 @@ void SocketUtils::Init()
 
 	// 런타임에 주소 알아오기
 	SOCKET dummySocket = CreateSocket();
-	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_CONNECTEX, (LPVOID*)&ConnectEx));
-	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_DISCONNECTEX, (LPVOID*)&DisconnectEx));
-	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_ACCEPTEX, (LPVOID*)&AcceptEx));
+	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_CONNECTEX, reinterpret_cast<LPVOID*>(&ConnectEx)));
+	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_DISCONNECTEX, reinterpret_cast<LPVOID*>(&DisconnectEx)));
+	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_ACCEPTEX, reinterpret_cast<LPVOID*>(&AcceptEx)));
+	Close(dummySocket);
 }
 
 void SocketUtils::Clear()
 {
-	WSACleanup();
+	::WSACleanup();
 }
 
 bool SocketUtils::BindWindowsFunction(SOCKET socket, GUID guid, LPVOID* functionPtr)
@@ -30,7 +31,7 @@ bool SocketUtils::BindWindowsFunction(SOCKET socket, GUID guid, LPVOID* function
 	// SIO_GET_EXTENSION_FUNCTION_POINTER: 확장 함수의 포인터를 가져오는 명령어
 	// guid: 가져오려는 함수의 GUID (GUID란 어떤 함수를 원하는지를 말함.(id))
 	return SOCKET_ERROR != ::WSAIoctl(socket, SIO_GET_EXTENSION_FUNCTION_POINTER, &guid, sizeof(guid), 
-		functionPtr, sizeof(functionPtr), &bytes, nullptr, nullptr);
+		functionPtr, sizeof(functionPtr),OUT &bytes, NULL, NULL);
 }
 
 SOCKET SocketUtils::CreateSocket()
@@ -73,19 +74,20 @@ bool SocketUtils::SetUpdateAcceptSocket(SOCKET socket, SOCKET listenSocket)
 	return SetSocketOpt(socket, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, listenSocket);
 }
 
+
 bool SocketUtils::Bind(SOCKET socket, NetAddress adress)
 {
-	return SOCKET_ERROR != ::bind(socket, (SOCKADDR*)&adress.GetSockAddr(), sizeof(SOCKADDR_IN));
+	return SOCKET_ERROR != ::bind(socket, reinterpret_cast<const SOCKADDR*>(&adress.GetSockAddr()), sizeof(SOCKADDR_IN));
 }
 
 bool SocketUtils::BindAnyAdress(SOCKET socket, uint16 port)
 {
 	SOCKADDR_IN sockAddr;
 	sockAddr.sin_family = AF_INET;
-	sockAddr.sin_addr.s_addr = htonl(INADDR_ANY); // host to network long
-	sockAddr.sin_port = htons(port); // host to network short
+	sockAddr.sin_addr.s_addr = ::htonl(INADDR_ANY); // host to network long
+	sockAddr.sin_port = ::htons(port); // host to network short
 
-	return SOCKET_ERROR != ::bind(socket, (SOCKADDR*)&sockAddr, sizeof(sockAddr));
+	return SOCKET_ERROR != ::bind(socket, reinterpret_cast<const SOCKADDR*>(&sockAddr), sizeof(sockAddr));
 }
 
 bool SocketUtils::Listen(SOCKET socket, int32 backlog)
