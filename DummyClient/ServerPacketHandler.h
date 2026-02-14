@@ -12,6 +12,11 @@ enum : uint16
 	PKT_S_ENTER_GAME = 1003,
 	PKT_C_CHAT = 1004,
 	PKT_S_CHAT = 1005,
+	PKT_C_MOVE = 1006,
+	PKT_S_MOVE = 1007,
+	PKT_S_PLAYER_LIST = 1008,
+	PKT_S_PLAYER_ENTER = 1009,
+	PKT_S_PLAYER_LEAVE = 1010,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -23,6 +28,10 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
 bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt);
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
 bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
+bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
+bool Handle_S_PLAYER_LIST(PacketSessionRef& session, Protocol::S_PLAYER_LIST& pkt);
+bool Handle_S_PLAYER_ENTER(PacketSessionRef& session, Protocol::S_PLAYER_ENTER& pkt);
+bool Handle_S_PLAYER_LEAVE(PacketSessionRef& session, Protocol::S_PLAYER_LEAVE& pkt);
 
 
 class ServerPacketHandler
@@ -46,6 +55,22 @@ public:
 		{
 			return HandlePacket<Protocol::S_CHAT>(Handle_S_CHAT, session, buffer, len);
 		};
+		GPacketHandler[PKT_S_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_MOVE>(Handle_S_MOVE, session, buffer, len);
+		};
+		GPacketHandler[PKT_S_PLAYER_LIST] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_PLAYER_LIST>(Handle_S_PLAYER_LIST, session, buffer, len);
+		};
+		GPacketHandler[PKT_S_PLAYER_ENTER] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_PLAYER_ENTER>(Handle_S_PLAYER_ENTER, session, buffer, len);
+		};
+		GPacketHandler[PKT_S_PLAYER_LEAVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_PLAYER_LEAVE>(Handle_S_PLAYER_LEAVE, session, buffer, len);
+		};
 	}
 
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
@@ -67,6 +92,11 @@ public:
 	{
 
 		return MakeSendBuffer(pkt, PKT_C_CHAT);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::C_MOVE& pkt)
+	{
+
+		return MakeSendBuffer(pkt, PKT_C_MOVE);
 	}
 	
 private:

@@ -35,7 +35,7 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 	}
 	else
 	{
-		int32 errorCode = ::WSAGetLastError();
+		int32 errorCode = ::WSAGetLastError(); // 경우에 따라 에러가 에러가 아닐 수 있음. (타임아웃이면 정상 처리)
 		switch (errorCode)
 		{
 		case WAIT_TIMEOUT:

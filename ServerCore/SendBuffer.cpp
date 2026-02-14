@@ -71,7 +71,7 @@ void SendBufferChunk::Close(uint32 writeSize)
 -------------------*/
 
 // [                 ] 이렇게 크게 할당된 버퍼를 나눈다.
-
+// TLS에 버퍼 할당.
 SendBufferRef SendBufferManager::Open(uint32 size)
 {
 	if (LSendBufferChunk == nullptr)
@@ -105,6 +105,7 @@ SendBufferChunkRef SendBufferManager::Pop()
 		}
 	}
 
+	//2번째 인자는 커스텀 delete임
 	return SendBufferChunkRef(xnew<SendBufferChunk>(), PushGlobal);
 }
 

@@ -29,8 +29,6 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	enterGamePkt.set_playerindex(0); // 첫번째 캐릭터 입장
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
 	
-	
-	//TODO: Session이 삭제 되면서 접근 충돌 문제 해결
 	session->Send(sendBuffer);
 
 	return true;

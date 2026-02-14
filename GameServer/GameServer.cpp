@@ -36,6 +36,7 @@ void DoWorkerJob(ServerServiceRef& service)
 
 int main()
 {
+	ASSERT_CRASH(GDBConnectionPool->Connect(1, L"DRIVER={MySQL ODBC 9.6 Unicode Driver};SERVER=localhost;PORT=3306;DATABASE=UjuMia;UID=root;PWD=Willylee0309!;"));
 	//
 	//ASSERT_CRASH(GDBConnectionPool->Connect(1, L"DRIVER={MySQL ODBC 9.6 Unicode Driver};SERVER=localhost;PORT=3306;DATABASE=UjuMia;UID=root;PWD=Willylee0309!;"));
 
@@ -59,30 +60,30 @@ int main()
 	//		wcout << "User Id: " << id << L", Username: " << userStr << endl;
 	//	}
 
-		//dbConn->Unbind();
+	//	dbConn->Unbind();
 
-		//int id;
-		//SQLLEN outIdLen = 0;
-		//dbConn->BindCol(1, &id, &outIdLen);
+	//	int id;
+	//	SQLLEN outIdLen = 0;
+	//	dbConn->BindCol(1, &id, &outIdLen);
 
-		//WCHAR username[51] = { 0 };
-		//SQLLEN outUsernameLen = 0;
-		//dbConn->BindCol(2, username, sizeof(username), &outUsernameLen);
+	//	WCHAR username[51] = { 0 };
+	//	SQLLEN outUsernameLen = 0;
+	//	dbConn->BindCol(2, username, sizeof(username), &outUsernameLen);
 
-		//ASSERT_CRASH(dbConn->Execute(L"SELECT * FROM users"));
+	//	ASSERT_CRASH(dbConn->Execute(L"SELECT * FROM users"));
 
-		//while (dbConn->Fetch())
-		//{
-		//	wstring userStr(username, outUsernameLen / sizeof(WCHAR));
-		//	wcout << "User Id: " << id << L", Username: " << userStr << endl;
-		//}
-		//GDBConnectionPool->Push(dbConn);
+	//	while (dbConn->Fetch())
+	//	{
+	//		wstring userStr(username, outUsernameLen / sizeof(WCHAR));
+	//		wcout << "User Id: " << id << L", Username: " << userStr << endl;
+	//	}
+	//	GDBConnectionPool->Push(dbConn);
 	//}
 
-	// ---------------------------- 
-	GRoom->DoTimer(1000, [] {cout << "Hello 1000" << endl;});
-	GRoom->DoTimer(2000, [] {cout << "Hello 1000" << endl;});
-	GRoom->DoTimer(3000, [] {cout << "Hello 1000" << endl;});
+	//// ---------------------------- 
+	//GRoom->DoTimer(1000, [] {cout << "Hello 1000" << endl;});
+	//GRoom->DoTimer(2000, [] {cout << "Hello 1000" << endl;});
+	//GRoom->DoTimer(3000, [] {cout << "Hello 1000" << endl;});
 
 
 	ClientPacketHandler::Init();
