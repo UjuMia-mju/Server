@@ -61,7 +61,7 @@ bool Listener::StartAccept(ServerServiceRef server)
 	const int32 acceptCount = _serverService->GetMaxSessionCount();
 	for (int32 i = 0; i < acceptCount; ++i)
 	{
-		AcceptEvent* acceptEvent = new AcceptEvent();
+		AcceptEvent* acceptEvent = xnew<AcceptEvent>();
 		acceptEvent->owner = shared_from_this();
 		_acceptEventPool.push_back(acceptEvent);
 		RegisterAccept(acceptEvent);

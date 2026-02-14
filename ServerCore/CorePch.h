@@ -5,6 +5,7 @@
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include <Windows.h>
+#include <chrono>
 
 #include "Types.h"
 #include "CoreMacro.h"

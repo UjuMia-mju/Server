@@ -30,6 +30,7 @@ void Session::Send(SendBufferRef sendBuffer)
 		// 현재 register send가 걸리지 않은 상태면 걸어준다..?
 		WRITE_LOCK;
 		_sendQueue.push(sendBuffer);
+		// 변경전 값을 반환하게 된다.
 		if (_sendRegistered.exchange(true) == false)
 		{
 			registerSend = true;

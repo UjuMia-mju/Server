@@ -2,7 +2,7 @@
 #include "IocpCore.h"
 #include "NetAdress.h"
 
-class AcceptEvent;
+class AcceptEvent; // 전방 선언
 class ServerService;
 
 /*----------------------
