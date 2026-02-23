@@ -8,3 +8,4 @@ extern class JobTimer*				GJobTimer;
 
 extern class DeadLockProfiler*		GDeadLockProfiler;
 extern class DBConnectionPool*		GDBConnectionPool;
+extern class ConfigManager*			GConfigManager;

@@ -97,5 +97,7 @@
     <None Include="..\Common\protoc-21.12-win64\bin\GenPackets.bat">
       <Filter>Protocol</Filter>
     </None>
+    <None Include="config.ini" />
+    <None Include="config.example.ini" />
   </ItemGroup>
 </Project>

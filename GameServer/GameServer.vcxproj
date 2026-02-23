@@ -129,6 +129,10 @@
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Common\protoc-21.12-win64\bin\GenPackets.bat</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)config.example.ini" "$(SolutionDir)Binary\Release\" /Y /I
+xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -169,6 +173,10 @@
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Common\protoc-21.12-win64\bin\GenPackets.bat</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)config.example.ini" "$(SolutionDir)Binary\Release\" /Y /I
+xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccountDB.cpp" />
@@ -220,6 +228,8 @@
     <None Include="..\Common\protoc-21.12-win64\bin\GenPackets.bat" />
     <None Include="..\Common\protoc-21.12-win64\bin\Protocol.proto" />
     <None Include="..\Common\protoc-21.12-win64\bin\Struct.proto" />
+    <None Include="config.example.ini" />
+    <None Include="config.ini" />
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Include="..\Common\protoc-3.17.1-win64\bin\Enum.proto" />

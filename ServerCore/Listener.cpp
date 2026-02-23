@@ -75,7 +75,7 @@ void Listener::CloseAccept()
 	SocketUtils::Close(_listenSocket);
 }
 
-HANDLE Listener::GetHandel()
+HANDLE Listener::GetHandle()
 {
 	return reinterpret_cast<HANDLE>(_listenSocket);
 }

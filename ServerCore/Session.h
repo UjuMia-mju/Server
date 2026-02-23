@@ -43,7 +43,7 @@ public:
 	SessionRef			GetSessionRef() { return static_pointer_cast<Session>(shared_from_this()); }
 private:
 						/* 인터페이스 구현 */
-	virtual HANDLE		GetHandel() override;
+	virtual HANDLE		GetHandle() override;
 	virtual void		Dispatch(class IocpEvent* iocpEvent, int32 numOfBytes = 0) override;
 private:
 						/* 전송 관련 */

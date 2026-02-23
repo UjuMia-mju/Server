@@ -25,3 +25,7 @@ x64/
 
 # Libs
 Libraries/Libs/**/*.lib
+
+# Config files with passwords
+GameServer/config.ini
+DummyClient/config.ini
