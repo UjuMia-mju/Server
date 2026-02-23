@@ -60,7 +60,7 @@ void Session::Disconnect(const WCHAR* cause)
 	RegisterDisConnect();
 }
 
-HANDLE Session::GetHandel()
+HANDLE Session::GetHandle()
 {
 	return reinterpret_cast<HANDLE>(_socket);
 }

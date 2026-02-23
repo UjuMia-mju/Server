@@ -23,3 +23,4 @@ using namespace std;
 #include "Session.h"
 #include "LockQueue.h"
 
+#include "ConfigManager.h"
