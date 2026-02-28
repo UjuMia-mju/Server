@@ -2,6 +2,7 @@
 #include "ClientPacketHandler.h"
 #include "Player.h"
 #include "Room.h"
+#include "RoomManager.h"
 #include "GameSession.h"
 #include "AccountDB.h"
 
@@ -22,7 +23,7 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	std::string email = pkt.userid();
 	std::string password = pkt.psw();
 
-	cout << "Received Login - Email: " << email << ", Password: " << password << endl;
+	std::cout << "Received Login - Email: " << email << ", Password: " << password << endl;
 
 	Protocol::S_LOGIN sLoginPkt;
 
@@ -31,8 +32,8 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	{
 		int32 dbPlayerId = 0;
 		wstring dbPlayerName;
-
-		if (AccountDB::GetPlayerInfo(email, dbPlayerId, dbPlayerName))
+		int32 dbPlayerTag;
+		if (AccountDB::GetPlayerInfo(email, dbPlayerId, dbPlayerName, dbPlayerTag))
 		{
 			sLoginPkt.set_success(true);
 			// wstring -> UTF-8 string 변환
@@ -47,6 +48,7 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 			auto player = sLoginPkt.mutable_player();
 			player->set_id(dbPlayerId);
 			player->set_name(playerNameUtf8);
+			player->set_tag(dbPlayerTag);
 
 			PlayerRef playerRef = MakeShared<Player>();
 			playerRef->name = player->name();
@@ -58,22 +60,112 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 		else
 		{
 			sLoginPkt.set_success(false);
-			cout << "Failed to retrieve player info for email: " << email << endl;
+			std::cout << "Failed to retrieve player info for email: " << email << endl;
 		}
 	}
 	else
 	{
 		// Fail to Login
 		sLoginPkt.set_success(false);
-		cout << "Failed to validate account for email: " << email << endl;
+		std::cout << "Failed to validate account for email: " << email << endl;
 	}
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(sLoginPkt);
-	cout << "Sending S_LOGIN packet - Size: " << sendBuffer->WriteSize()
+	std::cout << "Sending S_LOGIN packet - Size: " << sendBuffer->WriteSize()
 		<< ", Success: " << sLoginPkt.success() << endl;
 	session->Send(sendBuffer);
 
 	return true;
+}
+
+bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pkt)
+{
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+	
+	// 로그인 체크
+	if (gameSession->_player == nullptr)
+	{
+		std::cout << "Create room failed: Player not logged in" << endl;
+
+		Protocol::S_CREATE_ROOM createRoomPkt;
+		createRoomPkt.set_success(false);
+		createRoomPkt.set_error_msg("Not logged in");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(createRoomPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 이미 방에 있는지 체크
+	if (auto currentRoom = gameSession->_room.lock())
+	{
+		std::cout << "Create room failed: Already in a room" << endl;
+
+		Protocol::S_CREATE_ROOM createRoomPkt;
+		createRoomPkt.set_success(false);
+		createRoomPkt.set_error_msg("Already in a room");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(createRoomPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 방 생성
+	int64 hostId = gameSession->_player->playerId;
+	string hostName = gameSession->_player->name;
+	int32 hostTag = gameSession->_player->tag;
+	RoomRef newRoom = RoomManager::Instance().CreateRoom(hostId, hostName, hostTag);
+	
+	gameSession->_room = newRoom;
+	//newRoom->DoAsync(&Room::Enter, gameSession->_player);
+
+	// 패킷 만들기
+	Protocol::S_CREATE_ROOM createRoomPkt;
+	Protocol::RoomInfo* roomInfo = createRoomPkt.mutable_room();
+	roomInfo->set_room_id(newRoom->GetRoomId());
+	roomInfo->set_current_count(1);
+	roomInfo->set_max_count(4);
+	roomInfo->set_is_playing(false);
+
+	// host 정보 세팅
+	Protocol::Player* host = roomInfo->mutable_host();
+	host->set_id(gameSession->_player->playerId);
+	host->set_name(gameSession->_player->name);
+	host->set_tag(gameSession->_player->tag);
+
+	// 방 생성 결과 패킷 전송
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(createRoomPkt);
+	session->Send(sendBuffer);
+	
+	return true;
+}
+
+bool Handle_C_ROOM_LIST(PacketSessionRef& session, Protocol::C_ROOM_LIST& pkt)
+{
+	return false;
+}
+
+bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
+{
+	return false;
+}
+
+bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
+{
+	return false;
+}
+
+bool Handle_C_INVITE_PLAYER(PacketSessionRef& session, Protocol::C_INVITE_PLAYER& pkt)
+{
+	return false;
+}
+
+bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESPONSE& pkt)
+{
+	return false;
+}
+
+bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt)
+{
+	return false;
 }
 
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
@@ -93,7 +185,7 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
-	cout << pkt.msg() << endl;
+	std::cout << pkt.msg() << endl;
 
 	Protocol::S_CHAT chatPkt;
 	chatPkt.set_msg(pkt.msg());
@@ -111,7 +203,7 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 	// 플레이어가 로그인되어 있는지 확인
 	if (gameSession->_player == nullptr)
 	{
-		cout << "Move packet from non-logged in player!" << endl;
+		std::cout << "Move packet from non-logged in player!" << endl;
 		return false;
 	}
 
@@ -150,7 +242,7 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 	}
 	else
 	{
-		cout << "Room not found for player: " << gameSession->_player->name << endl;
+		std::cout << "Room not found for player: " << gameSession->_player->name << endl;
 	}
 
 	return true;

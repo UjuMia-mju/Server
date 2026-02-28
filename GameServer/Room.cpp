@@ -6,12 +6,106 @@
 
 shared_ptr<Room> GRoom = make_shared<Room>();
 
-void Room::Enter(PlayerRef player)
+Room::Room(uint64 roomId, const string& roomName, uint64 ownerId)
+	: _roomId(roomId), _roomName(roomName), _ownerId(ownerId)
+{
+}
+
+Room::~Room()
+{
+	cout << "Room " << _roomId << " destroyed." << endl;
+}
+
+void Room::EnterLobby(PlayerRef player)
+{
+	WRITE_LOCK;
+	_players[player->playerId] = player;
+	_readyStatus[player->playerId] = false;
+
+	// 방 멤버 입장 알림
+	Protocol::S_ROOM_MEMBER_ENTER enterPkt;
+	auto member = enterPkt.mutable_member();
+
+	auto playerInfo = member->mutable_player();
+	playerInfo->set_id(player->playerId);
+	playerInfo->set_name(player->name);
+	playerInfo->set_tag(player->tag);
+
+	member->set_is_ready(false);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterPkt);
+	BroadcastExcept(sendBuffer, player->playerId);
+
+	std::cout << "Player " << player->name << " entered lobby of Room " << _roomId << endl;
+}
+
+void Room::LeaveLobby(PlayerRef player)
+{
+	WRITE_LOCK;
+	_players.erase(player->playerId);
+	_readyStatus.erase(player->playerId);
+
+	// 퇴장 알림
+	Protocol::S_ROOM_MEMBER_LEAVE leavePkt;
+	leavePkt.set_player_id(player->playerId);
+	leavePkt.set_player_name(player->name);
+
+	// 방장이 나갔다면 새 방장 지정
+	if (_ownerId == player->playerId && !_players.empty())
+	{
+		_ownerId = _players.begin()->first;
+		leavePkt.set_new_owner_id(_ownerId);
+	}
+	else if (_players.empty())
+	{
+		// 방 삭제
+	}
+	else
+	{
+		leavePkt.set_new_owner_id(0); // 0이면 아무런 반응X
+	}
+
+	auto leaveBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
+	Broadcast(leaveBuffer);
+
+	std::cout << "Player " << player->name << " left lobby room " << _roomId << endl;
+}
+
+void Room::SetReady(uint64 playerId, bool isReady)
+{
+	WRITE_LOCK;
+
+	if (_players.find(playerId) == _players.end())
+	{
+		return;
+	}
+
+	_readyStatus[playerId] = isReady;
+
+	// 준비 상태 브로드캐스트
+	Protocol::S_READY readyPkt;
+	readyPkt.set_player_id(playerId);
+	readyPkt.set_is_ready(isReady);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(readyPkt);
+	Broadcast(sendBuffer);
+}
+
+bool Room::CanStartGame()
+{
+	return false;
+}
+
+void Room::StartGame()
+{
+}
+
+void Room::EnterGame(PlayerRef player)
 {
 	WRITE_LOCK;
 	_players[player->playerId] = player;
 
-	//// 새로 들어온 플레이어에게 기존 플레이어 정보 브로드캐스트
+	// 새로 들어온 플레이어에게 기존 플레이어 정보 브로드캐스트
 	Protocol::S_PLAYER_LIST playerListPkt;
 
     for (auto& p : _players)
@@ -64,7 +158,7 @@ void Room::Enter(PlayerRef player)
 	BroadcastExcept(newPlayerBuffer, player->playerId);
 }
 
-void Room::Leave(PlayerRef player)
+void Room::LeaveGame(PlayerRef player)
 {
 	WRITE_LOCK;
 	_players.erase(player->playerId);

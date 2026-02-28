@@ -204,6 +204,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
     </ClCompile>
     <ClCompile Include="ClientPacketHandler.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="RoomManager.cpp" />
     <ClCompile Include="Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -221,6 +222,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
     <ClInclude Include="Protocol.pb.h" />
     <ClInclude Include="ClientPacketHandler.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="RoomManager.h" />
     <ClInclude Include="Struct.pb.h" />
   </ItemGroup>
   <ItemGroup>

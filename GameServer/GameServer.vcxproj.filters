@@ -51,6 +51,9 @@
     <ClCompile Include="AccountDB.cpp">
       <Filter>DB</Filter>
     </ClCompile>
+    <ClCompile Include="RoomManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -82,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="AccountDB.h">
       <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomManager.h">
+      <Filter>GameContents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

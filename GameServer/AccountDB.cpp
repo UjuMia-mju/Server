@@ -39,7 +39,7 @@ bool AccountDB::ValidateAccount(const string& email, const string& password)
 	return result;
 }
 
-bool AccountDB::GetPlayerInfo(const string& email, OUT int32& playerId, OUT wstring& playerName)
+bool AccountDB::GetPlayerInfo(const string& email, OUT int32& playerId, OUT wstring& playerName, OUT int32& playerTag)
 {
 	DBConnection* dbConn = GDBConnectionPool->Pop();
 	if (dbConn == nullptr)

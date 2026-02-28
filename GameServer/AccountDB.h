@@ -12,5 +12,5 @@ class AccountDB
 {
 public: 
 	static bool ValidateAccount(const string& email, const string& password);
-	static bool GetPlayerInfo(const string& userId, OUT int32& playerId, OUT wstring& playerName);
+	static bool GetPlayerInfo(const string& userId, OUT int32& playerId, OUT wstring& playerName, OUT int32& playerTag);
 };
