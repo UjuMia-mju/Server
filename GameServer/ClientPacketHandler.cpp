@@ -94,7 +94,6 @@ bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pk
 		session->Send(sendBuffer);
 		return false;
 	}
-
 	// 이미 방에 있는지 체크
 	if (auto currentRoom = gameSession->_room.lock())
 	{
@@ -165,7 +164,71 @@ bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESP
 
 bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt)
 {
-	return false;
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+
+	// 방에 있는지 체크
+	auto room = gameSession->_room.lock();
+	if (!room)
+	{
+		std::cout << "Ready failed: Player not in a room" << endl;
+		return false;
+	}
+
+	// 준비 상태 변경
+	bool isReady = pkt.is_ready();
+	room->DoAsync(&Room::SetReady, gameSession->_player->playerId, isReady);
+
+	std::cout << "Player " << gameSession->_player->name
+		<< (isReady ? " is ready" : " cancelled ready") << endl;
+
+	return true;
+}
+
+bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
+{
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+
+	// 방에 있는지 체크
+	auto room = gameSession->_room.lock();
+	if (!room)
+	{
+		std::cout << "Start room failed: Player not in a room" << endl;
+		return false;
+	}
+
+	// 방장인지 확인
+	if (room->GetOwnerId() != gameSession->_player->playerId)
+	{
+		std::cout << "Start room failed: Only room owner can start game" << endl;
+
+		Protocol::S_START_ROOM startRoomPkt;
+		startRoomPkt.set_success(false);
+		startRoomPkt.set_error_msg("Only room owner can start game");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startRoomPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 모두 준비되었는지 확인
+	if (!room->CanStartGame())
+	{
+		std::cout << "Start room failed: Not all players are ready" << endl;
+
+		Protocol::S_START_ROOM startRoomPkt;
+		startRoomPkt.set_success(false);
+		startRoomPkt.set_error_msg("Not all players are ready");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startRoomPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 게임 시작
+	room->DoAsync(&Room::StartGame);
+
+	std::cout << "Room " << room->GetRoomId() << " game started by "
+		<< gameSession->_player->name << endl;
+
+	return true;
 }
 
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
@@ -173,7 +236,7 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
 
 	gameSession->_room = GRoom;
-	GRoom->DoAsync(&Room::Enter, gameSession->_player);
+	GRoom->DoAsync(&Room::EnterGame, gameSession->_player);
 
 	Protocol::S_ENTER_GAME enterGamePkt;
 	enterGamePkt.set_success(true);

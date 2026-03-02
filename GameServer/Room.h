@@ -13,9 +13,12 @@ public:
 	void LeaveLobby(PlayerRef player);      // 방 퇴장
 	void SetReady(uint64 playerId, bool isReady);  // 준비 상태
 	bool CanStartGame();
-
-	// ========== 게임 플레이 관련 ==========
 	void StartGame();                       // 게임 시작
+	
+	// ========== 게임 시작 후, 스테이지 진행 관련 ==========
+
+
+	// ========== 게임 플레이 관련(실제 이동하는 씬) ==========
 	void EnterGame(PlayerRef player);       // 게임 입장 (위치 동기화)
 	void LeaveGame(PlayerRef player);       // 게임 퇴장
 

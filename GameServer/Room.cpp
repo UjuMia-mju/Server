@@ -93,11 +93,38 @@ void Room::SetReady(uint64 playerId, bool isReady)
 
 bool Room::CanStartGame()
 {
-	return false;
+	READ_LOCK;
+
+	for (auto& pair : _readyStatus)
+	{
+		// 한 명이라도 준비 안하면 false
+		if (!pair.second)  
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void Room::StartGame()
 {
+	WRITE_LOCK;
+
+	// 이미 게임 중이면 무시
+	if (_isPlaying)
+	{
+		std::cout << "Cannot start game: Already playing" << endl;
+		return;
+	}
+	// 게임 시작 알림 브로드캐스트
+	Protocol::S_START_ROOM gameStartPkt;
+	gameStartPkt.set_success(true);
+	_isPlaying = true;
+	std::cout << "Game started in room " << _roomId << endl;
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(gameStartPkt);
+	Broadcast(sendBuffer);
 }
 
 void Room::EnterGame(PlayerRef player)
