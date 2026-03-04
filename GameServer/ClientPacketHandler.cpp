@@ -310,3 +310,23 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 
 	return true;
 }
+
+bool Handle_C_ANIMATION(PacketSessionRef& session, Protocol::C_ANIMATION& pkt)
+{
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+
+	gameSession->_player->animState = pkt.state();
+	Protocol::S_ANIMATION animPkt;
+	animPkt.set_playerid(gameSession->_player->playerId);
+	animPkt.set_state(pkt.state());
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(animPkt);
+	auto roomPtr = gameSession->_room.lock();
+
+	if (roomPtr != nullptr)
+	{
+		roomPtr->DoAsync(&Room::Broadcast, sendBuffer);
+	}
+
+	return true;
+}

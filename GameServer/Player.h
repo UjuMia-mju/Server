@@ -9,6 +9,9 @@ public:
 	string name;
     int32 tag;
 
+	// 애니메이션 상태
+    int32 animState = 0;
+
     // 위치 정보
     float posX = 0.0f;
     float posY = 0.0f;

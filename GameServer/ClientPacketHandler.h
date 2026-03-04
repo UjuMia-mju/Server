@@ -36,6 +36,8 @@ enum : uint16
 	PKT_S_PLAYER_LIST = 1027,
 	PKT_S_PLAYER_ENTER = 1028,
 	PKT_S_PLAYER_LEAVE = 1029,
+	PKT_C_ANIMATION = 1030,
+	PKT_S_ANIMATION = 1031,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -56,6 +58,7 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt);
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
 bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt);
+bool Handle_C_ANIMATION(PacketSessionRef& session, Protocol::C_ANIMATION& pkt);
 
 
 class ClientPacketHandler
@@ -114,6 +117,10 @@ public:
 		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::C_MOVE>(Handle_C_MOVE, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_ANIMATION] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_ANIMATION>(Handle_C_ANIMATION, session, buffer, len);
 		};
 	}
 
@@ -211,6 +218,11 @@ public:
 	{
 
 		return MakeSendBuffer(pkt, PKT_S_PLAYER_LEAVE);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_ANIMATION& pkt)
+	{
+
+		return MakeSendBuffer(pkt, PKT_S_ANIMATION);
 	}
 	
 private:

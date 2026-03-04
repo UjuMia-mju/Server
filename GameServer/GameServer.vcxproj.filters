@@ -54,6 +54,9 @@
     <ClCompile Include="RoomManager.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
+    <ClCompile Include="InviteManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -87,6 +90,9 @@
       <Filter>DB</Filter>
     </ClInclude>
     <ClInclude Include="RoomManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="InviteManager.h">
       <Filter>GameContents</Filter>
     </ClInclude>
   </ItemGroup>

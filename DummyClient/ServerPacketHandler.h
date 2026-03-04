@@ -36,6 +36,8 @@ enum : uint16
 	PKT_S_PLAYER_LIST = 1027,
 	PKT_S_PLAYER_ENTER = 1028,
 	PKT_S_PLAYER_LEAVE = 1029,
+	PKT_C_ANIMATION = 1030,
+	PKT_S_ANIMATION = 1031,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -62,6 +64,7 @@ bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
 bool Handle_S_PLAYER_LIST(PacketSessionRef& session, Protocol::S_PLAYER_LIST& pkt);
 bool Handle_S_PLAYER_ENTER(PacketSessionRef& session, Protocol::S_PLAYER_ENTER& pkt);
 bool Handle_S_PLAYER_LEAVE(PacketSessionRef& session, Protocol::S_PLAYER_LEAVE& pkt);
+bool Handle_S_ANIMATION(PacketSessionRef& session, Protocol::S_ANIMATION& pkt);
 
 
 class ServerPacketHandler
@@ -145,6 +148,10 @@ public:
 		{
 			return HandlePacket<Protocol::S_PLAYER_LEAVE>(Handle_S_PLAYER_LEAVE, session, buffer, len);
 		};
+		GPacketHandler[PKT_S_ANIMATION] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_ANIMATION>(Handle_S_ANIMATION, session, buffer, len);
+		};
 	}
 
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
@@ -211,6 +218,11 @@ public:
 	{
 
 		return MakeSendBuffer(pkt, PKT_C_MOVE);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::C_ANIMATION& pkt)
+	{
+
+		return MakeSendBuffer(pkt, PKT_C_ANIMATION);
 	}
 	
 private:
