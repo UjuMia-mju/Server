@@ -64,6 +64,9 @@ extern RoomMemberInfoDefaultTypeInternal _RoomMemberInfo_default_instance_;
 class RotInfo;
 struct RotInfoDefaultTypeInternal;
 extern RotInfoDefaultTypeInternal _RotInfo_default_instance_;
+class StageInfo;
+struct StageInfoDefaultTypeInternal;
+extern StageInfoDefaultTypeInternal _StageInfo_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
 template<> ::Protocol::Player* Arena::CreateMaybeMessage<::Protocol::Player>(Arena*);
@@ -72,6 +75,7 @@ template<> ::Protocol::PosInfo* Arena::CreateMaybeMessage<::Protocol::PosInfo>(A
 template<> ::Protocol::RoomInfo* Arena::CreateMaybeMessage<::Protocol::RoomInfo>(Arena*);
 template<> ::Protocol::RoomMemberInfo* Arena::CreateMaybeMessage<::Protocol::RoomMemberInfo>(Arena*);
 template<> ::Protocol::RotInfo* Arena::CreateMaybeMessage<::Protocol::RotInfo>(Arena*);
+template<> ::Protocol::StageInfo* Arena::CreateMaybeMessage<::Protocol::StageInfo>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
 
@@ -1190,6 +1194,208 @@ class RoomMemberInfo final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Struct_2eproto;
 };
+// -------------------------------------------------------------------
+
+class StageInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.StageInfo) */ {
+ public:
+  inline StageInfo() : StageInfo(nullptr) {}
+  ~StageInfo() override;
+  explicit PROTOBUF_CONSTEXPR StageInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  StageInfo(const StageInfo& from);
+  StageInfo(StageInfo&& from) noexcept
+    : StageInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline StageInfo& operator=(const StageInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline StageInfo& operator=(StageInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const StageInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const StageInfo* internal_default_instance() {
+    return reinterpret_cast<const StageInfo*>(
+               &_StageInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(StageInfo& a, StageInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(StageInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(StageInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  StageInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<StageInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const StageInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const StageInfo& from) {
+    StageInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(StageInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.StageInfo";
+  }
+  protected:
+  explicit StageInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kStageNameFieldNumber = 3,
+    kDescriptionFieldNumber = 4,
+    kStageLevelFieldNumber = 1,
+    kStageIndexFieldNumber = 2,
+    kDifficultyFieldNumber = 5,
+  };
+  // string stage_name = 3;
+  void clear_stage_name();
+  const std::string& stage_name() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_stage_name(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_stage_name();
+  PROTOBUF_NODISCARD std::string* release_stage_name();
+  void set_allocated_stage_name(std::string* stage_name);
+  private:
+  const std::string& _internal_stage_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_stage_name(const std::string& value);
+  std::string* _internal_mutable_stage_name();
+  public:
+
+  // string description = 4;
+  void clear_description();
+  const std::string& description() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_description(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_description();
+  PROTOBUF_NODISCARD std::string* release_description();
+  void set_allocated_description(std::string* description);
+  private:
+  const std::string& _internal_description() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_description(const std::string& value);
+  std::string* _internal_mutable_description();
+  public:
+
+  // int32 stage_level = 1;
+  void clear_stage_level();
+  int32_t stage_level() const;
+  void set_stage_level(int32_t value);
+  private:
+  int32_t _internal_stage_level() const;
+  void _internal_set_stage_level(int32_t value);
+  public:
+
+  // int32 stage_index = 2;
+  void clear_stage_index();
+  int32_t stage_index() const;
+  void set_stage_index(int32_t value);
+  private:
+  int32_t _internal_stage_index() const;
+  void _internal_set_stage_index(int32_t value);
+  public:
+
+  // int32 difficulty = 5;
+  void clear_difficulty();
+  int32_t difficulty() const;
+  void set_difficulty(int32_t value);
+  private:
+  int32_t _internal_difficulty() const;
+  void _internal_set_difficulty(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.StageInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr stage_name_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr description_;
+    int32_t stage_level_;
+    int32_t stage_index_;
+    int32_t difficulty_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
 // ===================================================================
 
 
@@ -2031,9 +2237,175 @@ inline void RoomMemberInfo::set_is_ready(bool value) {
   // @@protoc_insertion_point(field_set:Protocol.RoomMemberInfo.is_ready)
 }
 
+// -------------------------------------------------------------------
+
+// StageInfo
+
+// int32 stage_level = 1;
+inline void StageInfo::clear_stage_level() {
+  _impl_.stage_level_ = 0;
+}
+inline int32_t StageInfo::_internal_stage_level() const {
+  return _impl_.stage_level_;
+}
+inline int32_t StageInfo::stage_level() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.stage_level)
+  return _internal_stage_level();
+}
+inline void StageInfo::_internal_set_stage_level(int32_t value) {
+  
+  _impl_.stage_level_ = value;
+}
+inline void StageInfo::set_stage_level(int32_t value) {
+  _internal_set_stage_level(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.stage_level)
+}
+
+// int32 stage_index = 2;
+inline void StageInfo::clear_stage_index() {
+  _impl_.stage_index_ = 0;
+}
+inline int32_t StageInfo::_internal_stage_index() const {
+  return _impl_.stage_index_;
+}
+inline int32_t StageInfo::stage_index() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.stage_index)
+  return _internal_stage_index();
+}
+inline void StageInfo::_internal_set_stage_index(int32_t value) {
+  
+  _impl_.stage_index_ = value;
+}
+inline void StageInfo::set_stage_index(int32_t value) {
+  _internal_set_stage_index(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.stage_index)
+}
+
+// string stage_name = 3;
+inline void StageInfo::clear_stage_name() {
+  _impl_.stage_name_.ClearToEmpty();
+}
+inline const std::string& StageInfo::stage_name() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.stage_name)
+  return _internal_stage_name();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void StageInfo::set_stage_name(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.stage_name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.stage_name)
+}
+inline std::string* StageInfo::mutable_stage_name() {
+  std::string* _s = _internal_mutable_stage_name();
+  // @@protoc_insertion_point(field_mutable:Protocol.StageInfo.stage_name)
+  return _s;
+}
+inline const std::string& StageInfo::_internal_stage_name() const {
+  return _impl_.stage_name_.Get();
+}
+inline void StageInfo::_internal_set_stage_name(const std::string& value) {
+  
+  _impl_.stage_name_.Set(value, GetArenaForAllocation());
+}
+inline std::string* StageInfo::_internal_mutable_stage_name() {
+  
+  return _impl_.stage_name_.Mutable(GetArenaForAllocation());
+}
+inline std::string* StageInfo::release_stage_name() {
+  // @@protoc_insertion_point(field_release:Protocol.StageInfo.stage_name)
+  return _impl_.stage_name_.Release();
+}
+inline void StageInfo::set_allocated_stage_name(std::string* stage_name) {
+  if (stage_name != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.stage_name_.SetAllocated(stage_name, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.stage_name_.IsDefault()) {
+    _impl_.stage_name_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.StageInfo.stage_name)
+}
+
+// string description = 4;
+inline void StageInfo::clear_description() {
+  _impl_.description_.ClearToEmpty();
+}
+inline const std::string& StageInfo::description() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.description)
+  return _internal_description();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void StageInfo::set_description(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.description_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.description)
+}
+inline std::string* StageInfo::mutable_description() {
+  std::string* _s = _internal_mutable_description();
+  // @@protoc_insertion_point(field_mutable:Protocol.StageInfo.description)
+  return _s;
+}
+inline const std::string& StageInfo::_internal_description() const {
+  return _impl_.description_.Get();
+}
+inline void StageInfo::_internal_set_description(const std::string& value) {
+  
+  _impl_.description_.Set(value, GetArenaForAllocation());
+}
+inline std::string* StageInfo::_internal_mutable_description() {
+  
+  return _impl_.description_.Mutable(GetArenaForAllocation());
+}
+inline std::string* StageInfo::release_description() {
+  // @@protoc_insertion_point(field_release:Protocol.StageInfo.description)
+  return _impl_.description_.Release();
+}
+inline void StageInfo::set_allocated_description(std::string* description) {
+  if (description != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.description_.SetAllocated(description, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.description_.IsDefault()) {
+    _impl_.description_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.StageInfo.description)
+}
+
+// int32 difficulty = 5;
+inline void StageInfo::clear_difficulty() {
+  _impl_.difficulty_ = 0;
+}
+inline int32_t StageInfo::_internal_difficulty() const {
+  return _impl_.difficulty_;
+}
+inline int32_t StageInfo::difficulty() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.difficulty)
+  return _internal_difficulty();
+}
+inline void StageInfo::_internal_set_difficulty(int32_t value) {
+  
+  _impl_.difficulty_ = value;
+}
+inline void StageInfo::set_difficulty(int32_t value) {
+  _internal_set_difficulty(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.difficulty)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

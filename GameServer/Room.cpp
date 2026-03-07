@@ -4,7 +4,7 @@
 #include "GameSession.h"
 #include "ClientPacketHandler.h"
 
-shared_ptr<Room> GRoom = make_shared<Room>();
+RoomRef GTestRoom = nullptr;
 
 Room::Room(uint64 roomId, const string& roomName, uint64 ownerId)
 	: _roomId(roomId), _roomName(roomName), _ownerId(ownerId)
@@ -225,4 +225,10 @@ void Room::BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId)
 			session->Send(sendBuffer);
 		}
 	}
+}
+
+RoomRef GetGlobalTestRoom()
+{
+	static shared_ptr<Room> instance = make_shared<Room>(999999, "Global Test Room", 0);
+	return instance;
 }

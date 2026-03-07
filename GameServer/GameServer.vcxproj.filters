@@ -57,6 +57,9 @@
     <ClCompile Include="InviteManager.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
+    <ClCompile Include="AuthValidator.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -94,6 +97,12 @@
     </ClInclude>
     <ClInclude Include="InviteManager.h">
       <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthValidator.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketResult.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

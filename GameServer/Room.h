@@ -1,7 +1,7 @@
 #pragma once
 #include "JobQueue.h"
 
-class Room : public JobQueue, public enable_shared_from_this<Room>
+class Room : public JobQueue
 {
 public:
 	Room() = default;
@@ -46,4 +46,4 @@ private:
 	unordered_map<uint64, bool> _readyStatus;
 };
 
-extern shared_ptr<Room> GRoom;
+RoomRef GetGlobalTestRoom();

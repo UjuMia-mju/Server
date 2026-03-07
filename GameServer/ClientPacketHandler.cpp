@@ -5,8 +5,60 @@
 #include "RoomManager.h"
 #include "GameSession.h"
 #include "AccountDB.h"
+#include "AuthValidator.h"
 
 PacketHandleFunc GPacketHandler[UINT16_MAX];
+
+namespace
+{
+	void SendErrorResponse(PacketSessionRef& session, const PacketResult& result)
+	{
+		// 패킷 타입별 에러 응답 (함수 오버로딩으로 처리)
+	}
+
+	void SendCreateRoomError(PacketSessionRef& session, const std::string& errorMsg)
+	{
+		Protocol::S_CREATE_ROOM errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_error_msg(errorMsg);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+	}
+
+	void SendStartRoomError(PacketSessionRef& session, const std::string& errorMsg)
+	{
+		Protocol::S_START_ROOM errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_error_msg(errorMsg);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+	}
+
+	void SendEnterGameError(PacketSessionRef& session, const std::string& errorMsg)
+	{
+		Protocol::S_ENTER_GAME errorPkt;
+		errorPkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+	}
+}
+
+#define CHECK_AUTH_LOGIN(session, ErrorSender) \
+    GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session); \
+    PacketResult authResult = AuthValidator::ValidateAuth(gameSession, AuthLevel::LOGGED_IN); \
+    if (!authResult.IsSuccess()) { \
+        ErrorSender(session, authResult.GetMessage()); \
+        return false; \
+    }
+
+#define CHECK_AUTH_ROOM(session, room, ErrorSender) \
+    GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session); \
+    PacketResult authResult; \
+    auto room = AuthValidator::GetRoomIfValid(gameSession, &authResult); \
+    if (!room) { \
+        ErrorSender(session, authResult.GetMessage()); \
+        return false; \
+    }
 
 // 컨텐츠는 직접 개발
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
@@ -80,30 +132,13 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 
 bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
-	
-	// 로그인 체크
-	if (gameSession->_player == nullptr)
-	{
-		std::cout << "Create room failed: Player not logged in" << endl;
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
 
-		Protocol::S_CREATE_ROOM createRoomPkt;
-		createRoomPkt.set_success(false);
-		createRoomPkt.set_error_msg("Not logged in");
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(createRoomPkt);
-		session->Send(sendBuffer);
-		return false;
-	}
 	// 이미 방에 있는지 체크
 	if (auto currentRoom = gameSession->_room.lock())
 	{
 		std::cout << "Create room failed: Already in a room" << endl;
-
-		Protocol::S_CREATE_ROOM createRoomPkt;
-		createRoomPkt.set_success(false);
-		createRoomPkt.set_error_msg("Already in a room");
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(createRoomPkt);
-		session->Send(sendBuffer);
+		SendCreateRoomError(session, "Already in a room");
 		return false;
 	}
 
@@ -164,15 +199,7 @@ bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESP
 
 bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
-
-	// 방에 있는지 체크
-	auto room = gameSession->_room.lock();
-	if (!room)
-	{
-		std::cout << "Ready failed: Player not in a room" << endl;
-		return false;
-	}
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
 
 	// 준비 상태 변경
 	bool isReady = pkt.is_ready();
@@ -186,26 +213,14 @@ bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt)
 
 bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
-
 	// 방에 있는지 체크
-	auto room = gameSession->_room.lock();
-	if (!room)
-	{
-		std::cout << "Start room failed: Player not in a room" << endl;
-		return false;
-	}
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
 
 	// 방장인지 확인
 	if (room->GetOwnerId() != gameSession->_player->playerId)
 	{
-		std::cout << "Start room failed: Only room owner can start game" << endl;
-
-		Protocol::S_START_ROOM startRoomPkt;
-		startRoomPkt.set_success(false);
-		startRoomPkt.set_error_msg("Only room owner can start game");
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startRoomPkt);
-		session->Send(sendBuffer);
+		std::cout << "Start room failed: Only room owner" << endl;
+		SendStartRoomError(session, "Only room owner can start game");
 		return false;
 	}
 
@@ -213,12 +228,7 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 	if (!room->CanStartGame())
 	{
 		std::cout << "Start room failed: Not all players are ready" << endl;
-
-		Protocol::S_START_ROOM startRoomPkt;
-		startRoomPkt.set_success(false);
-		startRoomPkt.set_error_msg("Not all players are ready");
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startRoomPkt);
-		session->Send(sendBuffer);
+		SendStartRoomError(session, "Not all players are ready");
 		return false;
 	}
 
@@ -235,8 +245,22 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 {
 	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
 
-	gameSession->_room = GRoom;
-	GRoom->DoAsync(&Room::EnterGame, gameSession->_player);
+	// ------
+	//auto room = gameSession->_room.lock();
+
+	auto room = GetGlobalTestRoom(); // 테스트용 임시 코드
+	gameSession->_room = room; // 테스트용 임시 코드
+
+	// ------
+
+	if (!room)
+	{
+		std::cout << "Enter game failed: Room not available" << endl;
+		SendEnterGameError(session, "Room not available");
+		return false;
+	}
+
+	room->DoAsync(&Room::EnterGame, gameSession->_player);
 
 	Protocol::S_ENTER_GAME enterGamePkt;
 	enterGamePkt.set_success(true);
@@ -246,15 +270,28 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 	return true;
 }
 
+bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt)
+{
+	return false;
+}
+
+bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt)
+{
+	return false;
+}
+
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
+	// 방에 있는지 체크
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
 	std::cout << pkt.msg() << endl;
 
 	Protocol::S_CHAT chatPkt;
 	chatPkt.set_msg(pkt.msg());
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(chatPkt);
 
-	GRoom->DoAsync(&Room::Broadcast, sendBuffer);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
 
 	return true;
 }
