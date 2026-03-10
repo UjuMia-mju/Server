@@ -8,35 +8,33 @@
 
 bool AccountDB::ValidateAccount(const string& email, const string& password)
 {
-	DBConnection* dbConn = GDBConnectionPool->Pop();
-	if (dbConn == nullptr)
+	DBConnectionGuard guard(GDBConnectionPool);
+	if (!guard)
+	{
 		return false;
+	}
 
 	// UTF-8 -> UTF-16 변환
 	wstring wUserId(email.begin(), email.end());
 	wstring wPassword(password.begin(), password.end());
 
 	// 파라미터 2개, 결과 컬럼 1개
-	DBBind<2, 1> dbBind(*dbConn, L"SELECT COUNT(*) FROM users WHERE email = ? AND password = ?");
+	DBBind<2, 1> dbBind(guard, L"SELECT COUNT(*) FROM users WHERE email = ? AND password = ?");
 
 	int32 count = 0;
 	dbBind.BindParam(0, wUserId.c_str());
 	dbBind.BindParam(1, wPassword.c_str());
 	dbBind.BindCol(0, count);
 
-	bool result = false;
 	if (dbBind.Execute())
 	{
-		if (dbConn->Fetch())
+		if (guard->Fetch())
 		{
-			result = (count > 0);
+			return count > 0;
 		}
 	}
 
-	dbConn->Unbind();
-	GDBConnectionPool->Push(dbConn);
-
-	return result;
+	return false;
 }
 
 bool AccountDB::GetPlayerInfo(const string& email, OUT int32& playerId, OUT wstring& playerName, OUT int32& playerTag)

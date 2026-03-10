@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "InviteManager.h"
 #include "GameSession.h"
+#include "GameSessionManager.h"
 #include "ClientPacketHandler.h"
 #include "RoomManager.h"
 #include "Room.h"
@@ -8,16 +9,18 @@
 
 GameSessionRef InviteManager::FindPlayerByNameTag(const string& name, int32 targetTag)
 {
-	WRITE_LOCK;
+	GameSessionRef session = GSessionManager.FindPlayerByNameTag(name, targetTag);	
 
-	// TODO: 전역 세션 관리자 구현 필요
-	// 현재는 임시로 nullptr 반환
-	// 실제로는 SessionManager::Instance().FindSession(name, tag) 같은 방식으로 구현
+	if (session)
+	{
+		std::cout << "[InviteManager] Found player: " << name << "#" << targetTag << endl;
+	}
+	else
+	{
+		std::cout << "[InviteManager] Player not found: " << name << "#" << targetTag << endl;
+	}
 
-	std::cout << "[InviteManager] FindPlayerByNameTag not fully implemented yet" << endl;
-	std::cout << "  Looking for: " << name << "#" << targetTag << endl;
-
-	return nullptr;
+	return session;
 }
 
 uint64 InviteManager::CreateInvite(uint64 roomId, const string& roomName,

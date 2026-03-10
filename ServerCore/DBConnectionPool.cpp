@@ -10,10 +10,18 @@ DBConnectionPool::~DBConnectionPool()
 	Clear();
 }
 
-bool DBConnectionPool::Connect(int32 connectionCount, const WCHAR* connString)
+bool DBConnectionPool::Connect(int32 maxConnections, const WCHAR* connString)
 {
 	WRITE_LOCK;
 
+	// 이미 초기화된 경우
+	if (_initialized)
+	{
+		cout << "DBConnectionPool already initialized!" << endl;
+		return false;
+	}
+
+	// ODBC 환경 핸들 생성
 	if (::SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &_env) != SQL_SUCCESS)
 	{
 		cout << "SQLAllocHandle ENV FAILED" << endl;
@@ -26,18 +34,21 @@ bool DBConnectionPool::Connect(int32 connectionCount, const WCHAR* connString)
 		return false;
 	}
 
-	for (int32 i = 0; i < connectionCount; i++)
+	_maxConnections = maxConnections;
+
+	// 최소 개수만큼 미리 생성
+	_connections.reserve(_maxConnections);
+
+	for (int32 i = 0; i < _maxConnections; i++)
 	{
 		DBConnection* connection = xnew<DBConnection>();
 		if (connection->Connect(_env, connString) == false)
 		{
 			return false;
 		}
-
 		_connections.push_back(connection);
 	}
-
-	cout << "DBConnectionPool Connected. Count : " << connectionCount << endl;
+	cout << "DBConnectionPool Connected. Count : " << maxConnections << endl;
 	return true;
 }
 
@@ -58,10 +69,14 @@ void DBConnectionPool::Clear()
 	}
 
 	_connections.clear();
+	_initialized = false;
 }
 
-DBConnection* DBConnectionPool::Pop()
+DBConnection* DBConnectionPool::Pop(uint32 timeoutMs)
 {
+	const uint64 startTime = ::GetTickCount64();
+
+
 	WRITE_LOCK;
 
 	if (_connections.empty())

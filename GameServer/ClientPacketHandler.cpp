@@ -106,6 +106,7 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 			PlayerRef playerRef = MakeShared<Player>();
 			playerRef->name = player->name();
 			playerRef->playerId = player->id();
+			playerRef->tag = player->tag();
 			playerRef->ownerSession = gameSession;
 
 			gameSession->_player = playerRef;
@@ -150,15 +151,18 @@ bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pk
 	RoomRef newRoom = RoomManager::Instance().CreateRoom(hostId, hostName, hostTag);
 	
 	gameSession->_room = newRoom;
-	//newRoom->DoAsync(&Room::Enter, gameSession->_player);
+	newRoom->DoAsync(&Room::EnterLobby, gameSession->_player);
 
 	// 패킷 만들기
 	Protocol::S_CREATE_ROOM createRoomPkt;
+	createRoomPkt.set_success(true);
+	
 	Protocol::RoomInfo* roomInfo = createRoomPkt.mutable_room();
 	roomInfo->set_room_id(newRoom->GetRoomId());
 	roomInfo->set_current_count(1);
 	roomInfo->set_max_count(4);
 	roomInfo->set_is_playing(false);
+	
 
 	// host 정보 세팅
 	Protocol::Player* host = roomInfo->mutable_host();
@@ -208,6 +212,7 @@ bool Handle_C_INVITE_PLAYER(PacketSessionRef& session, Protocol::C_INVITE_PLAYER
 	}
 
 	// 방장인지 확인
+	std::cout << "room->GetOwnerId() : " << room->GetOwnerId() << "playerId : " << gameSession->_player->playerId << endl;
 	if (room->GetOwnerId() != gameSession->_player->playerId)
 	{
 		std::cout << "Invite failed: Only room owner can invite" << endl;
@@ -349,10 +354,11 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
 
 	// ------
-	//auto room = gameSession->_room.lock();
+	auto room = gameSession->_room.lock();
 
-	auto room = GetGlobalTestRoom(); // 테스트용 임시 코드
-	gameSession->_room = room; // 테스트용 임시 코드
+
+	//auto room = GetGlobalTestRoom(); // 테스트용 임시 코드
+	//gameSession->_room = room; // 테스트용 임시 코드
 
 	// ------
 

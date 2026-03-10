@@ -4,7 +4,6 @@
 class Room : public JobQueue
 {
 public:
-	Room() = default;
 	Room(uint64 roomId, const string& roomName, uint64 ownerId);
 	~Room();
 

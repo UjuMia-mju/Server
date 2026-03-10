@@ -107,10 +107,10 @@ int main()
 			cout << "[Step 1] Both players logged in successfully!\n" << endl;
 
 			// 2. Player1 방 생성
-			cout << "[Step 2] Player1 creating room..." << endl;
+			cout << "[Step 2 - 1] Player1 creating room..." << endl;
 			player1Session->SendCreateRoom();
 			this_thread::sleep_for(2s); // 방 생성 대기
-			cout << "[Step 2] Room created!\n" << endl;
+			cout << "[Step 2 - 2] Room created!\n" << endl;
 
 			// 3. Player1이 Player2 초대
 			cout << "[Step 3] Player1 inviting Player2..." << endl;
@@ -122,7 +122,15 @@ int main()
 				player2Session->GetPlayerTag()
 			);
 			this_thread::sleep_for(2s); // 초대 처리 대기
-			cout << "[Step 3] Invitation sent!\n" << endl;
+			cout << "[Step 3] Invitation success!\n" << endl;
+
+			cout << "[Step 4] 방 참여자 전체 목록 보기\n" << endl;
+
+			cout << "[Step 5] player1과 player2가 둘다 ready상태로 바꿈\n" << endl;
+
+			cout << "[Step 6] 방장(player1)이 게임 시작\n" << endl;
+
+			cout << "[Step 7] 둘다 같은 스테이지 정보 받는지 확인.\n" << endl;
 
 			cout << "\n========== Test Scenario Complete ==========\n" << endl;
 		});

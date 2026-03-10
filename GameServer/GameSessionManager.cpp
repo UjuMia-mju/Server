@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GameSessionManager.h"
 #include "GameSession.h"
+#include "Player.h"
 
 GameSessionManager GSessionManager;
 
@@ -16,11 +17,28 @@ void GameSessionManager::Remove(GameSessionRef session)
 	_sessions.erase(session);
 }
 
-void GameSessionManager::Brodcast(SendBufferRef sendBuffer)
+void GameSessionManager::Broadcast(SendBufferRef sendBuffer)
 {
 	WRITE_LOCK;
-	for (GameSessionRef sessoin : _sessions)
+	for (GameSessionRef session : _sessions)
 	{
-		sessoin->Send(sendBuffer);
+		session->Send(sendBuffer);
 	}
+}
+
+GameSessionRef GameSessionManager::FindPlayerByNameTag(const string& name, int32 tag)
+{
+	READ_LOCK;
+
+	for (const auto& session : _sessions)
+	{
+		if (session->_player &&
+			session->_player->name == name &&
+			session->_player->tag == tag)
+		{
+			return session;
+		}
+	}
+
+	return nullptr;
 }
