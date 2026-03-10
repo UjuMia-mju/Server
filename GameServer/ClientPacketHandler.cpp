@@ -6,6 +6,7 @@
 #include "GameSession.h"
 #include "AccountDB.h"
 #include "AuthValidator.h"
+#include "InviteManager.h"
 
 PacketHandleFunc GPacketHandler[UINT16_MAX];
 
@@ -189,12 +190,114 @@ bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
 
 bool Handle_C_INVITE_PLAYER(PacketSessionRef& session, Protocol::C_INVITE_PLAYER& pkt)
 {
-	return false;
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
+
+	// 방에 있는지 체크
+	auto room = gameSession->_room.lock();
+	if (!room)
+	{
+		std::cout << "Invite failed: Not in a room" << endl;
+		Protocol::S_INVITE_PLAYER errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_player_name(pkt.player_name());
+		errorPkt.set_player_tag(pkt.player_tag());
+		errorPkt.set_error_msg("Not in a room");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 방장인지 확인
+	if (room->GetOwnerId() != gameSession->_player->playerId)
+	{
+		std::cout << "Invite failed: Only room owner can invite" << endl;
+		Protocol::S_INVITE_PLAYER errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_player_name(pkt.player_name());
+		errorPkt.set_player_tag(pkt.player_tag());
+		errorPkt.set_error_msg("Only room owner can invite");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	string targetName = pkt.player_name();
+	int32 targetTag = pkt.player_tag();
+
+	std::cout << "Invite request from " << gameSession->_player->name
+		<< " to " << targetName << "#" << targetTag << endl;
+
+	// InviteManager를 통해 초대 생성 및 전송
+	uint64 inviteId = InviteManager::Instance().CreateInvite(
+		room->GetRoomId(),
+		room->GetRoomName(),
+		gameSession->_player->playerId,
+		gameSession->_player->name,
+		targetName,
+		targetTag
+	);
+
+	Protocol::S_INVITE_PLAYER responsePkt;
+
+	if (inviteId == 0)
+	{
+		// 초대 실패
+		responsePkt.set_success(false);
+		responsePkt.set_player_name(targetName);
+		responsePkt.set_player_tag(targetTag);
+		responsePkt.set_error_msg("Player not found or already in room");
+		std::cout << "Invite failed: Target not found or busy" << endl;
+	}
+	else
+	{
+		// 초대 성공
+		responsePkt.set_success(true);
+		responsePkt.set_player_name(targetName);
+		responsePkt.set_player_tag(targetTag);
+		std::cout << "Invite sent successfully - Invite ID: " << inviteId << endl;
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(responsePkt);
+	session->Send(sendBuffer);
+
+	return true;
 }
 
 bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESPONSE& pkt)
 {
-	return false;
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
+
+	uint64 inviteId = pkt.invite_id();
+	bool accept = pkt.accept();
+
+	std::cout << "Invite response from " << gameSession->_player->name
+		<< " - Invite ID: " << inviteId
+		<< ", Accept: " << (accept ? "Yes" : "No") << endl;
+
+	Protocol::S_INVITE_RESPONSE responsePkt;
+
+	if (accept)
+	{
+		// 초대 수락
+		bool success = InviteManager::Instance().AcceptInvite(inviteId, gameSession);
+		responsePkt.set_success(success);
+
+		if (!success)
+		{
+			responsePkt.set_error_msg("Failed to join room (invite expired or room full)");
+		}
+	}
+	else
+	{
+		// 초대 거절
+		InviteManager::Instance().DeclineInvite(inviteId);
+		responsePkt.set_success(true);
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(responsePkt);
+	session->Send(sendBuffer);
+
+	return true;
 }
 
 bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt)
@@ -278,6 +381,45 @@ bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt)
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt)
 {
 	return false;
+}
+
+bool Handle_C_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::C_GET_CLEAR_INFO& pkt)
+{
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
+
+	int32 playerId = gameSession->_player->playerId;
+
+	// DB에서 클리어 정보 조회
+	vector<StageClearData> clearDataList;
+	bool success = AccountDB::GetPlayerClearInfo(playerId, clearDataList);
+
+	Protocol::S_GET_CLEAR_INFO clearInfoPkt;
+	clearInfoPkt.set_success(success);
+
+	if (success)
+	{
+		// 클리어 정보를 패킷에 담기
+		for (const auto& clearData : clearDataList)
+		{
+			Protocol::StageClearInfo* clearInfo = clearInfoPkt.add_stage_clears();
+			clearInfo->set_stage(clearData.stage);
+			clearInfo->set_level(clearData.level);
+			clearInfo->set_star(clearData.star);
+			clearInfo->set_clear_time(clearData.clearTime);
+		}
+
+		std::cout << "Player " << gameSession->_player->name
+			<< " clear info loaded: " << clearDataList.size() << " records" << endl;
+	}
+	else
+	{
+		std::cout << "Failed to load clear info for player: " << playerId << endl;
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(clearInfoPkt);
+	session->Send(sendBuffer);
+
+	return true;
 }
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)

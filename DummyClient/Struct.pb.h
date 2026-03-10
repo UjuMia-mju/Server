@@ -64,6 +64,9 @@ extern RoomMemberInfoDefaultTypeInternal _RoomMemberInfo_default_instance_;
 class RotInfo;
 struct RotInfoDefaultTypeInternal;
 extern RotInfoDefaultTypeInternal _RotInfo_default_instance_;
+class StageClearInfo;
+struct StageClearInfoDefaultTypeInternal;
+extern StageClearInfoDefaultTypeInternal _StageClearInfo_default_instance_;
 class StageInfo;
 struct StageInfoDefaultTypeInternal;
 extern StageInfoDefaultTypeInternal _StageInfo_default_instance_;
@@ -75,6 +78,7 @@ template<> ::Protocol::PosInfo* Arena::CreateMaybeMessage<::Protocol::PosInfo>(A
 template<> ::Protocol::RoomInfo* Arena::CreateMaybeMessage<::Protocol::RoomInfo>(Arena*);
 template<> ::Protocol::RoomMemberInfo* Arena::CreateMaybeMessage<::Protocol::RoomMemberInfo>(Arena*);
 template<> ::Protocol::RotInfo* Arena::CreateMaybeMessage<::Protocol::RotInfo>(Arena*);
+template<> ::Protocol::StageClearInfo* Arena::CreateMaybeMessage<::Protocol::StageClearInfo>(Arena*);
 template<> ::Protocol::StageInfo* Arena::CreateMaybeMessage<::Protocol::StageInfo>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
@@ -1396,6 +1400,187 @@ class StageInfo final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Struct_2eproto;
 };
+// -------------------------------------------------------------------
+
+class StageClearInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.StageClearInfo) */ {
+ public:
+  inline StageClearInfo() : StageClearInfo(nullptr) {}
+  ~StageClearInfo() override;
+  explicit PROTOBUF_CONSTEXPR StageClearInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  StageClearInfo(const StageClearInfo& from);
+  StageClearInfo(StageClearInfo&& from) noexcept
+    : StageClearInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline StageClearInfo& operator=(const StageClearInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline StageClearInfo& operator=(StageClearInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const StageClearInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const StageClearInfo* internal_default_instance() {
+    return reinterpret_cast<const StageClearInfo*>(
+               &_StageClearInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(StageClearInfo& a, StageClearInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(StageClearInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(StageClearInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  StageClearInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<StageClearInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const StageClearInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const StageClearInfo& from) {
+    StageClearInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(StageClearInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.StageClearInfo";
+  }
+  protected:
+  explicit StageClearInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kStageFieldNumber = 1,
+    kLevelFieldNumber = 2,
+    kClearTimeFieldNumber = 4,
+    kStarFieldNumber = 3,
+  };
+  // int32 stage = 1;
+  void clear_stage();
+  int32_t stage() const;
+  void set_stage(int32_t value);
+  private:
+  int32_t _internal_stage() const;
+  void _internal_set_stage(int32_t value);
+  public:
+
+  // int32 level = 2;
+  void clear_level();
+  int32_t level() const;
+  void set_level(int32_t value);
+  private:
+  int32_t _internal_level() const;
+  void _internal_set_level(int32_t value);
+  public:
+
+  // int64 clear_time = 4;
+  void clear_clear_time();
+  int64_t clear_time() const;
+  void set_clear_time(int64_t value);
+  private:
+  int64_t _internal_clear_time() const;
+  void _internal_set_clear_time(int64_t value);
+  public:
+
+  // int32 star = 3;
+  void clear_star();
+  int32_t star() const;
+  void set_star(int32_t value);
+  private:
+  int32_t _internal_star() const;
+  void _internal_set_star(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.StageClearInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    int32_t stage_;
+    int32_t level_;
+    int64_t clear_time_;
+    int32_t star_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
 // ===================================================================
 
 
@@ -2401,9 +2586,95 @@ inline void StageInfo::set_difficulty(int32_t value) {
   // @@protoc_insertion_point(field_set:Protocol.StageInfo.difficulty)
 }
 
+// -------------------------------------------------------------------
+
+// StageClearInfo
+
+// int32 stage = 1;
+inline void StageClearInfo::clear_stage() {
+  _impl_.stage_ = 0;
+}
+inline int32_t StageClearInfo::_internal_stage() const {
+  return _impl_.stage_;
+}
+inline int32_t StageClearInfo::stage() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.stage)
+  return _internal_stage();
+}
+inline void StageClearInfo::_internal_set_stage(int32_t value) {
+  
+  _impl_.stage_ = value;
+}
+inline void StageClearInfo::set_stage(int32_t value) {
+  _internal_set_stage(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.stage)
+}
+
+// int32 level = 2;
+inline void StageClearInfo::clear_level() {
+  _impl_.level_ = 0;
+}
+inline int32_t StageClearInfo::_internal_level() const {
+  return _impl_.level_;
+}
+inline int32_t StageClearInfo::level() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.level)
+  return _internal_level();
+}
+inline void StageClearInfo::_internal_set_level(int32_t value) {
+  
+  _impl_.level_ = value;
+}
+inline void StageClearInfo::set_level(int32_t value) {
+  _internal_set_level(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.level)
+}
+
+// int32 star = 3;
+inline void StageClearInfo::clear_star() {
+  _impl_.star_ = 0;
+}
+inline int32_t StageClearInfo::_internal_star() const {
+  return _impl_.star_;
+}
+inline int32_t StageClearInfo::star() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.star)
+  return _internal_star();
+}
+inline void StageClearInfo::_internal_set_star(int32_t value) {
+  
+  _impl_.star_ = value;
+}
+inline void StageClearInfo::set_star(int32_t value) {
+  _internal_set_star(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.star)
+}
+
+// int64 clear_time = 4;
+inline void StageClearInfo::clear_clear_time() {
+  _impl_.clear_time_ = int64_t{0};
+}
+inline int64_t StageClearInfo::_internal_clear_time() const {
+  return _impl_.clear_time_;
+}
+inline int64_t StageClearInfo::clear_time() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.clear_time)
+  return _internal_clear_time();
+}
+inline void StageClearInfo::_internal_set_clear_time(int64_t value) {
+  
+  _impl_.clear_time_ = value;
+}
+inline void StageClearInfo::set_clear_time(int64_t value) {
+  _internal_set_clear_time(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.clear_time)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

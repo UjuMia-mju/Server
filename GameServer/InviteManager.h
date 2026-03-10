@@ -1,4 +1,5 @@
 #pragma once
+#include "GameSession.h"
 
 struct InviteInfo
 {
@@ -10,11 +11,10 @@ struct InviteInfo
     string inviterName;
     int32 inviterTag;
 
-    uint64 inviteeId;
     string inviteeName;
     int32 inviteeTag;
 
-    int64 expireTime;  // 만료 시간 (타임스탬프)
+    GameSessionRef targetSession;
 };
 
 class InviteManager
@@ -29,10 +29,20 @@ public:
         return instance;
     }
 
-    uint64 CreateInvite();
-    shared_ptr<InviteInfo> FindInvite(uint64 inviteId);
-    void RemoveInvite(uint64 inviteId);
-    void CleanupExpiredInvites();
+    // name + tag로 플레이어를 찾아서 초대 생성 및 알림 전송
+    uint64 CreateInvite(uint64 roomId, const string& roomName,
+        uint64 inviterId, const string& inviterName,
+        const string& targetName, int32 targetTag);
+
+    // 초대 수락 처리
+    bool AcceptInvite(uint64 inviteId, GameSessionRef accepter);
+
+    // 초대 거절 처리
+    bool DeclineInvite(uint64 inviteId);
+
+    // name + tag로 플레이어 세션 찾기
+    GameSessionRef FindPlayerByNameTag(const string& name, int32 targetTag);
+
 
 private:
     USE_LOCK;

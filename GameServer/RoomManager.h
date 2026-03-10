@@ -17,6 +17,8 @@ public:
 
 	uint64 GenerateRoomId();
 	RoomRef CreateRoom(uint64 hostPlayerId, const string& hostName, int32 hostTag);
+	RoomRef FindRoom(uint64 roomId);
+
 private:
 	USE_LOCK;
 	unordered_map<uint64, RoomRef> _rooms;

@@ -16,5 +16,6 @@ private:
 	USE_LOCK;
 	SQLHENV					_env = SQL_NULL_HANDLE;
 	xvector<DBConnection*>	_connections;
+	Atomic<int32>			_usedCount = 0; // 사용 중인 Connection 개수
 };
 

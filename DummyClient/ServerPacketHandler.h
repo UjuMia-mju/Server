@@ -35,13 +35,15 @@ enum : uint16
 	PKT_S_SHOW_STAGE = 1026,
 	PKT_C_START_STAGE = 1027,
 	PKT_S_START_STAGE = 1028,
-	PKT_C_MOVE = 1029,
-	PKT_S_MOVE = 1030,
-	PKT_S_PLAYER_LIST = 1031,
-	PKT_S_PLAYER_ENTER = 1032,
-	PKT_S_PLAYER_LEAVE = 1033,
-	PKT_C_ANIMATION = 1034,
-	PKT_S_ANIMATION = 1035,
+	PKT_C_GET_CLEAR_INFO = 1029,
+	PKT_S_GET_CLEAR_INFO = 1030,
+	PKT_C_MOVE = 1031,
+	PKT_S_MOVE = 1032,
+	PKT_S_PLAYER_LIST = 1033,
+	PKT_S_PLAYER_ENTER = 1034,
+	PKT_S_PLAYER_LEAVE = 1035,
+	PKT_C_ANIMATION = 1036,
+	PKT_S_ANIMATION = 1037,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -66,6 +68,7 @@ bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
 bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt);
 bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pkt);
+bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_INFO& pkt);
 bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
 bool Handle_S_PLAYER_LIST(PacketSessionRef& session, Protocol::S_PLAYER_LIST& pkt);
 bool Handle_S_PLAYER_ENTER(PacketSessionRef& session, Protocol::S_PLAYER_ENTER& pkt);
@@ -146,6 +149,10 @@ public:
 		{
 			return HandlePacket<Protocol::S_START_STAGE>(Handle_S_START_STAGE, session, buffer, len);
 		};
+		GPacketHandler[PKT_S_GET_CLEAR_INFO] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_GET_CLEAR_INFO>(Handle_S_GET_CLEAR_INFO, session, buffer, len);
+		};
 		GPacketHandler[PKT_S_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::S_MOVE>(Handle_S_MOVE, session, buffer, len);
@@ -175,77 +182,66 @@ public:
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_LOGIN& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_LOGIN);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_CREATE_ROOM& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_CREATE_ROOM);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_ROOM_LIST& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_ROOM_LIST);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_ENTER_ROOM& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_ENTER_ROOM);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_LEAVE_ROOM& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_LEAVE_ROOM);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_INVITE_PLAYER& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_INVITE_PLAYER);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_INVITE_RESPONSE& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_INVITE_RESPONSE);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_READY& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_READY);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_START_ROOM& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_START_ROOM);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_CHAT& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_CHAT);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_ENTER_GAME& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_ENTER_GAME);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_SHOW_STAGE& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_SHOW_STAGE);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_START_STAGE& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_START_STAGE);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::C_GET_CLEAR_INFO& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_C_GET_CLEAR_INFO);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_MOVE& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_MOVE);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_ANIMATION& pkt)
 	{
-
 		return MakeSendBuffer(pkt, PKT_C_ANIMATION);
 	}
 	
