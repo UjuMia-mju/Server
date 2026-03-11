@@ -31,19 +31,28 @@ enum : uint16
 	PKT_S_CHAT = 1022,
 	PKT_C_ENTER_GAME = 1023,
 	PKT_S_ENTER_GAME = 1024,
-	PKT_C_SHOW_STAGE = 1025,
-	PKT_S_SHOW_STAGE = 1026,
-	PKT_C_START_STAGE = 1027,
-	PKT_S_START_STAGE = 1028,
-	PKT_C_GET_CLEAR_INFO = 1029,
-	PKT_S_GET_CLEAR_INFO = 1030,
-	PKT_C_MOVE = 1031,
-	PKT_S_MOVE = 1032,
-	PKT_S_PLAYER_LIST = 1033,
-	PKT_S_PLAYER_ENTER = 1034,
-	PKT_S_PLAYER_LEAVE = 1035,
-	PKT_C_ANIMATION = 1036,
-	PKT_S_ANIMATION = 1037,
+	PKT_C_TEST_ENTER_GAME = 1025,
+	PKT_C_SHOW_STAGE = 1026,
+	PKT_S_SHOW_STAGE = 1027,
+	PKT_C_START_STAGE = 1028,
+	PKT_S_START_STAGE = 1029,
+	PKT_C_GET_CLEAR_INFO = 1030,
+	PKT_S_GET_CLEAR_INFO = 1031,
+	PKT_C_MOVE = 1032,
+	PKT_S_MOVE = 1033,
+	PKT_S_PLAYER_LIST = 1034,
+	PKT_S_PLAYER_ENTER = 1035,
+	PKT_S_PLAYER_LEAVE = 1036,
+	PKT_C_PLAYER_ANIMATION = 1037,
+	PKT_S_PLAYER_ANIMATION = 1038,
+	PKT_C_PLAYER_STAT_EVENT = 1039,
+	PKT_S_PLAYER_STAT = 1040,
+	PKT_C_OBJECT_PICKUP = 1041,
+	PKT_S_OBJECT_PICKUP = 1042,
+	PKT_C_OBJECT_DROP = 1043,
+	PKT_S_OBJECT_DROP = 1044,
+	PKT_C_OBJECT_MOVE = 1045,
+	PKT_S_OBJECT_MOVE = 1046,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -63,11 +72,16 @@ bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt);
 bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt);
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt);
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
+bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_GAME& pkt);
 bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt);
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt);
 bool Handle_C_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::C_GET_CLEAR_INFO& pkt);
 bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt);
-bool Handle_C_ANIMATION(PacketSessionRef& session, Protocol::C_ANIMATION& pkt);
+bool Handle_C_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::C_PLAYER_ANIMATION& pkt);
+bool Handle_C_PLAYER_STAT_EVENT(PacketSessionRef& session, Protocol::C_PLAYER_STAT_EVENT& pkt);
+bool Handle_C_OBJECT_PICKUP(PacketSessionRef& session, Protocol::C_OBJECT_PICKUP& pkt);
+bool Handle_C_OBJECT_DROP(PacketSessionRef& session, Protocol::C_OBJECT_DROP& pkt);
+bool Handle_C_OBJECT_MOVE(PacketSessionRef& session, Protocol::C_OBJECT_MOVE& pkt);
 
 
 class ClientPacketHandler
@@ -123,6 +137,10 @@ public:
 		{
 			return HandlePacket<Protocol::C_ENTER_GAME>(Handle_C_ENTER_GAME, session, buffer, len);
 		};
+		GPacketHandler[PKT_C_TEST_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_TEST_ENTER_GAME>(Handle_C_TEST_ENTER_GAME, session, buffer, len);
+		};
 		GPacketHandler[PKT_C_SHOW_STAGE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::C_SHOW_STAGE>(Handle_C_SHOW_STAGE, session, buffer, len);
@@ -139,9 +157,25 @@ public:
 		{
 			return HandlePacket<Protocol::C_MOVE>(Handle_C_MOVE, session, buffer, len);
 		};
-		GPacketHandler[PKT_C_ANIMATION] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		GPacketHandler[PKT_C_PLAYER_ANIMATION] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
-			return HandlePacket<Protocol::C_ANIMATION>(Handle_C_ANIMATION, session, buffer, len);
+			return HandlePacket<Protocol::C_PLAYER_ANIMATION>(Handle_C_PLAYER_ANIMATION, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_PLAYER_STAT_EVENT] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_PLAYER_STAT_EVENT>(Handle_C_PLAYER_STAT_EVENT, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_OBJECT_PICKUP] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_OBJECT_PICKUP>(Handle_C_OBJECT_PICKUP, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_OBJECT_DROP] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_OBJECT_DROP>(Handle_C_OBJECT_DROP, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_OBJECT_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_OBJECT_MOVE>(Handle_C_OBJECT_MOVE, session, buffer, len);
 		};
 	}
 
@@ -234,9 +268,25 @@ public:
 	{
 		return MakeSendBuffer(pkt, PKT_S_PLAYER_LEAVE);
 	}
-	static SendBufferRef MakeSendBuffer(Protocol::S_ANIMATION& pkt)
+	static SendBufferRef MakeSendBuffer(Protocol::S_PLAYER_ANIMATION& pkt)
 	{
-		return MakeSendBuffer(pkt, PKT_S_ANIMATION);
+		return MakeSendBuffer(pkt, PKT_S_PLAYER_ANIMATION);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_PLAYER_STAT& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_PLAYER_STAT);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_OBJECT_PICKUP& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_OBJECT_PICKUP);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_OBJECT_DROP& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_OBJECT_DROP);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_OBJECT_MOVE& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_OBJECT_MOVE);
 	}
 	
 private:

@@ -126,11 +126,26 @@ int main()
 
 			cout << "[Step 4] 방 참여자 전체 목록 보기\n" << endl;
 
-			cout << "[Step 5] player1과 player2가 둘다 ready상태로 바꿈\n" << endl;
+			cout << "[Step 5] Both players getting ready..." << endl;
+			player1Session->SendReady(true);
+			this_thread::sleep_for(500ms);
+			player2Session->SendReady(true);
+			this_thread::sleep_for(1s);
+			cout << "[Step 5] Both players are ready!\n" << endl;
 
-			cout << "[Step 6] 방장(player1)이 게임 시작\n" << endl;
+			// 6. 방장(Player1)이 게임 시작
+			cout << "[Step 6] Player1 (room owner) starting game..." << endl;
+			player1Session->SendStartRoom();
+			this_thread::sleep_for(2s); // 게임 시작 대기
+			cout << "[Step 6] Game started!\n" << endl;
 
-			cout << "[Step 7] 둘다 같은 스테이지 정보 받는지 확인.\n" << endl;
+			// 7. 둘다 같은 스테이지 정보 받는지 확인
+			cout << "[Step 7] Requesting stage info for both players..." << endl;
+			player1Session->SendShowStage(1, 1); // Stage 1-1
+			this_thread::sleep_for(500ms);
+			player2Session->SendShowStage(1, 1); // Stage 1-1
+			this_thread::sleep_for(2s);
+			cout << "[Step 7] Stage info received (check above logs)\n" << endl;
 
 			cout << "\n========== Test Scenario Complete ==========\n" << endl;
 		});

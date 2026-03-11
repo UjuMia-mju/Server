@@ -28,6 +28,7 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_Enum_2eproto
@@ -46,6 +47,146 @@ PROTOBUF_NAMESPACE_OPEN
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
 
+enum StatEventType : int {
+  STAT_EVENT_NONE = 0,
+  DAMAGE_TAKEN = 1,
+  HEALED = 2,
+  HEALTH_ITEM_USED = 3,
+  OXYGEN_CONSUMED = 10,
+  OXYGEN_RESTORED = 11,
+  OXYGEN_ITEM_USED = 12,
+  FOOD_CONSUMED = 20,
+  TOOL_USED = 21,
+  StatEventType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  StatEventType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool StatEventType_IsValid(int value);
+constexpr StatEventType StatEventType_MIN = STAT_EVENT_NONE;
+constexpr StatEventType StatEventType_MAX = TOOL_USED;
+constexpr int StatEventType_ARRAYSIZE = StatEventType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* StatEventType_descriptor();
+template<typename T>
+inline const std::string& StatEventType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, StatEventType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function StatEventType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    StatEventType_descriptor(), enum_t_value);
+}
+inline bool StatEventType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, StatEventType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<StatEventType>(
+    StatEventType_descriptor(), name, value);
+}
+enum ObjectType : int {
+  OBJECT_ID_NONE = 0,
+  TOOL = 1,
+  ITEM = 2,
+  ObjectType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  ObjectType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool ObjectType_IsValid(int value);
+constexpr ObjectType ObjectType_MIN = OBJECT_ID_NONE;
+constexpr ObjectType ObjectType_MAX = ITEM;
+constexpr int ObjectType_ARRAYSIZE = ObjectType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ObjectType_descriptor();
+template<typename T>
+inline const std::string& ObjectType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, ObjectType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ObjectType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ObjectType_descriptor(), enum_t_value);
+}
+inline bool ObjectType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ObjectType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ObjectType>(
+    ObjectType_descriptor(), name, value);
+}
+enum ItemType : int {
+  NONE = 0,
+  WOOD = 100,
+  STONE = 101,
+  IRON_ORE = 102,
+  GOLD_ORE = 103,
+  ItemType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  ItemType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool ItemType_IsValid(int value);
+constexpr ItemType ItemType_MIN = NONE;
+constexpr ItemType ItemType_MAX = GOLD_ORE;
+constexpr int ItemType_ARRAYSIZE = ItemType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ItemType_descriptor();
+template<typename T>
+inline const std::string& ItemType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, ItemType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ItemType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ItemType_descriptor(), enum_t_value);
+}
+inline bool ItemType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ItemType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ItemType>(
+    ItemType_descriptor(), name, value);
+}
+enum ToolType : int {
+  TOOL_TYPE_NONE = 0,
+  AXE = 100,
+  PICKAXE = 101,
+  DRILL = 102,
+  ToolType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  ToolType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool ToolType_IsValid(int value);
+constexpr ToolType ToolType_MIN = TOOL_TYPE_NONE;
+constexpr ToolType ToolType_MAX = DRILL;
+constexpr int ToolType_ARRAYSIZE = ToolType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ToolType_descriptor();
+template<typename T>
+inline const std::string& ToolType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, ToolType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ToolType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ToolType_descriptor(), enum_t_value);
+}
+inline bool ToolType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ToolType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ToolType>(
+    ToolType_descriptor(), name, value);
+}
+enum ItemState : int {
+  ITEM_STATE_NONE = 0,
+  ON_GROUND = 1,
+  IN_AIR = 2,
+  EQUIPPED = 3,
+  ItemState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  ItemState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool ItemState_IsValid(int value);
+constexpr ItemState ItemState_MIN = ITEM_STATE_NONE;
+constexpr ItemState ItemState_MAX = EQUIPPED;
+constexpr int ItemState_ARRAYSIZE = ItemState_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ItemState_descriptor();
+template<typename T>
+inline const std::string& ItemState_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, ItemState>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ItemState_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ItemState_descriptor(), enum_t_value);
+}
+inline bool ItemState_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ItemState* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ItemState>(
+    ItemState_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -65,6 +206,36 @@ namespace Protocol {
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace Protocol
+
+PROTOBUF_NAMESPACE_OPEN
+
+template <> struct is_proto_enum< ::Protocol::StatEventType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::StatEventType>() {
+  return ::Protocol::StatEventType_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::ObjectType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::ObjectType>() {
+  return ::Protocol::ObjectType_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::ItemType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::ItemType>() {
+  return ::Protocol::ItemType_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::ToolType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::ToolType>() {
+  return ::Protocol::ToolType_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::ItemState> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::ItemState>() {
+  return ::Protocol::ItemState_descriptor();
+}
+
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

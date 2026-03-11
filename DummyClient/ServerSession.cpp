@@ -91,3 +91,42 @@ void ServerSession::SendInvitePacket(string name, int32 tag)
 
 	cout << "[Client] Invite packet sent - Target: " << name << "#" << tag << endl;
 }
+
+void ServerSession::SendEnterRoom()
+{
+	Protocol::C_ENTER_ROOM pkt;
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+	cout << "[Client] Show members packet sent" << endl;
+}
+
+void ServerSession::SendReady(bool isReady)
+{
+	Protocol::C_READY readyPkt;
+	readyPkt.set_is_ready(isReady);
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(readyPkt);
+	Send(sendBuffer);
+	cout << "[Client] Ready packet sent - Ready: " << (isReady ? "Yes" : "No") << endl;
+}
+
+void ServerSession::SendStartRoom()
+{
+	Protocol::C_START_ROOM startPkt;
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(startPkt);
+	Send(sendBuffer);
+	cout << "[Client] Start room packet sent" << endl;
+}
+
+
+void ServerSession::SendShowStage(int32 stage, int32 level)
+{
+	Protocol::C_SHOW_STAGE pkt;
+	pkt.set_stagelevel(stage);
+	pkt.set_stageindex(level);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+
+	cout << "[Client] Show stage packet sent - Stage " << stage << "-" << level << endl;
+}
+

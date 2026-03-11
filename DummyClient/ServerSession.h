@@ -18,9 +18,14 @@ public:
 	const string& GetPlayerName() const;
 	int32 GetPlayerTag() const;
 
+	// Packet senders
 	void SendLoginPacket(string id, string psw);
 	void SendCreateRoom();
 	void SendInvitePacket(string name, int32 tag);
+	void SendReady(bool isReady);
+	void SendStartRoom();
+	void SendShowStage(int32 stage, int32 level);
+	void SendEnterRoom();
 
 private:
 	string _email;

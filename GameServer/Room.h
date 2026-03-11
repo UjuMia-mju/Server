@@ -32,6 +32,8 @@ public:
 	bool IsPlaying() const { return _isPlaying; }
 	int32 GetCurrentCount() const { return static_cast<int32>(_players.size()); }
 	int32 GetMaxCount() const { return MAX_ROOM_CAPACITY; }
+
+	vector<pair<PlayerRef, bool>> GetMembersWithReadyStatus() const;
 private:
 	USE_LOCK;
 

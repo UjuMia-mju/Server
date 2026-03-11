@@ -227,6 +227,27 @@ void Room::BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId)
 	}
 }
 
+vector<pair<PlayerRef, bool>> Room::GetMembersWithReadyStatus() const
+{
+	//READ_LOCK;
+
+	vector<pair<PlayerRef, bool>> members;
+	members.reserve(_players.size());
+
+	for (const auto& [playerId, player] : _players)
+	{
+		bool isReady = false;
+		auto it = _readyStatus.find(playerId);
+		if (it != _readyStatus.end())
+		{
+			isReady = it->second;
+		}
+		members.push_back({ player, isReady });
+	}
+
+	return members;
+}
+
 RoomRef GetGlobalTestRoom()
 {
 	static shared_ptr<Room> instance = make_shared<Room>(999999, "Global Test Room", 0);

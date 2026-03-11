@@ -184,7 +184,99 @@ bool Handle_C_ROOM_LIST(PacketSessionRef& session, Protocol::C_ROOM_LIST& pkt)
 
 bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 {
-	return false;
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
+	// 이미 방에 있는지 체크
+	if (auto currentRoom = gameSession->_room.lock())
+	{
+		std::cout << "Enter room failed: Already in a room" << endl;
+		SendEnterGameError(session, "Already in a room");
+		return false;
+	}
+	uint64 roomId = pkt.room_id();
+	RoomRef targetRoom = RoomManager::Instance().FindRoom(roomId);
+
+	if (!targetRoom)
+	{
+		std::cout << "Enter room failed: Room not found - ID: " << roomId << endl;
+
+		Protocol::S_ENTER_ROOM errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_error_msg("Room not found");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+	// 방이 꽉 찼는지 체크
+	if (targetRoom->GetCurrentCount() >= targetRoom->GetMaxCount())
+	{
+		std::cout << "Enter room failed: Room is full" << endl;
+
+		Protocol::S_ENTER_ROOM errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_error_msg("Room is full");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 게임이 이미 시작되었는지 체크
+	if (targetRoom->IsPlaying())
+	{
+		std::cout << "Enter room failed: Game already started" << endl;
+
+		Protocol::S_ENTER_ROOM errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_error_msg("Game already started");
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 방에 입장
+	gameSession->_room = targetRoom;
+	targetRoom->DoAsync(&Room::EnterLobby, gameSession->_player);
+
+	// 성공 응답 패킷 구성
+	Protocol::S_ENTER_ROOM enterRoomPkt;
+	enterRoomPkt.set_success(true);
+
+	// 방 정보 설정
+	Protocol::RoomInfo* roomInfo = enterRoomPkt.mutable_room();
+	roomInfo->set_room_id(targetRoom->GetRoomId());
+	roomInfo->set_room_name(targetRoom->GetRoomName());
+	roomInfo->set_current_count(targetRoom->GetCurrentCount());
+	roomInfo->set_max_count(targetRoom->GetMaxCount());
+	roomInfo->set_is_playing(targetRoom->IsPlaying());
+
+	// 방장 정보는 RoomInfo에 포함되어 있다고 가정
+	Protocol::Player* host = roomInfo->mutable_host();
+	host->set_id(targetRoom->GetOwnerId());
+
+	// 기존 멤버 리스트 추가
+	auto members = targetRoom->GetMembersWithReadyStatus();
+	for (const auto& [player, isReady] : members)
+	{
+		// 자기 자신은 제외
+		if (player->playerId == gameSession->_player->playerId)
+			continue;
+
+		Protocol::RoomMemberInfo* memberInfo = enterRoomPkt.add_members();
+
+		Protocol::Player* playerInfo = memberInfo->mutable_player();
+		playerInfo->set_id(player->playerId);
+		playerInfo->set_name(player->name);
+		playerInfo->set_tag(player->tag);
+
+		memberInfo->set_is_ready(isReady);
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
+	session->Send(sendBuffer);
+
+	std::cout << "Player " << gameSession->_player->name
+		<< " entered room " << roomId << endl;
+
+	return true;
 }
 
 bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
@@ -194,6 +286,7 @@ bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
 
 bool Handle_C_INVITE_PLAYER(PacketSessionRef& session, Protocol::C_INVITE_PLAYER& pkt)
 {
+	// 여기 나중에 수정
 	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
 
 	// 방에 있는지 체크
@@ -291,6 +384,50 @@ bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESP
 		{
 			responsePkt.set_error_msg("Failed to join room (invite expired or room full)");
 		}
+		else
+		{
+			// 추가: 방 입장 성공 시 방 정보 전송
+			auto room = gameSession->_room.lock();
+			if (room)
+			{
+				Protocol::S_ENTER_ROOM enterRoomPkt;
+				enterRoomPkt.set_success(true);
+
+				// 방 정보 설정
+				Protocol::RoomInfo* roomInfo = enterRoomPkt.mutable_room();
+				roomInfo->set_room_id(room->GetRoomId());
+				roomInfo->set_room_name(room->GetRoomName());
+				roomInfo->set_current_count(room->GetCurrentCount());
+				roomInfo->set_max_count(room->GetMaxCount());
+				roomInfo->set_is_playing(room->IsPlaying());
+
+				// 방장 정보
+				Protocol::Player* host = roomInfo->mutable_host();
+				host->set_id(room->GetOwnerId());
+
+				// 기존 멤버 리스트
+				auto members = room->GetMembersWithReadyStatus();
+				for (const auto& [player, isReady] : members)
+				{
+					if (player->playerId == gameSession->_player->playerId)
+						continue;
+
+					Protocol::RoomMemberInfo* memberInfo = enterRoomPkt.add_members();
+
+					Protocol::Player* playerInfo = memberInfo->mutable_player();
+					playerInfo->set_id(player->playerId);
+					playerInfo->set_name(player->name);
+					playerInfo->set_tag(player->tag);
+
+					memberInfo->set_is_ready(isReady);
+				}
+
+				auto enterRoomBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
+				session->Send(enterRoomBuffer);
+
+				std::cout << "Sent S_ENTER_ROOM to " << gameSession->_player->name << endl;
+			}
+		}
 	}
 	else
 	{
@@ -353,15 +490,34 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 {
 	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
 
-	// ------
 	auto room = gameSession->_room.lock();
 
+	if (!room)
+	{
+		std::cout << "Enter game failed: Room not available" << endl;
+		SendEnterGameError(session, "Room not available");
+		return false;
+	}
 
-	//auto room = GetGlobalTestRoom(); // 테스트용 임시 코드
-	//gameSession->_room = room; // 테스트용 임시 코드
+	room->DoAsync(&Room::EnterGame, gameSession->_player);
 
-	// ------
+	Protocol::S_ENTER_GAME enterGamePkt;
+	enterGamePkt.set_success(true);
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
+	session->Send(sendBuffer);
 
+	return true;
+}
+
+bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_GAME& pkt)
+{
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+
+	// 테스트 코드 부분
+	auto room = GetGlobalTestRoom();
+	gameSession->_room = room;
+
+	//
 	if (!room)
 	{
 		std::cout << "Enter game failed: Room not available" << endl;
@@ -496,22 +652,89 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 	return true;
 }
 
-bool Handle_C_ANIMATION(PacketSessionRef& session, Protocol::C_ANIMATION& pkt)
+bool Handle_C_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::C_PLAYER_ANIMATION& pkt)
 {
 	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
 
 	gameSession->_player->animState = pkt.state();
-	Protocol::S_ANIMATION animPkt;
-	animPkt.set_playerid(gameSession->_player->playerId);
-	animPkt.set_state(pkt.state());
+	Protocol::S_PLAYER_ANIMATION animationPkt;
+	animationPkt.set_playerid(gameSession->_player->playerId);
+	animationPkt.set_state(pkt.state());
 
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(animPkt);
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(animationPkt);
 	auto roomPtr = gameSession->_room.lock();
 
 	if (roomPtr != nullptr)
 	{
 		roomPtr->DoAsync(&Room::Broadcast, sendBuffer);
 	}
+
+	return true;
+}
+
+bool Handle_C_PLAYER_STAT_EVENT(PacketSessionRef& session, Protocol::C_PLAYER_STAT_EVENT& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+}
+
+bool Handle_C_OBJECT_PICKUP(PacketSessionRef& session, Protocol::C_OBJECT_PICKUP& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 픽업 브로드캐스트
+	Protocol::S_OBJECT_PICKUP pickupPkt;
+	pickupPkt.set_success(true);
+
+	// ObjectId 복사
+	Protocol::ObjectId* objId = pickupPkt.mutable_object_id();
+	objId->CopyFrom(pkt.object_id());
+
+	pickupPkt.set_player_id(gameSession->_player->playerId);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(pickupPkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
+
+	std::cout << "Player " << gameSession->_player->name
+		<< " picked up object" << endl;
+
+	return true;
+}
+
+bool Handle_C_OBJECT_DROP(PacketSessionRef& session, Protocol::C_OBJECT_DROP& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+	// 드롭 브로드캐스트
+	Protocol::S_OBJECT_DROP dropPkt;
+
+	// ObjectId 복사
+	Protocol::ObjectId* objId = dropPkt.mutable_object_id();
+	objId->CopyFrom(pkt.object_id());
+
+	dropPkt.set_player_id(gameSession->_player->playerId);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(dropPkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
+
+	std::cout << "Player " << gameSession->_player->name
+		<< " dropped object" << endl;
+
+	return true;
+}
+
+bool Handle_C_OBJECT_MOVE(PacketSessionRef& session, Protocol::C_OBJECT_MOVE& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 그대로 브로드캐스트 (플레이어 이동과 동일)
+	Protocol::S_OBJECT_MOVE movePkt;
+	Protocol::ObjectId* objId = movePkt.mutable_object_id();
+	objId->CopyFrom(pkt.object_id());  // 받은 그대로 복사
+
+	*movePkt.mutable_pos() = pkt.pos();
+	*movePkt.mutable_rot() = pkt.rot();
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(movePkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
 
 	return true;
 }
