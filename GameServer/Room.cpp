@@ -4,14 +4,135 @@
 #include "GameSession.h"
 #include "ClientPacketHandler.h"
 
-shared_ptr<Room> GRoom = make_shared<Room>();
+RoomRef GTestRoom = nullptr;
 
-void Room::Enter(PlayerRef player)
+Room::Room(uint64 roomId, const string& roomName, uint64 ownerId)
+	: _roomId(roomId), _roomName(roomName), _ownerId(ownerId)
+{
+}
+
+Room::~Room()
+{
+	cout << "Room " << _roomId << " destroyed." << endl;
+}
+
+void Room::EnterLobby(PlayerRef player)
+{
+	WRITE_LOCK;
+	_players[player->playerId] = player;
+	_readyStatus[player->playerId] = false;
+
+	// 방 멤버 입장 알림
+	Protocol::S_ROOM_MEMBER_ENTER enterPkt;
+	auto member = enterPkt.mutable_member();
+
+	auto playerInfo = member->mutable_player();
+	playerInfo->set_id(player->playerId);
+	playerInfo->set_name(player->name);
+	playerInfo->set_tag(player->tag);
+
+	member->set_is_ready(false);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterPkt);
+	BroadcastExcept(sendBuffer, player->playerId);
+
+	std::cout << "Player " << player->name << " entered lobby of Room " << _roomId << endl;
+}
+
+void Room::LeaveLobby(PlayerRef player)
+{
+	WRITE_LOCK;
+	_players.erase(player->playerId);
+	_readyStatus.erase(player->playerId);
+
+	// 퇴장 알림
+	Protocol::S_ROOM_MEMBER_LEAVE leavePkt;
+	leavePkt.set_player_id(player->playerId);
+	leavePkt.set_player_name(player->name);
+
+	// 방장이 나갔다면 새 방장 지정
+	if (_ownerId == player->playerId && !_players.empty())
+	{
+		_ownerId = _players.begin()->first;
+		leavePkt.set_new_owner_id(_ownerId);
+	}
+	else if (_players.empty())
+	{
+		// 방 삭제
+	}
+	else
+	{
+		leavePkt.set_new_owner_id(0); // 0이면 아무런 반응X
+	}
+
+	auto leaveBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
+	Broadcast(leaveBuffer);
+
+	std::cout << "Player " << player->name << " left lobby room " << _roomId << endl;
+}
+
+void Room::SetReady(uint64 playerId, bool isReady)
+{
+	WRITE_LOCK;
+
+	if (_players.find(playerId) == _players.end())
+	{
+		return;
+	}
+
+	_readyStatus[playerId] = isReady;
+
+	// 준비 상태 브로드캐스트
+	Protocol::S_READY readyPkt;
+	readyPkt.set_player_id(playerId);
+	readyPkt.set_is_ready(isReady);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(readyPkt);
+	Broadcast(sendBuffer);
+}
+
+bool Room::CanStartGame()
+{
+	READ_LOCK;
+
+	for (auto& pair : _readyStatus)
+	{
+		// 한 명이라도 준비 안하면 false
+		if (!pair.second)  
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void Room::StartGame()
+{
+	WRITE_LOCK;
+
+	// 이미 게임 중이면 무시
+	if (_isPlaying)
+	{
+		std::cout << "Cannot start game: Already playing" << endl;
+		return;
+	}
+	// 게임 시작 알림 브로드캐스트
+	Protocol::S_START_ROOM gameStartPkt;
+	gameStartPkt.set_success(true);
+	_isPlaying = true;
+	std::cout << "Game started in room " << _roomId << endl;
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(gameStartPkt);
+	Broadcast(sendBuffer);
+}
+
+void Room::EnterGame(PlayerRef player)
 {
 	WRITE_LOCK;
 	_players[player->playerId] = player;
 
-	//// 새로 들어온 플레이어에게 기존 플레이어 정보 브로드캐스트
+	// 새로 들어온 플레이어에게 기존 플레이어 정보 브로드캐스트
 	Protocol::S_PLAYER_LIST playerListPkt;
 
     for (auto& p : _players)
@@ -64,7 +185,7 @@ void Room::Enter(PlayerRef player)
 	BroadcastExcept(newPlayerBuffer, player->playerId);
 }
 
-void Room::Leave(PlayerRef player)
+void Room::LeaveGame(PlayerRef player)
 {
 	WRITE_LOCK;
 	_players.erase(player->playerId);
@@ -104,4 +225,31 @@ void Room::BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId)
 			session->Send(sendBuffer);
 		}
 	}
+}
+
+vector<pair<PlayerRef, bool>> Room::GetMembersWithReadyStatus() const
+{
+	//READ_LOCK;
+
+	vector<pair<PlayerRef, bool>> members;
+	members.reserve(_players.size());
+
+	for (const auto& [playerId, player] : _players)
+	{
+		bool isReady = false;
+		auto it = _readyStatus.find(playerId);
+		if (it != _readyStatus.end())
+		{
+			isReady = it->second;
+		}
+		members.push_back({ player, isReady });
+	}
+
+	return members;
+}
+
+RoomRef GetGlobalTestRoom()
+{
+	static shared_ptr<Room> instance = make_shared<Room>(999999, "Global Test Room", 0);
+	return instance;
 }

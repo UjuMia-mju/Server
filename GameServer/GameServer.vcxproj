@@ -180,6 +180,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccountDB.cpp" />
+    <ClCompile Include="AuthValidator.cpp" />
     <ClCompile Include="Enum.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -189,6 +190,9 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="GameSessionManager.cpp" />
+    <ClCompile Include="InviteManager.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="ItemManager.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -204,6 +208,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
     </ClCompile>
     <ClCompile Include="ClientPacketHandler.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="RoomManager.cpp" />
     <ClCompile Include="Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -213,14 +218,20 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccountDB.h" />
+    <ClInclude Include="AuthValidator.h" />
     <ClInclude Include="Enum.pb.h" />
     <ClInclude Include="GameSession.h" />
     <ClInclude Include="GameSessionManager.h" />
+    <ClInclude Include="InviteManager.h" />
+    <ClInclude Include="item.h" />
+    <ClInclude Include="ItemManager.h" />
+    <ClInclude Include="PacketResult.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Protocol.pb.h" />
     <ClInclude Include="ClientPacketHandler.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="RoomManager.h" />
     <ClInclude Include="Struct.pb.h" />
   </ItemGroup>
   <ItemGroup>

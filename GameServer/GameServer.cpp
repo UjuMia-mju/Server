@@ -64,7 +64,7 @@ int main()
 	}
 
 	std::wstring dbConnectionString = GConfigManager->GetDBConnectionString();
-	ASSERT_CRASH(GDBConnectionPool->Connect(1, dbConnectionString.c_str()));
+	ASSERT_CRASH(GDBConnectionPool->Connect(3, dbConnectionString.c_str()));
 	ClientPacketHandler::Init();
 
 	// Config에서 서버 설정 가져오기

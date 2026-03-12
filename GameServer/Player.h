@@ -7,7 +7,10 @@ class Player
 public:
 	uint64 playerId = 0;
 	string name;
-	Protocol::PlayerType type = Protocol::PlayerType::PLAYER_TYPE_NONE;
+    int32 tag;
+
+	// 애니메이션 상태
+    int32 animState = 0;
 
     // 위치 정보
     float posX = 0.0f;

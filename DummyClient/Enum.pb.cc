@@ -22,21 +22,30 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[1];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[5];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nEnum.proto\022\010Protocol*h\n\nPlayerType\022\024\n\020"
-  "PLAYER_TYPE_NONE\020\000\022\026\n\022PLAYER_TYPE_KNIGHT"
-  "\020\001\022\024\n\020PLAYER_TYPE_MAGE\020\002\022\026\n\022PLAYER_TYPE_"
-  "ARCHER\020\003b\006proto3"
+  "\n\nEnum.proto\022\010Protocol*\272\001\n\rStatEventType"
+  "\022\023\n\017STAT_EVENT_NONE\020\000\022\020\n\014DAMAGE_TAKEN\020\001\022"
+  "\n\n\006HEALED\020\002\022\024\n\020HEALTH_ITEM_USED\020\003\022\023\n\017OXY"
+  "GEN_CONSUMED\020\n\022\023\n\017OXYGEN_RESTORED\020\013\022\024\n\020O"
+  "XYGEN_ITEM_USED\020\014\022\021\n\rFOOD_CONSUMED\020\024\022\r\n\t"
+  "TOOL_USED\020\025*4\n\nObjectType\022\022\n\016OBJECT_ID_N"
+  "ONE\020\000\022\010\n\004TOOL\020\001\022\010\n\004ITEM\020\002*E\n\010ItemType\022\010\n"
+  "\004NONE\020\000\022\010\n\004WOOD\020d\022\t\n\005STONE\020e\022\014\n\010IRON_ORE"
+  "\020f\022\014\n\010GOLD_ORE\020g*\?\n\010ToolType\022\022\n\016TOOL_TYP"
+  "E_NONE\020\000\022\007\n\003AXE\020d\022\013\n\007PICKAXE\020e\022\t\n\005DRILL\020"
+  "f*I\n\tItemState\022\023\n\017ITEM_STATE_NONE\020\000\022\r\n\tO"
+  "N_GROUND\020\001\022\n\n\006IN_AIR\020\002\022\014\n\010EQUIPPED\020\003b\006pr"
+  "oto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 136, descriptor_table_protodef_Enum_2eproto,
+    false, false, 484, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -50,11 +59,80 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_Enum_2ep
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_Enum_2eproto(&descriptor_table_Enum_2eproto);
 namespace Protocol {
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PlayerType_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* StatEventType_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
   return file_level_enum_descriptors_Enum_2eproto[0];
 }
-bool PlayerType_IsValid(int value) {
+bool StatEventType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 10:
+    case 11:
+    case 12:
+    case 20:
+    case 21:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ObjectType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[1];
+}
+bool ObjectType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ItemType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[2];
+}
+bool ItemType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 100:
+    case 101:
+    case 102:
+    case 103:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ToolType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[3];
+}
+bool ToolType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 100:
+    case 101:
+    case 102:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ItemState_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[4];
+}
+bool ItemState_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:

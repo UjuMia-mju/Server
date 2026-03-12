@@ -51,6 +51,21 @@
     <ClCompile Include="AccountDB.cpp">
       <Filter>DB</Filter>
     </ClCompile>
+    <ClCompile Include="RoomManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="InviteManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthValidator.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -82,6 +97,24 @@
     </ClInclude>
     <ClInclude Include="AccountDB.h">
       <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="InviteManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthValidator.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketResult.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemManager.h">
+      <Filter>GameContents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
