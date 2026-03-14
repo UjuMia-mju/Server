@@ -43,6 +43,21 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
+{
+	return false;
+}
+
+bool Handle_S_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::S_GACHA_POOL_LIST& pkt)
+{
+	return false;
+}
+
+bool Handle_S_MY_SKINS(PacketSessionRef& session, Protocol::S_MY_SKINS& pkt)
+{
+	return false;
+}
+
 bool Handle_S_CREATE_ROOM(PacketSessionRef& session, Protocol::S_CREATE_ROOM& pkt)
 {
 	if (!pkt.success())

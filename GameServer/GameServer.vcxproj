@@ -187,6 +187,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GachaManager.cpp" />
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="GameSessionManager.cpp" />
@@ -220,6 +221,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
     <ClInclude Include="AccountDB.h" />
     <ClInclude Include="AuthValidator.h" />
     <ClInclude Include="Enum.pb.h" />
+    <ClInclude Include="GachaManager.h" />
     <ClInclude Include="GameSession.h" />
     <ClInclude Include="GameSessionManager.h" />
     <ClInclude Include="InviteManager.h" />

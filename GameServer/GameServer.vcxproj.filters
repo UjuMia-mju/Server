@@ -66,6 +66,9 @@
     <ClCompile Include="ItemManager.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
+    <ClCompile Include="GachaManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -114,6 +117,9 @@
       <Filter>GameContents</Filter>
     </ClInclude>
     <ClInclude Include="ItemManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="GachaManager.h">
       <Filter>GameContents</Filter>
     </ClInclude>
   </ItemGroup>

@@ -32,9 +32,9 @@ GameSessionRef GameSessionManager::FindPlayerByNameTag(const string& name, int32
 
 	for (const auto& session : _sessions)
 	{
-		if (session->_player &&
-			session->_player->name == name &&
-			session->_player->tag == tag)
+		if (session->GetPlayer() &&
+			session->GetPlayer()->name == name &&
+			session->GetPlayer()->tag == tag)
 		{
 			return session;
 		}
