@@ -20,7 +20,6 @@ DeadLockProfiler*		GDeadLockProfiler = nullptr;
 DBConnectionPool*		GDBConnectionPool = nullptr;
 ConfigManager*			GConfigManager = nullptr;
 
-
 class CoreGlobal
 {
 public:

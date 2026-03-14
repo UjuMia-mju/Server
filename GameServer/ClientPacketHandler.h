@@ -8,51 +8,57 @@ enum : uint16
 {
 	PKT_C_LOGIN = 1000,
 	PKT_S_LOGIN = 1001,
-	PKT_C_CREATE_ROOM = 1002,
-	PKT_S_CREATE_ROOM = 1003,
-	PKT_C_ROOM_LIST = 1004,
-	PKT_S_ROOM_LIST = 1005,
-	PKT_C_ENTER_ROOM = 1006,
-	PKT_S_ENTER_ROOM = 1007,
-	PKT_C_LEAVE_ROOM = 1008,
-	PKT_S_LEAVE_ROOM = 1009,
-	PKT_C_INVITE_PLAYER = 1010,
-	PKT_S_INVITE_PLAYER = 1011,
-	PKT_S_INVITE_NOTIFICATION = 1012,
-	PKT_C_INVITE_RESPONSE = 1013,
-	PKT_S_INVITE_RESPONSE = 1014,
-	PKT_S_ROOM_MEMBER_ENTER = 1015,
-	PKT_S_ROOM_MEMBER_LEAVE = 1016,
-	PKT_C_READY = 1017,
-	PKT_S_READY = 1018,
-	PKT_C_START_ROOM = 1019,
-	PKT_S_START_ROOM = 1020,
-	PKT_C_CHAT = 1021,
-	PKT_S_CHAT = 1022,
-	PKT_C_ENTER_GAME = 1023,
-	PKT_S_ENTER_GAME = 1024,
-	PKT_C_TEST_ENTER_GAME = 1025,
-	PKT_C_SHOW_STAGE = 1026,
-	PKT_S_SHOW_STAGE = 1027,
-	PKT_C_START_STAGE = 1028,
-	PKT_S_START_STAGE = 1029,
-	PKT_C_GET_CLEAR_INFO = 1030,
-	PKT_S_GET_CLEAR_INFO = 1031,
-	PKT_C_MOVE = 1032,
-	PKT_S_MOVE = 1033,
-	PKT_S_PLAYER_LIST = 1034,
-	PKT_S_PLAYER_ENTER = 1035,
-	PKT_S_PLAYER_LEAVE = 1036,
-	PKT_C_PLAYER_ANIMATION = 1037,
-	PKT_S_PLAYER_ANIMATION = 1038,
-	PKT_C_PLAYER_STAT_EVENT = 1039,
-	PKT_S_PLAYER_STAT = 1040,
-	PKT_C_OBJECT_PICKUP = 1041,
-	PKT_S_OBJECT_PICKUP = 1042,
-	PKT_C_OBJECT_DROP = 1043,
-	PKT_S_OBJECT_DROP = 1044,
-	PKT_C_OBJECT_MOVE = 1045,
-	PKT_S_OBJECT_MOVE = 1046,
+	PKT_C_GACHA = 1002,
+	PKT_S_GACHA = 1003,
+	PKT_C_GACHA_POOL_LIST = 1004,
+	PKT_S_GACHA_POOL_LIST = 1005,
+	PKT_C_MY_SKINS = 1006,
+	PKT_S_MY_SKINS = 1007,
+	PKT_C_CREATE_ROOM = 1008,
+	PKT_S_CREATE_ROOM = 1009,
+	PKT_C_ROOM_LIST = 1010,
+	PKT_S_ROOM_LIST = 1011,
+	PKT_C_ENTER_ROOM = 1012,
+	PKT_S_ENTER_ROOM = 1013,
+	PKT_C_LEAVE_ROOM = 1014,
+	PKT_S_LEAVE_ROOM = 1015,
+	PKT_C_INVITE_PLAYER = 1016,
+	PKT_S_INVITE_PLAYER = 1017,
+	PKT_S_INVITE_NOTIFICATION = 1018,
+	PKT_C_INVITE_RESPONSE = 1019,
+	PKT_S_INVITE_RESPONSE = 1020,
+	PKT_S_ROOM_MEMBER_ENTER = 1021,
+	PKT_S_ROOM_MEMBER_LEAVE = 1022,
+	PKT_C_READY = 1023,
+	PKT_S_READY = 1024,
+	PKT_C_START_ROOM = 1025,
+	PKT_S_START_ROOM = 1026,
+	PKT_C_CHAT = 1027,
+	PKT_S_CHAT = 1028,
+	PKT_C_ENTER_GAME = 1029,
+	PKT_S_ENTER_GAME = 1030,
+	PKT_C_TEST_ENTER_GAME = 1031,
+	PKT_C_SHOW_STAGE = 1032,
+	PKT_S_SHOW_STAGE = 1033,
+	PKT_C_START_STAGE = 1034,
+	PKT_S_START_STAGE = 1035,
+	PKT_C_GET_CLEAR_INFO = 1036,
+	PKT_S_GET_CLEAR_INFO = 1037,
+	PKT_C_MOVE = 1038,
+	PKT_S_MOVE = 1039,
+	PKT_S_PLAYER_LIST = 1040,
+	PKT_S_PLAYER_ENTER = 1041,
+	PKT_S_PLAYER_LEAVE = 1042,
+	PKT_C_PLAYER_ANIMATION = 1043,
+	PKT_S_PLAYER_ANIMATION = 1044,
+	PKT_C_PLAYER_STAT_EVENT = 1045,
+	PKT_S_PLAYER_STAT = 1046,
+	PKT_C_OBJECT_PICKUP = 1047,
+	PKT_S_OBJECT_PICKUP = 1048,
+	PKT_C_OBJECT_DROP = 1049,
+	PKT_S_OBJECT_DROP = 1050,
+	PKT_C_OBJECT_MOVE = 1051,
+	PKT_S_OBJECT_MOVE = 1052,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -62,6 +68,9 @@ enum : uint16
 // Custom Handlers
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
 bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt);
+bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt);
+bool Handle_C_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::C_GACHA_POOL_LIST& pkt);
+bool Handle_C_MY_SKINS(PacketSessionRef& session, Protocol::C_MY_SKINS& pkt);
 bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pkt);
 bool Handle_C_ROOM_LIST(PacketSessionRef& session, Protocol::C_ROOM_LIST& pkt);
 bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt);
@@ -96,6 +105,18 @@ public:
 		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::C_LOGIN>(Handle_C_LOGIN, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_GACHA] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_GACHA>(Handle_C_GACHA, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_GACHA_POOL_LIST] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_GACHA_POOL_LIST>(Handle_C_GACHA_POOL_LIST, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_MY_SKINS] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_MY_SKINS>(Handle_C_MY_SKINS, session, buffer, len);
 		};
 		GPacketHandler[PKT_C_CREATE_ROOM] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
@@ -187,6 +208,18 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_LOGIN& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_S_LOGIN);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_GACHA& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_GACHA);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_GACHA_POOL_LIST& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_GACHA_POOL_LIST);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_MY_SKINS& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_MY_SKINS);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_CREATE_ROOM& pkt)
 	{

@@ -31,14 +31,14 @@ uint64 InviteManager::CreateInvite(uint64 roomId, const string& roomName,
 
 	// 대상 플레이어 찾기
 	GameSessionRef targetSession = FindPlayerByNameTag(targetName, targetTag);
-	if (!targetSession || !targetSession->_player)
+	if (!targetSession || !targetSession->GetPlayer())
 	{
 		std::cout << "[InviteManager] Target player not found: " << targetName << "#" << targetTag << endl;
 		return 0;
 	}
 
 	// 이미 방에 있는지 체크
-	if (targetSession->_room.lock())
+	if (targetSession->GetRoom().lock())
 	{
 		std::cout << "[InviteManager] Target player already in a room" << endl;
 		return 0;
@@ -107,13 +107,13 @@ bool InviteManager::AcceptInvite(uint64 inviteId, GameSessionRef accepter)
 	}
 
 	// 방에 입장
-	accepter->_room = room;
-	room->DoAsync(&Room::EnterLobby, accepter->_player);
+	accepter->GetRoom() = room;
+	room->DoAsync(&Room::EnterLobby, accepter->GetPlayer());
 
 	// 초대 정보 삭제
 	_invites.erase(it);
 
-	std::cout << "[InviteManager] Player " << accepter->_player->name
+	std::cout << "[InviteManager] Player " << accepter->GetPlayer()->name
 		<< " accepted invite " << inviteId << " and joined room " << inviteInfo->roomId << endl;
 
 	return true;

@@ -19,7 +19,7 @@ public:
         // 로그인 체크
         if (required >= AuthLevel::LOGGED_IN)
         {
-            if (!session->_player)
+            if (!session->GetPlayer())
             {
                 std::cout << "Auth failed: Not logged in" << endl;
 				return PacketResult::Fail(PacketResultCode::NOT_LOGGED_IN);
@@ -29,7 +29,7 @@ public:
         // 방 입장 체크
         if (required >= AuthLevel::IN_ROOM)
         {
-            auto room = session->_room.lock();
+            auto room = session->GetRoom().lock();
             if (!room)
             {
                 std::cout << "Auth failed: Not in a room" << endl;
@@ -43,7 +43,7 @@ public:
 	// 방 객체를 반환하는 인증 검증 함수 (실패 시 nullptr 반환)
     static RoomRef GetRoomIfValid(GameSessionRef session, PacketResult* outResult = nullptr)
     {
-        if (!session->_player)
+        if (!session->GetPlayer())
         {
             std::cout << "Auth failed: Not logged in" << endl;
             if (outResult)
@@ -51,7 +51,7 @@ public:
             return nullptr;
         }
 
-        auto room = session->_room.lock();
+        auto room = session->GetRoom().lock();
         if (!room)
         {
             std::cout << "Auth failed: Not in a room" << endl;

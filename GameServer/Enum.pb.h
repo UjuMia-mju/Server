@@ -51,18 +51,14 @@ enum StatEventType : int {
   STAT_EVENT_NONE = 0,
   DAMAGE_TAKEN = 1,
   HEALED = 2,
-  HEALTH_ITEM_USED = 3,
-  OXYGEN_CONSUMED = 10,
-  OXYGEN_RESTORED = 11,
-  OXYGEN_ITEM_USED = 12,
-  FOOD_CONSUMED = 20,
-  TOOL_USED = 21,
+  ITEM_USED = 3,
+  OXYGEN_CHANGED = 4,
   StatEventType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   StatEventType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool StatEventType_IsValid(int value);
 constexpr StatEventType StatEventType_MIN = STAT_EVENT_NONE;
-constexpr StatEventType StatEventType_MAX = TOOL_USED;
+constexpr StatEventType StatEventType_MAX = OXYGEN_CHANGED;
 constexpr int StatEventType_ARRAYSIZE = StatEventType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* StatEventType_descriptor();
@@ -187,6 +183,87 @@ inline bool ItemState_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ItemState>(
     ItemState_descriptor(), name, value);
 }
+enum DamageSource : int {
+  DAMAGE_SOURCE_NONE = 0,
+  SUFFOCATION = 1,
+  ENVIRONMENTAL = 2,
+  MONSTER_ATTACK = 3,
+  DamageSource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  DamageSource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool DamageSource_IsValid(int value);
+constexpr DamageSource DamageSource_MIN = DAMAGE_SOURCE_NONE;
+constexpr DamageSource DamageSource_MAX = MONSTER_ATTACK;
+constexpr int DamageSource_ARRAYSIZE = DamageSource_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* DamageSource_descriptor();
+template<typename T>
+inline const std::string& DamageSource_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, DamageSource>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function DamageSource_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    DamageSource_descriptor(), enum_t_value);
+}
+inline bool DamageSource_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, DamageSource* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<DamageSource>(
+    DamageSource_descriptor(), name, value);
+}
+enum HealSource : int {
+  HEAL_SOURCE_NONE = 0,
+  REST_AREA = 1,
+  MEDICAL_KIT = 2,
+  HealSource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  HealSource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool HealSource_IsValid(int value);
+constexpr HealSource HealSource_MIN = HEAL_SOURCE_NONE;
+constexpr HealSource HealSource_MAX = MEDICAL_KIT;
+constexpr int HealSource_ARRAYSIZE = HealSource_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* HealSource_descriptor();
+template<typename T>
+inline const std::string& HealSource_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, HealSource>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function HealSource_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    HealSource_descriptor(), enum_t_value);
+}
+inline bool HealSource_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, HealSource* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<HealSource>(
+    HealSource_descriptor(), name, value);
+}
+enum OxygenChangeType : int {
+  OXYGEN_CHANGE_NONE = 0,
+  CONSUME_NATURAL = 1,
+  CONSUME_RUNNING = 2,
+  RESTORE_TANK = 3,
+  RESTORE_AREA = 4,
+  OxygenChangeType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  OxygenChangeType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool OxygenChangeType_IsValid(int value);
+constexpr OxygenChangeType OxygenChangeType_MIN = OXYGEN_CHANGE_NONE;
+constexpr OxygenChangeType OxygenChangeType_MAX = RESTORE_AREA;
+constexpr int OxygenChangeType_ARRAYSIZE = OxygenChangeType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* OxygenChangeType_descriptor();
+template<typename T>
+inline const std::string& OxygenChangeType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, OxygenChangeType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function OxygenChangeType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    OxygenChangeType_descriptor(), enum_t_value);
+}
+inline bool OxygenChangeType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, OxygenChangeType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<OxygenChangeType>(
+    OxygenChangeType_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -233,6 +310,21 @@ template <> struct is_proto_enum< ::Protocol::ItemState> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::ItemState>() {
   return ::Protocol::ItemState_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::DamageSource> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::DamageSource>() {
+  return ::Protocol::DamageSource_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::HealSource> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::HealSource>() {
+  return ::Protocol::HealSource_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::OxygenChangeType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::OxygenChangeType>() {
+  return ::Protocol::OxygenChangeType_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE
