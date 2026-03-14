@@ -1,5 +1,28 @@
 #include "pch.h"
 #include "AccountDB.h"
+#include "Player.h"
+#include <ctime> 
+
+
+static int64 ConvertDbTimestampToUnix(const TIMESTAMP_STRUCT& ts)
+{
+	// 기본값이거나 초기화되지 않은 경우
+	if (ts.year == 0) return 0;
+
+	struct tm timeInfo = {};
+	timeInfo.tm_year = ts.year - 1900;
+	timeInfo.tm_mon = ts.month - 1;
+	timeInfo.tm_mday = ts.day;
+	timeInfo.tm_hour = ts.hour;
+	timeInfo.tm_min = ts.minute;
+	timeInfo.tm_sec = ts.second;
+	timeInfo.tm_isdst = -1; // 시스템 기본 썸머타임 정책 따름
+
+	time_t epochTime = mktime(&timeInfo);
+	if (epochTime == -1) return 0;
+
+	return static_cast<int64>(epochTime);
+}
 
 /*----------------------
 	AccountDB
@@ -37,37 +60,50 @@ bool AccountDB::ValidateAccount(const string& email, const string& password)
 	return false;
 }
 
-bool AccountDB::GetPlayerInfo(const string& email, OUT int32& playerId, OUT wstring& playerName, OUT int32& playerTag)
+bool AccountDB::GetPlayerInfo(const string& email,const std::string& password, OUT int32& playerId, OUT string& playerName, OUT int32& playerTag)
 {
 	DBConnection* dbConn = GDBConnectionPool->Pop();
 	if (dbConn == nullptr)
 		return false;
 
-	std::wstring wEmail(email.begin(), email.end());
-
 	// email로 사용자 정보 조회
-	DBBind<1, 3> dbBind(*dbConn, L"SELECT id, username, tag FROM users WHERE email = ?");
+	DBBind<2, 3> dbBind(*dbConn, L"SELECT id, username, tag FROM users WHERE email = ? AND password = ?");
 
-	WCHAR nameBuffer[51] = { 0 };
-	dbBind.BindParam(0, wEmail.c_str());
-	dbBind.BindCol(0, playerId);
-	dbBind.BindCol(1, nameBuffer, sizeof(nameBuffer));
-	dbBind.BindCol(2, playerTag);
+	WCHAR wEmail[100];
+	::MultiByteToWideChar(CP_UTF8, 0, email.c_str(), -1, wEmail, 100);
 
-	bool result = false;
-	if (dbBind.Execute())
+	WCHAR wPassword[100];
+	::MultiByteToWideChar(CP_UTF8, 0, password.c_str(), -1, wPassword, 100);
+
+	// 2. 파라미터를 바인딩
+	dbBind.BindParam(0, wEmail);
+	dbBind.BindParam(1, wPassword);
+
+	int32 idCol = 0;
+	WCHAR nameCol[100] = { 0, };
+	int32 tagCol = 0;
+
+	dbBind.BindCol(0, idCol);
+	dbBind.BindCol(1, nameCol);
+	dbBind.BindCol(2, tagCol);
+
+	// 3. 쿼리 실행 (조건이 틀리면 Fetch가 false를 뱉고 실패 처리됨)
+	if (dbBind.Execute() && dbBind.Fetch())
 	{
-		if (dbConn->Fetch())
+		playerId = idCol;
+		playerTag = tagCol;
+
+		int len = ::WideCharToMultiByte(CP_UTF8, 0, nameCol, -1, nullptr, 0, nullptr, nullptr);
+		if (len > 0)
 		{
-			playerName = nameBuffer;
-			result = true;
+			playerName = std::string(len - 1, 0);
+			::WideCharToMultiByte(CP_UTF8, 0, nameCol, -1, &playerName[0], len, nullptr, nullptr);
 		}
+
+		return true; // 로그인 성공 + 정보 추출 완료!
 	}
 
-	dbConn->Unbind();
-	GDBConnectionPool->Push(dbConn);
-
-	return result;
+	return false;
 }
 
 bool AccountDB::GetPlayerClearInfo(int32 playerId, OUT vector<StageClearData>& outClearData)
@@ -107,4 +143,68 @@ bool AccountDB::GetPlayerClearInfo(int32 playerId, OUT vector<StageClearData>& o
 
 	dbConn->Unbind();
 	GDBConnectionPool->Push(dbConn);
+}
+
+
+bool AccountDB::GetUserProfileInfo(int32 dbUserId, OUT int32& outCoin, OUT int32& outGem, OUT vector<OwnedSkinInfo>& outOwnedSkins)
+{
+	// 초기화
+	outCoin = 0;
+	outGem = 0;
+	outOwnedSkins.clear();
+
+	DBConnectionGuard conn(GDBConnectionPool);
+	if (!conn)
+	{
+		return false;
+	}
+	
+	// 1. 유저의 재화 가져오기 (테이블: user_goods 또는 users)
+	DBBind<1, 2> dbGoodsBind(conn, L"SELECT coin, gem FROM user_goods WHERE user_id = ?");
+	dbGoodsBind.BindParam(0, dbUserId);
+
+	dbGoodsBind.BindCol(0, outCoin);
+	dbGoodsBind.BindCol(1, outGem);
+
+	if (dbGoodsBind.Execute())
+	{
+		dbGoodsBind.Fetch();
+	}
+	else
+	{
+		// 쿼리 자체가 실패한 경우
+		return false;
+	}
+
+	// 2. 유저가 보유한 스킨 목록 및 상태 상세 정보 가져오기 
+	DBBind<1, 3> dbSkinBind(conn,
+		L"SELECT skin_id, skin_get_at, is_equipped FROM user_owned_skins WHERE user_id = ?"
+	);
+	dbSkinBind.BindParam(0, dbUserId);
+
+	int32 sId = 0;
+	TIMESTAMP_STRUCT sGetAt = {};
+	bool sEquipped = false;
+
+	dbSkinBind.BindCol(0, sId);
+	dbSkinBind.BindCol(1, sGetAt);
+	dbSkinBind.BindCol(2, sEquipped);
+
+	if (dbSkinBind.Execute())
+	{
+		// 유저가 가진 스킨이 10개라면 Fetch() 가 10번 True를 반환합니다.
+		while (dbSkinBind.Fetch())
+		{
+			// 타임스탬프 구조체를 우리가 쓰기 편한 int64(Unix)로 변환
+			int64 unixGetAt = ConvertDbTimestampToUnix(sGetAt);
+			// 완성된 스킨 구조체 하나를 리스트에 밀어 넣습니다.
+			outOwnedSkins.push_back({ sId, unixGetAt, sEquipped });
+		}
+	}
+	else
+	{
+		return false; // 스킨 쿼리 실패
+	}
+
+	return true;
 }

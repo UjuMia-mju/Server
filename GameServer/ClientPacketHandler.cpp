@@ -72,12 +72,12 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 
 bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 
-	std::string email = pkt.userid();
-	std::string password = pkt.psw();
+	string email = pkt.userid();
+	string password = pkt.psw();
 
-	std::cout << "Received Login - Email: " << email << ", Password: " << password << endl;
+	cout << "Received Login - Email: " << email << ", Password: " << password << endl;
 
 	Protocol::S_LOGIN sLoginPkt;
 
@@ -85,23 +85,16 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	if (AccountDB::ValidateAccount(email, password))
 	{
 		int32 dbPlayerId = 0;
-		wstring dbPlayerName;
+		string dbPlayerName;
 		int32 dbPlayerTag;
-		if (AccountDB::GetPlayerInfo(email, dbPlayerId, dbPlayerName, dbPlayerTag))
+		if (AccountDB::GetPlayerInfo(email, password, dbPlayerId, dbPlayerName, dbPlayerTag))
 		{
 			sLoginPkt.set_success(true);
-			// wstring -> UTF-8 string 변환
-			int size = WideCharToMultiByte(CP_UTF8, 0, dbPlayerName.c_str(), -1, nullptr, 0, nullptr, nullptr);
-			std::string playerNameUtf8;
-			if (size > 0)
-			{
-				playerNameUtf8.resize(size - 1);
-				WideCharToMultiByte(CP_UTF8, 0, dbPlayerName.c_str(), -1, &playerNameUtf8[0], size, nullptr, nullptr);
-			}
+			
 			// DB에서 플레이어 정보를 세팅한다.
 			auto player = sLoginPkt.mutable_player();
 			player->set_id(dbPlayerId);
-			player->set_name(playerNameUtf8);
+			player->set_name(dbPlayerName);
 			player->set_tag(dbPlayerTag);
 
 			// Player 연결
@@ -110,13 +103,42 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 			playerRef->playerId = player->id();
 			playerRef->tag = player->tag();
 			playerRef->ownerSession = gameSession;
+
 			// PlayerInfo연결
 			PlayerInfoRef playerInfo = MakeShared<PlayerInfo>();
+
+			int32 dbCoin = 0;
+			int32 dbGem = 0;
+			std::vector<OwnedSkinInfo> loadedSkins;
+			if (AccountDB::GetUserProfileInfo(dbPlayerId, dbCoin, dbGem, loadedSkins))
+			{
+				auto infoPkt = sLoginPkt.mutable_player_info();
+				infoPkt->set_player_id(player->id());
+				infoPkt->set_coin(dbCoin);
+				infoPkt->set_gem(dbGem);
+
+				playerInfo->SetCoin(dbCoin);
+				playerInfo->SetGem(dbGem);
+				playerInfo->SetDbUserId(dbPlayerId);
+
+				for (const auto& skin : loadedSkins)
+				{
+					playerInfo->AddSkin(skin.skinId, skin.getAt, skin.isEquipped);
+					infoPkt->add_owned_skins(skin.skinId);
+				}
+			}
+			else
+			{
+				cout << "Failed to retrieve user profile info for player ID: " << dbPlayerId << endl;
+			}
+			
 			playerInfo->SetDbUserId(player->id());
 			playerInfo->ownerSession = gameSession; //순환 참조 방지
 
 			gameSession->SetPlayer(playerRef);
 			gameSession->SetPlayerInfo(playerInfo);
+
+			cout << "gem: " << playerInfo->GetGem() << ", coin: " << playerInfo->GetCoin() << endl;
 		}
 		else
 		{
@@ -142,10 +164,14 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 {
 	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
-	PlayerInfoRef playerInfo = gameSession->GetPlayerInfo(); // (또는 GetPlayerInfo() 사용)
+	
+	PlayerInfoRef playerInfo = gameSession->GetPlayerInfo();
+
+	cout << "[GACHA LOG] start gacha - Player ID: " << playerInfo->GetDbUserId() << ", Pool ID: " << pkt.pool_id() << std::endl;
 	if (playerInfo == nullptr)
 	{
 		// 인증은 되었지만 플레이어 정보가 없는 경우 (예: DB 오류)
+		cout << "[GACHA LOG] 플레이어 정보가 없습니다. 가챠를 진행할 수 없습니다." << std::endl;
 		return false;
 	}
 	int32 obtainedSkinId = 0;
@@ -154,6 +180,7 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 	int32 gemBefore = playerInfo->GetGem();
 	int32 coinBefore = playerInfo->GetCoin();
 
+	std::cout << "[GACHA LOG] player owned goods -> Gem: " << gemBefore << ", Coin: " << coinBefore << std::endl;
 
 	bool isSuccess = GGACHA.ExecuteGacha(playerInfo, pkt.pool_id(), obtainedSkinId);
 
@@ -163,6 +190,7 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 	if (isSuccess)
 	{
+		std::cout << "[GACHA LOG] 가챠 성공! 획득한 스킨 ID = " << obtainedSkinId << std::endl;
 		Protocol::GachaResult* result = resPkt.mutable_result();
 
 		int32 gemAfter = playerInfo->GetGem();
@@ -193,7 +221,9 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 	else
 	{
 		// (선택) 에러 코드를 보내고 싶다면 추가적으로 패킷에 세팅
-		resPkt.set_error_msg("fail");
+		cout << "[GACHA LOG] Fail" << endl;
+		resPkt.set_success(false);
+		resPkt.set_error_msg("fail to send");
 	}
 
 	// 6. 패킷 전송

@@ -38,6 +38,7 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 PROTOBUF_CONSTEXPR S_LOGIN::S_LOGIN(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.player_)*/nullptr
+  , /*decltype(_impl_.player_info_)*/nullptr
   , /*decltype(_impl_.success_)*/false
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct S_LOGINDefaultTypeInternal {
@@ -765,6 +766,7 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S_LOGIN, _impl_.success_),
   PROTOBUF_FIELD_OFFSET(::Protocol::S_LOGIN, _impl_.player_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_LOGIN, _impl_.player_info_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::C_GACHA, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1167,57 +1169,57 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::C_LOGIN)},
   { 8, -1, -1, sizeof(::Protocol::S_LOGIN)},
-  { 16, -1, -1, sizeof(::Protocol::C_GACHA)},
-  { 24, -1, -1, sizeof(::Protocol::S_GACHA)},
-  { 33, -1, -1, sizeof(::Protocol::C_GACHA_POOL_LIST)},
-  { 39, -1, -1, sizeof(::Protocol::S_GACHA_POOL_LIST)},
-  { 46, -1, -1, sizeof(::Protocol::C_MY_SKINS)},
-  { 52, -1, -1, sizeof(::Protocol::S_MY_SKINS)},
-  { 59, -1, -1, sizeof(::Protocol::C_CREATE_ROOM)},
-  { 65, -1, -1, sizeof(::Protocol::S_CREATE_ROOM)},
-  { 74, -1, -1, sizeof(::Protocol::C_ROOM_LIST)},
-  { 80, -1, -1, sizeof(::Protocol::S_ROOM_LIST)},
-  { 87, -1, -1, sizeof(::Protocol::C_ENTER_ROOM)},
-  { 94, -1, -1, sizeof(::Protocol::S_ENTER_ROOM)},
-  { 104, -1, -1, sizeof(::Protocol::C_LEAVE_ROOM)},
-  { 110, -1, -1, sizeof(::Protocol::S_LEAVE_ROOM)},
-  { 118, -1, -1, sizeof(::Protocol::C_INVITE_PLAYER)},
-  { 126, -1, -1, sizeof(::Protocol::S_INVITE_PLAYER)},
-  { 136, -1, -1, sizeof(::Protocol::S_INVITE_NOTIFICATION)},
-  { 146, -1, -1, sizeof(::Protocol::C_INVITE_RESPONSE)},
-  { 154, -1, -1, sizeof(::Protocol::S_INVITE_RESPONSE)},
-  { 162, -1, -1, sizeof(::Protocol::S_ROOM_MEMBER_ENTER)},
-  { 169, -1, -1, sizeof(::Protocol::S_ROOM_MEMBER_LEAVE)},
-  { 178, -1, -1, sizeof(::Protocol::C_READY)},
-  { 185, -1, -1, sizeof(::Protocol::S_READY)},
-  { 193, -1, -1, sizeof(::Protocol::C_START_ROOM)},
-  { 199, -1, -1, sizeof(::Protocol::S_START_ROOM)},
-  { 207, -1, -1, sizeof(::Protocol::C_CHAT)},
-  { 214, -1, -1, sizeof(::Protocol::S_CHAT)},
-  { 222, -1, -1, sizeof(::Protocol::C_ENTER_GAME)},
-  { 229, -1, -1, sizeof(::Protocol::S_ENTER_GAME)},
-  { 236, -1, -1, sizeof(::Protocol::C_TEST_ENTER_GAME)},
-  { 243, -1, -1, sizeof(::Protocol::C_SHOW_STAGE)},
-  { 251, -1, -1, sizeof(::Protocol::S_SHOW_STAGE)},
-  { 259, -1, -1, sizeof(::Protocol::C_START_STAGE)},
-  { 267, -1, -1, sizeof(::Protocol::S_START_STAGE)},
-  { 275, -1, -1, sizeof(::Protocol::C_GET_CLEAR_INFO)},
-  { 281, -1, -1, sizeof(::Protocol::S_GET_CLEAR_INFO)},
-  { 289, -1, -1, sizeof(::Protocol::C_MOVE)},
-  { 297, -1, -1, sizeof(::Protocol::S_MOVE)},
-  { 306, -1, -1, sizeof(::Protocol::S_PLAYER_LIST)},
-  { 313, -1, -1, sizeof(::Protocol::S_PLAYER_ENTER)},
-  { 320, -1, -1, sizeof(::Protocol::S_PLAYER_LEAVE)},
-  { 327, -1, -1, sizeof(::Protocol::C_PLAYER_ANIMATION)},
-  { 334, -1, -1, sizeof(::Protocol::S_PLAYER_ANIMATION)},
-  { 342, -1, -1, sizeof(::Protocol::C_PLAYER_STAT_EVENT)},
-  { 355, -1, -1, sizeof(::Protocol::S_PLAYER_STAT)},
-  { 364, -1, -1, sizeof(::Protocol::C_OBJECT_PICKUP)},
-  { 371, -1, -1, sizeof(::Protocol::S_OBJECT_PICKUP)},
-  { 381, -1, -1, sizeof(::Protocol::C_OBJECT_DROP)},
-  { 388, -1, -1, sizeof(::Protocol::S_OBJECT_DROP)},
-  { 396, -1, -1, sizeof(::Protocol::C_OBJECT_MOVE)},
-  { 405, -1, -1, sizeof(::Protocol::S_OBJECT_MOVE)},
+  { 17, -1, -1, sizeof(::Protocol::C_GACHA)},
+  { 25, -1, -1, sizeof(::Protocol::S_GACHA)},
+  { 34, -1, -1, sizeof(::Protocol::C_GACHA_POOL_LIST)},
+  { 40, -1, -1, sizeof(::Protocol::S_GACHA_POOL_LIST)},
+  { 47, -1, -1, sizeof(::Protocol::C_MY_SKINS)},
+  { 53, -1, -1, sizeof(::Protocol::S_MY_SKINS)},
+  { 60, -1, -1, sizeof(::Protocol::C_CREATE_ROOM)},
+  { 66, -1, -1, sizeof(::Protocol::S_CREATE_ROOM)},
+  { 75, -1, -1, sizeof(::Protocol::C_ROOM_LIST)},
+  { 81, -1, -1, sizeof(::Protocol::S_ROOM_LIST)},
+  { 88, -1, -1, sizeof(::Protocol::C_ENTER_ROOM)},
+  { 95, -1, -1, sizeof(::Protocol::S_ENTER_ROOM)},
+  { 105, -1, -1, sizeof(::Protocol::C_LEAVE_ROOM)},
+  { 111, -1, -1, sizeof(::Protocol::S_LEAVE_ROOM)},
+  { 119, -1, -1, sizeof(::Protocol::C_INVITE_PLAYER)},
+  { 127, -1, -1, sizeof(::Protocol::S_INVITE_PLAYER)},
+  { 137, -1, -1, sizeof(::Protocol::S_INVITE_NOTIFICATION)},
+  { 147, -1, -1, sizeof(::Protocol::C_INVITE_RESPONSE)},
+  { 155, -1, -1, sizeof(::Protocol::S_INVITE_RESPONSE)},
+  { 163, -1, -1, sizeof(::Protocol::S_ROOM_MEMBER_ENTER)},
+  { 170, -1, -1, sizeof(::Protocol::S_ROOM_MEMBER_LEAVE)},
+  { 179, -1, -1, sizeof(::Protocol::C_READY)},
+  { 186, -1, -1, sizeof(::Protocol::S_READY)},
+  { 194, -1, -1, sizeof(::Protocol::C_START_ROOM)},
+  { 200, -1, -1, sizeof(::Protocol::S_START_ROOM)},
+  { 208, -1, -1, sizeof(::Protocol::C_CHAT)},
+  { 215, -1, -1, sizeof(::Protocol::S_CHAT)},
+  { 223, -1, -1, sizeof(::Protocol::C_ENTER_GAME)},
+  { 230, -1, -1, sizeof(::Protocol::S_ENTER_GAME)},
+  { 237, -1, -1, sizeof(::Protocol::C_TEST_ENTER_GAME)},
+  { 244, -1, -1, sizeof(::Protocol::C_SHOW_STAGE)},
+  { 252, -1, -1, sizeof(::Protocol::S_SHOW_STAGE)},
+  { 260, -1, -1, sizeof(::Protocol::C_START_STAGE)},
+  { 268, -1, -1, sizeof(::Protocol::S_START_STAGE)},
+  { 276, -1, -1, sizeof(::Protocol::C_GET_CLEAR_INFO)},
+  { 282, -1, -1, sizeof(::Protocol::S_GET_CLEAR_INFO)},
+  { 290, -1, -1, sizeof(::Protocol::C_MOVE)},
+  { 298, -1, -1, sizeof(::Protocol::S_MOVE)},
+  { 307, -1, -1, sizeof(::Protocol::S_PLAYER_LIST)},
+  { 314, -1, -1, sizeof(::Protocol::S_PLAYER_ENTER)},
+  { 321, -1, -1, sizeof(::Protocol::S_PLAYER_LEAVE)},
+  { 328, -1, -1, sizeof(::Protocol::C_PLAYER_ANIMATION)},
+  { 335, -1, -1, sizeof(::Protocol::S_PLAYER_ANIMATION)},
+  { 343, -1, -1, sizeof(::Protocol::C_PLAYER_STAT_EVENT)},
+  { 356, -1, -1, sizeof(::Protocol::S_PLAYER_STAT)},
+  { 365, -1, -1, sizeof(::Protocol::C_OBJECT_PICKUP)},
+  { 372, -1, -1, sizeof(::Protocol::S_OBJECT_PICKUP)},
+  { 382, -1, -1, sizeof(::Protocol::C_OBJECT_DROP)},
+  { 389, -1, -1, sizeof(::Protocol::S_OBJECT_DROP)},
+  { 397, -1, -1, sizeof(::Protocol::C_OBJECT_MOVE)},
+  { 406, -1, -1, sizeof(::Protocol::S_OBJECT_MOVE)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -1279,88 +1281,90 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\016Protocol.proto\022\010Protocol\032\nEnum.proto\032\014"
   "Struct.proto\"&\n\007C_LOGIN\022\016\n\006userId\030\001 \001(\t\022"
-  "\013\n\003psw\030\002 \001(\t\"<\n\007S_LOGIN\022\017\n\007success\030\001 \001(\010"
-  "\022 \n\006player\030\002 \001(\0132\020.Protocol.Player\".\n\007C_"
-  "GACHA\022\017\n\007pool_id\030\001 \001(\005\022\022\n\npull_count\030\002 \001"
-  "(\005\"T\n\007S_GACHA\022\017\n\007success\030\001 \001(\010\022%\n\006result"
-  "\030\002 \001(\0132\025.Protocol.GachaResult\022\021\n\terror_m"
-  "sg\030\003 \001(\t\"\023\n\021C_GACHA_POOL_LIST\";\n\021S_GACHA"
-  "_POOL_LIST\022&\n\005pools\030\001 \003(\0132\027.Protocol.Gac"
-  "haPoolInfo\"\014\n\nC_MY_SKINS\"/\n\nS_MY_SKINS\022!"
-  "\n\005skins\030\001 \003(\0132\022.Protocol.SkinInfo\"\017\n\rC_C"
-  "REATE_ROOM\"U\n\rS_CREATE_ROOM\022\017\n\007success\030\001"
-  " \001(\010\022 \n\004room\030\002 \001(\0132\022.Protocol.RoomInfo\022\021"
-  "\n\terror_msg\030\003 \001(\t\"\r\n\013C_ROOM_LIST\"0\n\013S_RO"
-  "OM_LIST\022!\n\005rooms\030\001 \003(\0132\022.Protocol.RoomIn"
-  "fo\"\037\n\014C_ENTER_ROOM\022\017\n\007room_id\030\001 \001(\004\"\177\n\014S"
-  "_ENTER_ROOM\022\017\n\007success\030\001 \001(\010\022 \n\004room\030\002 \001"
-  "(\0132\022.Protocol.RoomInfo\022)\n\007members\030\003 \003(\0132"
-  "\030.Protocol.RoomMemberInfo\022\021\n\terror_msg\030\004"
-  " \001(\t\"\016\n\014C_LEAVE_ROOM\"2\n\014S_LEAVE_ROOM\022\017\n\007"
-  "success\030\001 \001(\010\022\021\n\tplayer_id\030\002 \001(\004\":\n\017C_IN"
-  "VITE_PLAYER\022\023\n\013player_name\030\001 \001(\t\022\022\n\nplay"
-  "er_tag\030\002 \001(\005\"^\n\017S_INVITE_PLAYER\022\017\n\007succe"
-  "ss\030\001 \001(\010\022\023\n\013player_name\030\002 \001(\t\022\022\n\nplayer_"
-  "tag\030\003 \001(\005\022\021\n\terror_msg\030\004 \001(\t\"d\n\025S_INVITE"
-  "_NOTIFICATION\022\017\n\007room_id\030\001 \001(\004\022\021\n\troom_n"
-  "ame\030\002 \001(\t\022\024\n\014inviter_name\030\003 \001(\t\022\021\n\tinvit"
-  "e_id\030\004 \001(\004\"6\n\021C_INVITE_RESPONSE\022\021\n\tinvit"
-  "e_id\030\001 \001(\004\022\016\n\006accept\030\002 \001(\010\"7\n\021S_INVITE_R"
-  "ESPONSE\022\017\n\007success\030\001 \001(\010\022\021\n\terror_msg\030\002 "
-  "\001(\t\"\?\n\023S_ROOM_MEMBER_ENTER\022(\n\006member\030\001 \001"
-  "(\0132\030.Protocol.RoomMemberInfo\"S\n\023S_ROOM_M"
-  "EMBER_LEAVE\022\021\n\tplayer_id\030\001 \001(\004\022\023\n\013player"
-  "_name\030\002 \001(\t\022\024\n\014new_owner_id\030\003 \001(\004\"\033\n\007C_R"
-  "EADY\022\020\n\010is_ready\030\001 \001(\010\".\n\007S_READY\022\021\n\tpla"
-  "yer_id\030\001 \001(\004\022\020\n\010is_ready\030\002 \001(\010\"\016\n\014C_STAR"
-  "T_ROOM\"2\n\014S_START_ROOM\022\017\n\007success\030\001 \001(\010\022"
-  "\021\n\terror_msg\030\002 \001(\t\"\025\n\006C_CHAT\022\013\n\003msg\030\001 \001("
-  "\t\"\'\n\006S_CHAT\022\020\n\010playerId\030\001 \001(\004\022\013\n\003msg\030\002 \001"
-  "(\t\"#\n\014C_ENTER_GAME\022\023\n\013playerIndex\030\001 \001(\004\""
-  "\037\n\014S_ENTER_GAME\022\017\n\007success\030\001 \001(\010\"(\n\021C_TE"
-  "ST_ENTER_GAME\022\023\n\013playerIndex\030\001 \001(\004\"6\n\014C_"
-  "SHOW_STAGE\022\022\n\nstageLevel\030\001 \001(\005\022\022\n\nstageI"
-  "ndex\030\002 \001(\005\"C\n\014S_SHOW_STAGE\022\017\n\007success\030\001 "
-  "\001(\010\022\"\n\005stage\030\002 \001(\0132\023.Protocol.StageInfo\""
-  "7\n\rC_START_STAGE\022\022\n\nstageLevel\030\001 \001(\005\022\022\n\n"
-  "stageIndex\030\002 \001(\005\"D\n\rS_START_STAGE\022\017\n\007suc"
-  "cess\030\001 \001(\010\022\"\n\005stage\030\002 \001(\0132\023.Protocol.Sta"
-  "geInfo\"\022\n\020C_GET_CLEAR_INFO\"S\n\020S_GET_CLEA"
-  "R_INFO\022\017\n\007success\030\001 \001(\010\022.\n\014stage_clears\030"
-  "\002 \003(\0132\030.Protocol.StageClearInfo\"H\n\006C_MOV"
-  "E\022\036\n\003pos\030\001 \001(\0132\021.Protocol.PosInfo\022\036\n\003rot"
-  "\030\002 \001(\0132\021.Protocol.RotInfo\"Z\n\006S_MOVE\022\020\n\010p"
-  "layerId\030\001 \001(\004\022\036\n\003pos\030\002 \001(\0132\021.Protocol.Po"
-  "sInfo\022\036\n\003rot\030\003 \001(\0132\021.Protocol.RotInfo\"6\n"
-  "\rS_PLAYER_LIST\022%\n\007players\030\001 \003(\0132\024.Protoc"
-  "ol.PlayerInfo\"6\n\016S_PLAYER_ENTER\022$\n\006playe"
-  "r\030\001 \001(\0132\024.Protocol.PlayerInfo\"6\n\016S_PLAYE"
-  "R_LEAVE\022$\n\006player\030\001 \001(\0132\024.Protocol.Playe"
-  "rInfo\"#\n\022C_PLAYER_ANIMATION\022\r\n\005state\030\001 \001"
-  "(\005\"5\n\022S_PLAYER_ANIMATION\022\020\n\010playerId\030\001 \001"
-  "(\004\022\r\n\005state\030\002 \001(\005\"\235\002\n\023C_PLAYER_STAT_EVEN"
-  "T\022\030\n\020target_player_id\030\001 \001(\004\022+\n\nevent_typ"
-  "e\030\002 \001(\0162\027.Protocol.StatEventType\022+\n\006dama"
-  "ge\030\n \001(\0132\031.Protocol.DamageEventDataH\000\022\'\n"
-  "\004heal\030\013 \001(\0132\027.Protocol.HealEventDataH\000\022."
-  "\n\010item_use\030\014 \001(\0132\032.Protocol.ItemUseEvent"
-  "DataH\000\022+\n\006oxygen\030\r \001(\0132\031.Protocol.Oxygen"
-  "EventDataH\000B\014\n\nevent_data\"=\n\rS_PLAYER_ST"
-  "AT\022\020\n\010playerId\030\001 \001(\004\022\n\n\002hp\030\002 \001(\005\022\016\n\006oxyg"
-  "en\030\003 \001(\002\"8\n\017C_OBJECT_PICKUP\022%\n\tobject_id"
-  "\030\001 \001(\0132\022.Protocol.ObjectId\"o\n\017S_OBJECT_P"
-  "ICKUP\022\017\n\007success\030\001 \001(\010\022%\n\tobject_id\030\002 \001("
-  "\0132\022.Protocol.ObjectId\022\021\n\tplayer_id\030\003 \001(\004"
-  "\022\021\n\terror_msg\030\004 \001(\t\"6\n\rC_OBJECT_DROP\022%\n\t"
-  "object_id\030\001 \001(\0132\022.Protocol.ObjectId\"I\n\rS"
-  "_OBJECT_DROP\022%\n\tobject_id\030\001 \001(\0132\022.Protoc"
-  "ol.ObjectId\022\021\n\tplayer_id\030\002 \001(\004\"v\n\rC_OBJE"
-  "CT_MOVE\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.Ob"
-  "jectId\022\036\n\003pos\030\002 \001(\0132\021.Protocol.PosInfo\022\036"
-  "\n\003rot\030\003 \001(\0132\021.Protocol.RotInfo\"v\n\rS_OBJE"
-  "CT_MOVE\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.Ob"
-  "jectId\022\036\n\003pos\030\002 \001(\0132\021.Protocol.PosInfo\022\036"
-  "\n\003rot\030\003 \001(\0132\021.Protocol.RotInfob\006proto3"
+  "\013\n\003psw\030\002 \001(\t\"g\n\007S_LOGIN\022\017\n\007success\030\001 \001(\010"
+  "\022 \n\006player\030\002 \001(\0132\020.Protocol.Player\022)\n\013pl"
+  "ayer_info\030\003 \001(\0132\024.Protocol.PlayerInfo\".\n"
+  "\007C_GACHA\022\017\n\007pool_id\030\001 \001(\005\022\022\n\npull_count\030"
+  "\002 \001(\005\"T\n\007S_GACHA\022\017\n\007success\030\001 \001(\010\022%\n\006res"
+  "ult\030\002 \001(\0132\025.Protocol.GachaResult\022\021\n\terro"
+  "r_msg\030\003 \001(\t\"\023\n\021C_GACHA_POOL_LIST\";\n\021S_GA"
+  "CHA_POOL_LIST\022&\n\005pools\030\001 \003(\0132\027.Protocol."
+  "GachaPoolInfo\"\014\n\nC_MY_SKINS\"/\n\nS_MY_SKIN"
+  "S\022!\n\005skins\030\001 \003(\0132\022.Protocol.SkinInfo\"\017\n\r"
+  "C_CREATE_ROOM\"U\n\rS_CREATE_ROOM\022\017\n\007succes"
+  "s\030\001 \001(\010\022 \n\004room\030\002 \001(\0132\022.Protocol.RoomInf"
+  "o\022\021\n\terror_msg\030\003 \001(\t\"\r\n\013C_ROOM_LIST\"0\n\013S"
+  "_ROOM_LIST\022!\n\005rooms\030\001 \003(\0132\022.Protocol.Roo"
+  "mInfo\"\037\n\014C_ENTER_ROOM\022\017\n\007room_id\030\001 \001(\004\"\177"
+  "\n\014S_ENTER_ROOM\022\017\n\007success\030\001 \001(\010\022 \n\004room\030"
+  "\002 \001(\0132\022.Protocol.RoomInfo\022)\n\007members\030\003 \003"
+  "(\0132\030.Protocol.RoomMemberInfo\022\021\n\terror_ms"
+  "g\030\004 \001(\t\"\016\n\014C_LEAVE_ROOM\"2\n\014S_LEAVE_ROOM\022"
+  "\017\n\007success\030\001 \001(\010\022\021\n\tplayer_id\030\002 \001(\004\":\n\017C"
+  "_INVITE_PLAYER\022\023\n\013player_name\030\001 \001(\t\022\022\n\np"
+  "layer_tag\030\002 \001(\005\"^\n\017S_INVITE_PLAYER\022\017\n\007su"
+  "ccess\030\001 \001(\010\022\023\n\013player_name\030\002 \001(\t\022\022\n\nplay"
+  "er_tag\030\003 \001(\005\022\021\n\terror_msg\030\004 \001(\t\"d\n\025S_INV"
+  "ITE_NOTIFICATION\022\017\n\007room_id\030\001 \001(\004\022\021\n\troo"
+  "m_name\030\002 \001(\t\022\024\n\014inviter_name\030\003 \001(\t\022\021\n\tin"
+  "vite_id\030\004 \001(\004\"6\n\021C_INVITE_RESPONSE\022\021\n\tin"
+  "vite_id\030\001 \001(\004\022\016\n\006accept\030\002 \001(\010\"7\n\021S_INVIT"
+  "E_RESPONSE\022\017\n\007success\030\001 \001(\010\022\021\n\terror_msg"
+  "\030\002 \001(\t\"\?\n\023S_ROOM_MEMBER_ENTER\022(\n\006member\030"
+  "\001 \001(\0132\030.Protocol.RoomMemberInfo\"S\n\023S_ROO"
+  "M_MEMBER_LEAVE\022\021\n\tplayer_id\030\001 \001(\004\022\023\n\013pla"
+  "yer_name\030\002 \001(\t\022\024\n\014new_owner_id\030\003 \001(\004\"\033\n\007"
+  "C_READY\022\020\n\010is_ready\030\001 \001(\010\".\n\007S_READY\022\021\n\t"
+  "player_id\030\001 \001(\004\022\020\n\010is_ready\030\002 \001(\010\"\016\n\014C_S"
+  "TART_ROOM\"2\n\014S_START_ROOM\022\017\n\007success\030\001 \001"
+  "(\010\022\021\n\terror_msg\030\002 \001(\t\"\025\n\006C_CHAT\022\013\n\003msg\030\001"
+  " \001(\t\"\'\n\006S_CHAT\022\020\n\010playerId\030\001 \001(\004\022\013\n\003msg\030"
+  "\002 \001(\t\"#\n\014C_ENTER_GAME\022\023\n\013playerIndex\030\001 \001"
+  "(\004\"\037\n\014S_ENTER_GAME\022\017\n\007success\030\001 \001(\010\"(\n\021C"
+  "_TEST_ENTER_GAME\022\023\n\013playerIndex\030\001 \001(\004\"6\n"
+  "\014C_SHOW_STAGE\022\022\n\nstageLevel\030\001 \001(\005\022\022\n\nsta"
+  "geIndex\030\002 \001(\005\"C\n\014S_SHOW_STAGE\022\017\n\007success"
+  "\030\001 \001(\010\022\"\n\005stage\030\002 \001(\0132\023.Protocol.StageIn"
+  "fo\"7\n\rC_START_STAGE\022\022\n\nstageLevel\030\001 \001(\005\022"
+  "\022\n\nstageIndex\030\002 \001(\005\"D\n\rS_START_STAGE\022\017\n\007"
+  "success\030\001 \001(\010\022\"\n\005stage\030\002 \001(\0132\023.Protocol."
+  "StageInfo\"\022\n\020C_GET_CLEAR_INFO\"S\n\020S_GET_C"
+  "LEAR_INFO\022\017\n\007success\030\001 \001(\010\022.\n\014stage_clea"
+  "rs\030\002 \003(\0132\030.Protocol.StageClearInfo\"H\n\006C_"
+  "MOVE\022\036\n\003pos\030\001 \001(\0132\021.Protocol.PosInfo\022\036\n\003"
+  "rot\030\002 \001(\0132\021.Protocol.RotInfo\"Z\n\006S_MOVE\022\020"
+  "\n\010playerId\030\001 \001(\004\022\036\n\003pos\030\002 \001(\0132\021.Protocol"
+  ".PosInfo\022\036\n\003rot\030\003 \001(\0132\021.Protocol.RotInfo"
+  "\":\n\rS_PLAYER_LIST\022)\n\007players\030\001 \003(\0132\030.Pro"
+  "tocol.PlayerGameInfo\":\n\016S_PLAYER_ENTER\022("
+  "\n\006player\030\001 \001(\0132\030.Protocol.PlayerGameInfo"
+  "\":\n\016S_PLAYER_LEAVE\022(\n\006player\030\001 \001(\0132\030.Pro"
+  "tocol.PlayerGameInfo\"#\n\022C_PLAYER_ANIMATI"
+  "ON\022\r\n\005state\030\001 \001(\005\"5\n\022S_PLAYER_ANIMATION\022"
+  "\020\n\010playerId\030\001 \001(\004\022\r\n\005state\030\002 \001(\005\"\235\002\n\023C_P"
+  "LAYER_STAT_EVENT\022\030\n\020target_player_id\030\001 \001"
+  "(\004\022+\n\nevent_type\030\002 \001(\0162\027.Protocol.StatEv"
+  "entType\022+\n\006damage\030\n \001(\0132\031.Protocol.Damag"
+  "eEventDataH\000\022\'\n\004heal\030\013 \001(\0132\027.Protocol.He"
+  "alEventDataH\000\022.\n\010item_use\030\014 \001(\0132\032.Protoc"
+  "ol.ItemUseEventDataH\000\022+\n\006oxygen\030\r \001(\0132\031."
+  "Protocol.OxygenEventDataH\000B\014\n\nevent_data"
+  "\"=\n\rS_PLAYER_STAT\022\020\n\010playerId\030\001 \001(\004\022\n\n\002h"
+  "p\030\002 \001(\005\022\016\n\006oxygen\030\003 \001(\002\"8\n\017C_OBJECT_PICK"
+  "UP\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.ObjectI"
+  "d\"o\n\017S_OBJECT_PICKUP\022\017\n\007success\030\001 \001(\010\022%\n"
+  "\tobject_id\030\002 \001(\0132\022.Protocol.ObjectId\022\021\n\t"
+  "player_id\030\003 \001(\004\022\021\n\terror_msg\030\004 \001(\t\"6\n\rC_"
+  "OBJECT_DROP\022%\n\tobject_id\030\001 \001(\0132\022.Protoco"
+  "l.ObjectId\"I\n\rS_OBJECT_DROP\022%\n\tobject_id"
+  "\030\001 \001(\0132\022.Protocol.ObjectId\022\021\n\tplayer_id\030"
+  "\002 \001(\004\"v\n\rC_OBJECT_MOVE\022%\n\tobject_id\030\001 \001("
+  "\0132\022.Protocol.ObjectId\022\036\n\003pos\030\002 \001(\0132\021.Pro"
+  "tocol.PosInfo\022\036\n\003rot\030\003 \001(\0132\021.Protocol.Ro"
+  "tInfo\"v\n\rS_OBJECT_MOVE\022%\n\tobject_id\030\001 \001("
+  "\0132\022.Protocol.ObjectId\022\036\n\003pos\030\002 \001(\0132\021.Pro"
+  "tocol.PosInfo\022\036\n\003rot\030\003 \001(\0132\021.Protocol.Ro"
+  "tInfob\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -1368,7 +1372,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Protocol_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Protocol_2eproto = {
-    false, false, 3358, descriptor_table_protodef_Protocol_2eproto,
+    false, false, 3413, descriptor_table_protodef_Protocol_2eproto,
     "Protocol.proto",
     &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 53,
     schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
@@ -1641,17 +1645,28 @@ void C_LOGIN::InternalSwap(C_LOGIN* other) {
 class S_LOGIN::_Internal {
  public:
   static const ::Protocol::Player& player(const S_LOGIN* msg);
+  static const ::Protocol::PlayerInfo& player_info(const S_LOGIN* msg);
 };
 
 const ::Protocol::Player&
 S_LOGIN::_Internal::player(const S_LOGIN* msg) {
   return *msg->_impl_.player_;
 }
+const ::Protocol::PlayerInfo&
+S_LOGIN::_Internal::player_info(const S_LOGIN* msg) {
+  return *msg->_impl_.player_info_;
+}
 void S_LOGIN::clear_player() {
   if (GetArenaForAllocation() == nullptr && _impl_.player_ != nullptr) {
     delete _impl_.player_;
   }
   _impl_.player_ = nullptr;
+}
+void S_LOGIN::clear_player_info() {
+  if (GetArenaForAllocation() == nullptr && _impl_.player_info_ != nullptr) {
+    delete _impl_.player_info_;
+  }
+  _impl_.player_info_ = nullptr;
 }
 S_LOGIN::S_LOGIN(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -1664,12 +1679,16 @@ S_LOGIN::S_LOGIN(const S_LOGIN& from)
   S_LOGIN* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.player_){nullptr}
+    , decltype(_impl_.player_info_){nullptr}
     , decltype(_impl_.success_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_player()) {
     _this->_impl_.player_ = new ::Protocol::Player(*from._impl_.player_);
+  }
+  if (from._internal_has_player_info()) {
+    _this->_impl_.player_info_ = new ::Protocol::PlayerInfo(*from._impl_.player_info_);
   }
   _this->_impl_.success_ = from._impl_.success_;
   // @@protoc_insertion_point(copy_constructor:Protocol.S_LOGIN)
@@ -1681,6 +1700,7 @@ inline void S_LOGIN::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.player_){nullptr}
+    , decltype(_impl_.player_info_){nullptr}
     , decltype(_impl_.success_){false}
     , /*decltype(_impl_._cached_size_)*/{}
   };
@@ -1698,6 +1718,7 @@ S_LOGIN::~S_LOGIN() {
 inline void S_LOGIN::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   if (this != internal_default_instance()) delete _impl_.player_;
+  if (this != internal_default_instance()) delete _impl_.player_info_;
 }
 
 void S_LOGIN::SetCachedSize(int size) const {
@@ -1714,6 +1735,10 @@ void S_LOGIN::Clear() {
     delete _impl_.player_;
   }
   _impl_.player_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.player_info_ != nullptr) {
+    delete _impl_.player_info_;
+  }
+  _impl_.player_info_ = nullptr;
   _impl_.success_ = false;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -1736,6 +1761,14 @@ const char* S_LOGIN::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) 
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_player(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .Protocol.PlayerInfo player_info = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          ptr = ctx->ParseMessage(_internal_mutable_player_info(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1782,6 +1815,13 @@ uint8_t* S_LOGIN::_InternalSerialize(
         _Internal::player(this).GetCachedSize(), target, stream);
   }
 
+  // .Protocol.PlayerInfo player_info = 3;
+  if (this->_internal_has_player_info()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, _Internal::player_info(this),
+        _Internal::player_info(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1803,6 +1843,13 @@ size_t S_LOGIN::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *_impl_.player_);
+  }
+
+  // .Protocol.PlayerInfo player_info = 3;
+  if (this->_internal_has_player_info()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.player_info_);
   }
 
   // bool success = 1;
@@ -1831,6 +1878,10 @@ void S_LOGIN::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOB
   if (from._internal_has_player()) {
     _this->_internal_mutable_player()->::Protocol::Player::MergeFrom(
         from._internal_player());
+  }
+  if (from._internal_has_player_info()) {
+    _this->_internal_mutable_player_info()->::Protocol::PlayerInfo::MergeFrom(
+        from._internal_player_info());
   }
   if (from._internal_success() != 0) {
     _this->_internal_set_success(from._internal_success());
@@ -9233,7 +9284,7 @@ const char* S_PLAYER_LIST::_InternalParse(const char* ptr, ::_pbi::ParseContext*
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // repeated .Protocol.PlayerInfo players = 1;
+      // repeated .Protocol.PlayerGameInfo players = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr -= 1;
@@ -9275,7 +9326,7 @@ uint8_t* S_PLAYER_LIST::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .Protocol.PlayerInfo players = 1;
+  // repeated .Protocol.PlayerGameInfo players = 1;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_players_size()); i < n; i++) {
     const auto& repfield = this->_internal_players(i);
@@ -9299,7 +9350,7 @@ size_t S_PLAYER_LIST::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .Protocol.PlayerInfo players = 1;
+  // repeated .Protocol.PlayerGameInfo players = 1;
   total_size += 1UL * this->_internal_players_size();
   for (const auto& msg : this->_impl_.players_) {
     total_size +=
@@ -9355,10 +9406,10 @@ void S_PLAYER_LIST::InternalSwap(S_PLAYER_LIST* other) {
 
 class S_PLAYER_ENTER::_Internal {
  public:
-  static const ::Protocol::PlayerInfo& player(const S_PLAYER_ENTER* msg);
+  static const ::Protocol::PlayerGameInfo& player(const S_PLAYER_ENTER* msg);
 };
 
-const ::Protocol::PlayerInfo&
+const ::Protocol::PlayerGameInfo&
 S_PLAYER_ENTER::_Internal::player(const S_PLAYER_ENTER* msg) {
   return *msg->_impl_.player_;
 }
@@ -9383,7 +9434,7 @@ S_PLAYER_ENTER::S_PLAYER_ENTER(const S_PLAYER_ENTER& from)
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_player()) {
-    _this->_impl_.player_ = new ::Protocol::PlayerInfo(*from._impl_.player_);
+    _this->_impl_.player_ = new ::Protocol::PlayerGameInfo(*from._impl_.player_);
   }
   // @@protoc_insertion_point(copy_constructor:Protocol.S_PLAYER_ENTER)
 }
@@ -9435,7 +9486,7 @@ const char* S_PLAYER_ENTER::_InternalParse(const char* ptr, ::_pbi::ParseContext
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // .Protocol.PlayerInfo player = 1;
+      // .Protocol.PlayerGameInfo player = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr = ctx->ParseMessage(_internal_mutable_player(), ptr);
@@ -9472,7 +9523,7 @@ uint8_t* S_PLAYER_ENTER::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .Protocol.PlayerInfo player = 1;
+  // .Protocol.PlayerGameInfo player = 1;
   if (this->_internal_has_player()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(1, _Internal::player(this),
@@ -9495,7 +9546,7 @@ size_t S_PLAYER_ENTER::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .Protocol.PlayerInfo player = 1;
+  // .Protocol.PlayerGameInfo player = 1;
   if (this->_internal_has_player()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -9521,7 +9572,7 @@ void S_PLAYER_ENTER::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const :
   (void) cached_has_bits;
 
   if (from._internal_has_player()) {
-    _this->_internal_mutable_player()->::Protocol::PlayerInfo::MergeFrom(
+    _this->_internal_mutable_player()->::Protocol::PlayerGameInfo::MergeFrom(
         from._internal_player());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -9554,10 +9605,10 @@ void S_PLAYER_ENTER::InternalSwap(S_PLAYER_ENTER* other) {
 
 class S_PLAYER_LEAVE::_Internal {
  public:
-  static const ::Protocol::PlayerInfo& player(const S_PLAYER_LEAVE* msg);
+  static const ::Protocol::PlayerGameInfo& player(const S_PLAYER_LEAVE* msg);
 };
 
-const ::Protocol::PlayerInfo&
+const ::Protocol::PlayerGameInfo&
 S_PLAYER_LEAVE::_Internal::player(const S_PLAYER_LEAVE* msg) {
   return *msg->_impl_.player_;
 }
@@ -9582,7 +9633,7 @@ S_PLAYER_LEAVE::S_PLAYER_LEAVE(const S_PLAYER_LEAVE& from)
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_player()) {
-    _this->_impl_.player_ = new ::Protocol::PlayerInfo(*from._impl_.player_);
+    _this->_impl_.player_ = new ::Protocol::PlayerGameInfo(*from._impl_.player_);
   }
   // @@protoc_insertion_point(copy_constructor:Protocol.S_PLAYER_LEAVE)
 }
@@ -9634,7 +9685,7 @@ const char* S_PLAYER_LEAVE::_InternalParse(const char* ptr, ::_pbi::ParseContext
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // .Protocol.PlayerInfo player = 1;
+      // .Protocol.PlayerGameInfo player = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr = ctx->ParseMessage(_internal_mutable_player(), ptr);
@@ -9671,7 +9722,7 @@ uint8_t* S_PLAYER_LEAVE::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .Protocol.PlayerInfo player = 1;
+  // .Protocol.PlayerGameInfo player = 1;
   if (this->_internal_has_player()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(1, _Internal::player(this),
@@ -9694,7 +9745,7 @@ size_t S_PLAYER_LEAVE::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .Protocol.PlayerInfo player = 1;
+  // .Protocol.PlayerGameInfo player = 1;
   if (this->_internal_has_player()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -9720,7 +9771,7 @@ void S_PLAYER_LEAVE::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const :
   (void) cached_has_bits;
 
   if (from._internal_has_player()) {
-    _this->_internal_mutable_player()->::Protocol::PlayerInfo::MergeFrom(
+    _this->_internal_mutable_player()->::Protocol::PlayerGameInfo::MergeFrom(
         from._internal_player());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);

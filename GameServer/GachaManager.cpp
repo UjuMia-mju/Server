@@ -107,9 +107,9 @@ bool GachaManager::Init(const WCHAR* langCode)
 
 	// 3. skins 테이블에서 스킨 메타 데이터 로드 (선택 사항)
 	DBBind<1, 6> dbSkinBind(conn,
-		L"SELECT s.id, COALESCE(l.name, 'Unknown'), COALESCE(l.description, ''), s.skin_type, s.skin_rank, s.is_limited " 
+		L"SELECT s.id, COALESCE(l.skin_name, 'Unknown'), COALESCE(l.skin_des, ''), s.skin_type, s.skin_rank, s.is_limited " 
 		L"FROM skins s "
-		L"LEFT JOIN skin_locales l ON s.id = l.skin_id AND l.lang_code = ?");
+		L"LEFT JOIN skin_locales l ON s.id = l.skin_id AND l.lan_code = ?");
 
 	int32 sId = 0, sRarity = 0, sType = 0;
 	WCHAR sName[100] = { 0, };
@@ -164,11 +164,12 @@ bool GachaManager::Init(const WCHAR* langCode)
 bool GachaManager::ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int32& outObtainedSkinId)
 {
 	outObtainedSkinId = 0;
-
+	cout << "start gacha !!!!!" << endl;
 	// 1. 메모리에 캐시된 풀 정보 찾기
 	auto poolIt = _poolCache.find(poolId);
 	if (poolIt == _poolCache.end())
 	{
+		cout << "fail to-" << endl;
 		return false; // 존재하지 않는 풀
 	}
 		
@@ -177,6 +178,7 @@ bool GachaManager::ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int3
 	// 2. 메모리 상에서 유저 재화 1차 검사 (DB 가기 전 빠른 차단)
 	if (playerInfo->GetCoin() < poolInfo.costCoin || playerInfo->GetGem() < poolInfo.costGem)
 	{
+		cout << "fail to-2" << endl;
 		return false;
 	}
 		
@@ -189,6 +191,7 @@ bool GachaManager::ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int3
 		// Player 객체에 HasSkin() 같은 보유 스킨 체크 함수가 있다고 가정합니다
 		if (playerInfo->HasSkin(item.skinId) == false)
 		{
+			cout << "Available Skin - ID: " << item.skinId << ", Weight: " << item.weight << endl;
 			availablePool.push_back(item);
 			totalWeight += item.weight;
 		}
@@ -196,6 +199,7 @@ bool GachaManager::ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int3
 
 	if (availablePool.empty() || totalWeight <= 0)
 	{
+		cout << "fail to-3" << endl;
 		return false; // 더 이상 뽑을 수 있는 스킨이 없음
 	}
 		
@@ -217,7 +221,11 @@ bool GachaManager::ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int3
 		}
 	}
 
-	if (outObtainedSkinId == 0) return false;
+	if (outObtainedSkinId == 0)
+	{
+		cout << "fail to-4" << endl;
+		return false;
+	}
 
 	// 5. DB 저장 프로시저 호출 (원자성. DB 안에서 다 처리)
 	bool isSuccess = PerformDBTransaction(playerInfo->GetDbUserId(), outObtainedSkinId, poolInfo.costCoin, poolInfo.costGem);
@@ -231,6 +239,7 @@ bool GachaManager::ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int3
 		return true;
 	}
 
+	cout << "fail procedure" << endl;
 	// 재화가 부족하거나 등 기타 여러 이유로 DB 에러
 	return false;
 }
@@ -240,7 +249,7 @@ bool GachaManager::PerformDBTransaction(int32 userId, int32 skinId, int32 costCo
 	DBConnectionGuard conn(GDBConnectionPool);
 
 	// 저장 프로시저 파라미터 (IN 4개, OUT 1개)
-	DBBind<5, 0> dbBind(conn, L"{CALL sp_ExecuteGacha(?, ?, ?, ?, ?)}");
+	DBBind<4, 1> dbBind(conn, L"{CALL sp_ExecuteGacha(?, ?, ?, ?)}");
 
 	int32 result = -1;
 
@@ -248,17 +257,30 @@ bool GachaManager::PerformDBTransaction(int32 userId, int32 skinId, int32 costCo
 	dbBind.BindParam(1, skinId);
 	dbBind.BindParam(2, costCoin);
 	dbBind.BindParam(3, costGem);
-	dbBind.BindParam(4, result); // 프로시저의 OUT 파라미터 (결과값)
+
+	dbBind.BindCol(0, result);
 
 	if (dbBind.Execute())
 	{
-		dbBind.Fetch(); // ODBC/드라이버에 따라 Fetch를 호출해야 OUT 파라미터가 갱신됩니다.
-
-		if (result == 0)
+		// SELECT 결과를 꺼내옵니다.
+		if (dbBind.Fetch())
 		{
-			return true; // 성공
+			std::cout << "[DB_SP LOG] sp_ExecuteGacha result = " << result << std::endl;
+			if (result == 0)
+			{
+				return true; // 드디어 완벽한 성공!
+			}
+		}
+		else
+		{
+			std::cout << "[DB_SP ERROR] Fetch() fail!" << std::endl;
 		}
 	}
+	else
+	{
+		std::cout << "[DB_SP ERROR] Execute fail" << std::endl;
+	}
 
+	cout << "result : " << result << endl;
 	return false;
 }

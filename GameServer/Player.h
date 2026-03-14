@@ -5,6 +5,13 @@ using namespace std;
 
 class GameSession;
 
+struct OwnedSkinInfo
+{
+	int32 skinId;
+	int64 getAt;        // 획득 시간 (Unix Timestamp 변환)
+	bool isEquipped;    // 장착 여부
+};
+
 // =================== 인게임 캐릭터 정보 ====================
 class Player
 {
@@ -63,10 +70,21 @@ public:
 		return _ownedSkins.find(skinId) != _ownedSkins.end();
 	}
 
-	void AddSkin(int32 skinId)
+	const OwnedSkinInfo* GetSkinInfo(int32 skinId) const
 	{
-		_ownedSkins.insert(skinId);
+		auto it = _ownedSkins.find(skinId);
+		if (it != _ownedSkins.end())
+			return &(it->second);
+		return nullptr;
 	}
+
+	void AddSkin(int32 skinId, int64 getAt = 0, bool isEquipped = false)
+	{
+		_ownedSkins[skinId] = { skinId, getAt, isEquipped };
+	}
+
+public:
+	const std::unordered_map<int32, OwnedSkinInfo>& GetOwnedSkins() const { return _ownedSkins; }
 
 private:
 	int32 dbUserId = 0; // DB의 user_id (PK)
@@ -75,5 +93,5 @@ private:
 	int32 _gem = 0;
 
 	// 유저가 이미 보유한 스킨의 ID 목록을 상수 시간(O(1))으로 찾기 위한 해시 테이블
-	std::unordered_set<int32> _ownedSkins;
+	std::unordered_map<int32, OwnedSkinInfo> _ownedSkins;
 };

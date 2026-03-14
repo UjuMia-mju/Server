@@ -33,19 +33,48 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 		pkt.player().id()
 	);
 
-	// 로그인 성공 후 클리어 정보 요청
-	Protocol::C_GET_CLEAR_INFO getClearInfoPkt;
-	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(getClearInfoPkt);
-	session->Send(sendBuffer);
+	cout << "ss" << endl;
+	// 로그인 성공 후 유저 정보 요청
+	//Protocol::C_GET_USER_INFO getUserInfoPkt;
 
-	cout << "[Client] Requested clear info" << endl;
+
+	// 로그인 성공 후 클리어 정보 요청
+	//Protocol::C_GET_CLEAR_INFO getClearInfoPkt;
+	//auto sendBuffer = ServerPacketHandler::MakeSendBuffer(getClearInfoPkt);
+	//session->Send(sendBuffer);
+
+	//cout << "[Client] Requested clear info" << endl;
 
 	return true;
 }
 
 bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 {
-	return false;
+	if (pkt.success())
+	{
+		cout << "\n============================================\n";
+		cout << u8"[가챠 대성공] 결과를 확인하세요!\n";
+
+		const auto& result = pkt.result();
+		cout << u8"소모한 젬: " << result.gems_spent() << u8" / 남은 젬: " << result.remaining_gems() << "\n\n";
+
+		// 얻은 스킨 리스트 출력
+		for (int i = 0; i < result.obtained_skins_size(); ++i)
+		{
+			const auto& skin = result.obtained_skins(i);
+			cout << u8"  [당첨] 스킨 ID: " << skin.skin_id() << "\n";
+			cout << u8"      이름: " << skin.skin_name() << "\n";
+			cout << u8"      설명: " << skin.skin_des() << "\n";
+			cout << u8"      등급: " << skin.rarity() << "\n";
+		}
+		cout << "============================================\n";
+	}
+	else
+	{
+		cout << "\nu8[가챠 실패] " << pkt.error_msg() << "\n";
+	}
+
+	return true;
 }
 
 bool Handle_S_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::S_GACHA_POOL_LIST& pkt)
@@ -237,27 +266,27 @@ bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 
 bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt)
 {
-	return false;
+	return true;
 }
 
 bool Handle_S_PLAYER_LIST(PacketSessionRef& session, Protocol::S_PLAYER_LIST& pkt)
 {
-	return false;
+	return true;
 }
 
 bool Handle_S_PLAYER_ENTER(PacketSessionRef& session, Protocol::S_PLAYER_ENTER& pkt)
 {
-	return false;
+	return true;
 }
 
 bool Handle_S_PLAYER_LEAVE(PacketSessionRef& session, Protocol::S_PLAYER_LEAVE& pkt)
 {
-	return false;
+	return true;
 }
 
 bool Handle_S_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::S_PLAYER_ANIMATION& pkt)
 {
-	return false;
+	return true;
 }
 
 bool Handle_S_PLAYER_STAT(PacketSessionRef& session, Protocol::S_PLAYER_STAT& pkt)
