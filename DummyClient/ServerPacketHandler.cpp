@@ -84,7 +84,25 @@ bool Handle_S_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::S_GACHA_POOL_
 
 bool Handle_S_MY_SKINS(PacketSessionRef& session, Protocol::S_MY_SKINS& pkt)
 {
-	return false;
+	const auto& skins = pkt.skins();
+	cout << "\n========== My Skins ==========" << endl;
+	if (skins.size() == 0)
+	{
+		cout << "No skins obtained yet." << endl;
+	}
+	else
+	{
+		for (const auto& skin : skins)
+		{
+			cout << "Skin ID: " << skin.skin_id() << endl;
+			cout << "Name: " << skin.skin_name() << endl;
+			cout << "Description: " << skin.skin_des() << endl;
+			cout << "Rarity: " << skin.rarity() << endl;
+			cout << "-----------------------------" << endl;
+		}
+	}
+
+	return true;
 }
 
 bool Handle_S_CREATE_ROOM(PacketSessionRef& session, Protocol::S_CREATE_ROOM& pkt)

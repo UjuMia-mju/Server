@@ -198,6 +198,8 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 		result->set_remaining_gems(gemAfter);
 
 		// 2. SkinInfo 리스트에 새 스킨 추가
+		playerInfo->AddSkin(obtainedSkinId, std::time(nullptr), false); // 획득한 스킨을 플레이어 정보에 추가 (DB 저장은 별도 처리 필요)
+
 		Protocol::SkinInfo* skinInfo = result->add_obtained_skins();
 		skinInfo->set_skin_id(obtainedSkinId);
 
@@ -235,12 +237,43 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 bool Handle_C_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::C_GACHA_POOL_LIST& pkt)
 {
-	return false;
+	return true;
 }
 
 bool Handle_C_MY_SKINS(PacketSessionRef& session, Protocol::C_MY_SKINS& pkt)
 {
-	return false;
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
+
+	PlayerInfoRef playerInfo = gameSession->GetPlayerInfo();
+
+	auto owned_skins = playerInfo->GetOwnedSkins();
+	Protocol::S_MY_SKINS resPkt;
+	for (const auto& skin : owned_skins)
+	{
+		Protocol::SkinInfo* skinInfo = resPkt.add_skins();
+		skinInfo->set_skin_id(skin.first);
+		const SkinMetaData* skinMeta = GGACHA.GetSkinMetaData(skin.first);
+
+		if (skinMeta != nullptr)
+		{
+			skinInfo->set_skin_name(skinMeta->name);
+			skinInfo->set_skin_des(skinMeta->description);
+			skinInfo->set_rarity(skinMeta->rarity);
+
+			cout << "Owned Skin - ID: " << skin.first << ", Name: " << skinMeta->name << ", Rarity: " << skinMeta->rarity << endl;
+		}
+		else
+		{
+			skinInfo->set_skin_name("Unknown Skin");
+			skinInfo->set_skin_des("정보를 찾을 수 없습니다.");
+			skinInfo->set_rarity(1);
+		}
+	}
+	// 6. 패킷 전송
+	SendBufferRef sendBuffer = ClientPacketHandler::MakeSendBuffer(resPkt);
+	session->Send(sendBuffer);
+
+	return true;
 }
 
 bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pkt)

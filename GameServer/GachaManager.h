@@ -48,7 +48,9 @@ public:
 	// 클라이언트에서 가챠 요청 시 호출
 	bool ExecuteGacha(PlayerInfoRef playerInfo, int32 poolId, OUT int32& outObtainedSkinId);
 	bool PerformDBTransaction(int32 userId, int32 skinId, int32 costCoin, int32 costGem);
-	
+	bool GetMySkins(PlayerInfoRef playerInfo, OUT xvector<SkinMetaData>& outSkins);
+
+
 	const SkinMetaData* GetSkinMetaData(int32 skinId) const
 	{
 		auto it = _skinCache.find(skinId);

@@ -284,3 +284,60 @@ bool GachaManager::PerformDBTransaction(int32 userId, int32 skinId, int32 costCo
 	cout << "result : " << result << endl;
 	return false;
 }
+
+bool GachaManager::GetMySkins(PlayerInfoRef playerInfo, OUT xvector<SkinMetaData>& outSkins)
+{
+	outSkins.clear();
+
+	auto userId = playerInfo->GetDbUserId();
+	DBConnectionGuard conn(GDBConnectionPool);
+
+	DBBind<2, 5> dbBind(conn,
+		L"SELECT s.id, COALESCE(l.skin_name, 'Unknown'), COALESCE(l.skin_des, ''), s.skin_type, s.skin_rank "
+		L"FROM user_owned_skins us "
+		L"JOIN skins s ON us.skin_id = s.id "
+		L"LEFT JOIN skin_locales l ON s.id = l.skin_id AND l.lan_code = ? "
+		L"WHERE us.user_id = ?");
+
+	int32 sId = 0, sRarity = 0, sType = 0;
+	WCHAR sName[100] = { 0, };
+	WCHAR sDesc[255] = { 0, };
+
+	dbBind.BindParam(0, L"ko"); // 언어 코드 (예: "en", "ko")
+	dbBind.BindParam(1, userId);
+
+	dbBind.BindCol(0, sId);
+	dbBind.BindCol(1, sName);
+	dbBind.BindCol(2, sDesc);
+	dbBind.BindCol(3, sType);
+	dbBind.BindCol(4, sRarity);
+
+	if (dbBind.Execute())
+	{
+		while (dbBind.Fetch())
+		{
+			SkinMetaData meta;
+			meta.skinId = sId;
+			meta.rarity = sRarity;
+			meta.skinType = sType;
+			// 이름 WCHAR -> UTF-8 String 변환
+			int lenName = WideCharToMultiByte(CP_UTF8, 0, sName, -1, nullptr, 0, nullptr, nullptr);
+			if (lenName > 0) {
+				std::string strName(lenName - 1, 0);
+				WideCharToMultiByte(CP_UTF8, 0, sName, -1, &strName[0], lenName, nullptr, nullptr);
+				meta.name = strName;
+			}
+			// 설명 WCHAR -> UTF-8 String 변환
+			int lenDesc = WideCharToMultiByte(CP_UTF8, 0, sDesc, -1, nullptr, 0, nullptr, nullptr);
+			if (lenDesc > 0) {
+				std::string strDesc(lenDesc - 1, 0);
+				WideCharToMultiByte(CP_UTF8, 0, sDesc, -1, &strDesc[0], lenDesc, nullptr, nullptr);
+				meta.description = strDesc;
+			}
+			outSkins.push_back(meta);
+		}
+		return true;
+	}
+
+	return false;
+}

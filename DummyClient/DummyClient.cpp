@@ -114,6 +114,11 @@ int main()
 			auto sendBuffer = ServerPacketHandler::MakeSendBuffer(gachaPkt);
 			player1Session->Send(sendBuffer);
 
+			cout << "[Step 2] Show Owned skins\n" << endl;
+			Protocol::C_MY_SKINS showSkinsPkt;
+			sendBuffer = ServerPacketHandler::MakeSendBuffer(showSkinsPkt);
+			player1Session->Send(sendBuffer);
+
 			cout << "\n========== Test Scenario Complete ==========\n" << endl;
 		});
 
