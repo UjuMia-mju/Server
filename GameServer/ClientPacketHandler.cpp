@@ -368,8 +368,10 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 	for (const auto& [player, isReady] : members)
 	{
 		// 자기 자신은 제외
-		if (player->playerId == gameSession->GetPlayer()->playerId)
-			continue;
+		//if (player->playerId == gameSession->GetPlayer()->playerId)
+		//{
+		//	continue;
+		//}
 
 		Protocol::RoomMemberInfo* memberInfo = enterRoomPkt.add_members();
 
