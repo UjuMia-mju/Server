@@ -66,7 +66,7 @@ int main()
 	}
 
 	std::wstring dbConnectionString = GConfigManager->GetDBConnectionString();
-	ASSERT_CRASH(GDBConnectionPool->Connect(2, dbConnectionString.c_str()));
+	ASSERT_CRASH(GDBConnectionPool->Connect(4, dbConnectionString.c_str()));
 
 	// 뽑기 매니저 초기화 (DB에서 가챠 풀과 아이템 정보 로드)
 	if (GGACHA.Init(L"ko") == false)
