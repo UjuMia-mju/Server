@@ -294,7 +294,7 @@ bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pk
 	int32 hostTag = gameSession->GetPlayer()->tag;
 	RoomRef newRoom = RoomManager::Instance().CreateRoom(hostId, hostName, hostTag);
 
-	gameSession->GetRoom() = newRoom;
+	gameSession->SetRoom(newRoom);
 	newRoom->DoAsync(&Room::EnterLobby, gameSession->GetPlayer());
 
 	// 패킷 만들기
@@ -316,7 +316,9 @@ bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pk
 
 	// 방 생성 결과 패킷 전송
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(createRoomPkt);
-	session->Send(sendBuffer);
+	newRoom->DoAsync([session, sendBuffer]() {
+		session->Send(sendBuffer);
+		});
 	
 	return true;
 }
@@ -417,7 +419,9 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 	}
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
-	session->Send(sendBuffer);
+	targetRoom->DoAsync([session, sendBuffer]() {
+		session->Send(sendBuffer);
+		});
 
 	std::cout << "Player " << gameSession->GetPlayer()->name
 		<< " entered room " << roomId << endl;

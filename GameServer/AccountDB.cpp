@@ -62,22 +62,32 @@ bool AccountDB::ValidateAccount(const string& email, const string& password)
 
 bool AccountDB::GetPlayerInfo(const string& email,const std::string& password, OUT int32& playerId, OUT string& playerName, OUT int32& playerTag)
 {
-	DBConnection* dbConn = GDBConnectionPool->Pop();
-	if (dbConn == nullptr)
+	DBConnectionGuard guard(GDBConnectionPool);
+	if (!guard)
+	{
 		return false;
+	}
 
 	// email로 사용자 정보 조회
-	DBBind<2, 3> dbBind(*dbConn, L"SELECT id, username, tag FROM users WHERE email = ? AND password = ?");
+	DBBind<2, 3> dbBind(guard, L"SELECT id, username, tag FROM users WHERE email = ? AND password = ?");
 
-	WCHAR wEmail[100];
-	::MultiByteToWideChar(CP_UTF8, 0, email.c_str(), -1, wEmail, 100);
-
-	WCHAR wPassword[100];
-	::MultiByteToWideChar(CP_UTF8, 0, password.c_str(), -1, wPassword, 100);
+	int32 emailLen = ::MultiByteToWideChar(CP_UTF8, 0, email.c_str(), -1, nullptr, 0);
+	int32 pwLen = ::MultiByteToWideChar(CP_UTF8, 0, password.c_str(), -1, nullptr, 0);
+	if (emailLen <= 0 || pwLen <= 0)
+	{
+		return false;
+	}
 
 	// 2. 파라미터를 바인딩
-	dbBind.BindParam(0, wEmail);
-	dbBind.BindParam(1, wPassword);
+	std::wstring wEmail(emailLen - 1, L'\0');
+	std::wstring wPassword(pwLen - 1, L'\0');
+
+	::MultiByteToWideChar(CP_UTF8, 0, email.c_str(), -1, wEmail.data(), emailLen);
+	::MultiByteToWideChar(CP_UTF8, 0, password.c_str(), -1, wPassword.data(), pwLen);
+
+	// 핵심: 반드시 const WCHAR* 오버로드 사용
+	dbBind.BindParam(0, wEmail.c_str());
+	dbBind.BindParam(1, wPassword.c_str());
 
 	int32 idCol = 0;
 	WCHAR nameCol[100] = { 0, };
@@ -103,17 +113,21 @@ bool AccountDB::GetPlayerInfo(const string& email,const std::string& password, O
 		return true; // 로그인 성공 + 정보 추출 완료!
 	}
 
+	cout << "heeeeeeeeeeeeeeeeeeeeeeeeer" << endl;
+
 	return false;
 }
 
 bool AccountDB::GetPlayerClearInfo(int32 playerId, OUT vector<StageClearData>& outClearData)
 {
-	DBConnection* dbConn = GDBConnectionPool->Pop();
-	if (dbConn == nullptr)
+	DBConnectionGuard guard(GDBConnectionPool);
+	if (!guard)
+	{
 		return false;
+	}
 
 	// 플레이어 ID로 클리어 정보 조회 (스테이지, 레벨 순으로 정렬)
-	DBBind<1, 4> dbBind(*dbConn, L"SELECT stage, level, star, UNIX_TIMESTAMP(clear_time) FROM user_map_clears WHERE user_id = ? ORDER BY stage, level");
+	DBBind<1, 4> dbBind(guard, L"SELECT stage, level, star, UNIX_TIMESTAMP(clear_time) FROM user_map_clears WHERE user_id = ? ORDER BY stage, level");
 
 	int32 stage = 0;
 	int32 level = 0;
@@ -129,7 +143,7 @@ bool AccountDB::GetPlayerClearInfo(int32 playerId, OUT vector<StageClearData>& o
 	bool result = false;
 	if (dbBind.Execute())
 	{
-		while (dbConn->Fetch())
+		while (guard->Fetch())
 		{
 			StageClearData data;
 			data.stage = stage;
@@ -141,8 +155,7 @@ bool AccountDB::GetPlayerClearInfo(int32 playerId, OUT vector<StageClearData>& o
 		result = true;
 	}
 
-	dbConn->Unbind();
-	GDBConnectionPool->Push(dbConn);
+	return result;
 }
 
 

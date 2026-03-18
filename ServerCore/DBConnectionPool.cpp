@@ -35,7 +35,6 @@ bool DBConnectionPool::Connect(int32 maxConnections, const WCHAR* connString)
 	}
 
 	_maxConnections = maxConnections;
-
 	// 최소 개수만큼 미리 생성
 	_connections.reserve(_maxConnections);
 
@@ -48,6 +47,7 @@ bool DBConnectionPool::Connect(int32 maxConnections, const WCHAR* connString)
 		}
 		_connections.push_back(connection);
 	}
+	_initialized = true;
 	cout << "DBConnectionPool Connected. Count : " << maxConnections << endl;
 	return true;
 }
@@ -76,17 +76,29 @@ DBConnection* DBConnectionPool::Pop(uint32 timeoutMs)
 {
 	const uint64 startTime = ::GetTickCount64();
 
-
-	WRITE_LOCK;
-
-	if (_connections.empty())
+	while (true)
 	{
-		return nullptr;
-	}
+		// 락을 걸고 꺼낼 수 있는지 확인
+		{
+			WRITE_LOCK;
+			if (_connections.empty() == false)
+			{
+				DBConnection* connection = _connections.back();
+				_connections.pop_back();
+				return connection;
+			}
+		}
 
-	DBConnection* connection = _connections.back();
-	_connections.pop_back();
-	return connection;
+		// 타임아웃 시간이 지났으면 포기
+		if (::GetTickCount64() > startTime + timeoutMs)
+		{
+			return nullptr;
+		}
+			
+
+		// 스레드가 빈 루프를 돌면서 CPU를 잡아먹지 않도록 양보
+		this_thread::yield();
+	}
 }
 
 // 반납
