@@ -246,9 +246,8 @@ bool Handle_C_MY_SKINS(PacketSessionRef& session, Protocol::C_MY_SKINS& pkt)
 
 	PlayerInfoRef playerInfo = gameSession->GetPlayerInfo();
 
-	auto owned_skins = playerInfo->GetOwnedSkins();
 	Protocol::S_MY_SKINS resPkt;
-	for (const auto& skin : owned_skins)
+	for (const auto& skin : playerInfo->GetOwnedSkins())
 	{
 		Protocol::SkinInfo* skinInfo = resPkt.add_skins();
 		skinInfo->set_skin_id(skin.first);
@@ -384,39 +383,7 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 
 	// 성공 응답 패킷 구성
 	Protocol::S_ENTER_ROOM enterRoomPkt;
-	enterRoomPkt.set_success(true);
-
-	// 방 정보 설정
-	Protocol::RoomInfo* roomInfo = enterRoomPkt.mutable_room();
-	roomInfo->set_room_id(targetRoom->GetRoomId());
-	roomInfo->set_room_name(targetRoom->GetRoomName());
-	roomInfo->set_current_count(targetRoom->GetCurrentCount());
-	roomInfo->set_max_count(targetRoom->GetMaxCount());
-	roomInfo->set_is_playing(targetRoom->IsPlaying());
-
-	// 방장 정보는 RoomInfo에 포함되어 있다고 가정
-	Protocol::Player* host = roomInfo->mutable_host();
-	host->set_id(targetRoom->GetOwnerId());
-
-	// 기존 멤버 리스트 추가
-	auto members = targetRoom->GetMembersWithReadyStatus();
-	for (const auto& [player, isReady] : members)
-	{
-		// 자기 자신은 제외
-		//if (player->playerId == gameSession->GetPlayer()->playerId)
-		//{
-		//	continue;
-		//}
-
-		Protocol::RoomMemberInfo* memberInfo = enterRoomPkt.add_members();
-
-		Protocol::Player* playerInfo = memberInfo->mutable_player();
-		playerInfo->set_id(player->playerId);
-		playerInfo->set_name(player->name);
-		playerInfo->set_tag(player->tag);
-
-		memberInfo->set_is_ready(isReady);
-	}
+	targetRoom->MakeEnterRoomPacket(gameSession, enterRoomPkt);
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
 	targetRoom->DoAsync([session, sendBuffer]() {
@@ -443,7 +410,7 @@ bool Handle_C_INVITE_PLAYER(PacketSessionRef& session, Protocol::C_INVITE_PLAYER
 	auto room = gameSession->GetRoom().lock();
 	if (!room)
 	{
-		std::cout << "Invite failed: Not in a room" << endl;
+		std::cout << "Invite failed: you are not in the room" << endl;
 		Protocol::S_INVITE_PLAYER errorPkt;
 		errorPkt.set_success(false);
 		errorPkt.set_player_name(pkt.player_name());
@@ -541,41 +508,9 @@ bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESP
 			if (room)
 			{
 				Protocol::S_ENTER_ROOM enterRoomPkt;
-				enterRoomPkt.set_success(true);
-
-				// 방 정보 설정
-				Protocol::RoomInfo* roomInfo = enterRoomPkt.mutable_room();
-				roomInfo->set_room_id(room->GetRoomId());
-				roomInfo->set_room_name(room->GetRoomName());
-				roomInfo->set_current_count(room->GetCurrentCount());
-				roomInfo->set_max_count(room->GetMaxCount());
-				roomInfo->set_is_playing(room->IsPlaying());
-
-				// 방장 정보
-				Protocol::Player* host = roomInfo->mutable_host();
-				host->set_id(room->GetOwnerId());
-
-				// 기존 멤버 리스트
-				auto members = room->GetMembersWithReadyStatus();
-				for (const auto& [player, isReady] : members)
-				{
-					if (player->playerId == gameSession->GetPlayer()->playerId)
-						continue;
-
-					Protocol::RoomMemberInfo* memberInfo = enterRoomPkt.add_members();
-
-					Protocol::Player* playerInfo = memberInfo->mutable_player();
-					playerInfo->set_id(player->playerId);
-					playerInfo->set_name(player->name);
-					playerInfo->set_tag(player->tag);
-
-					memberInfo->set_is_ready(isReady);
-				}
-
+				room->MakeEnterRoomPacket(gameSession, enterRoomPkt);
 				auto enterRoomBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
 				session->Send(enterRoomBuffer);
-
-				std::cout << "Sent S_ENTER_ROOM to " << gameSession->GetPlayer()->name << endl;
 			}
 		}
 	}

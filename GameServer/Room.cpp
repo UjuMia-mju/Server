@@ -6,8 +6,8 @@
 
 RoomRef GTestRoom = nullptr;
 
-Room::Room(uint64 roomId, const string& roomName, uint64 ownerId)
-	: _roomId(roomId), _roomName(roomName), _ownerId(ownerId)
+Room::Room(uint64 roomId, const string& roomName, uint64 ownerId, string ownerName, int32 ownerTag)
+	: _roomId(roomId), _roomName(roomName), _ownerId(ownerId), _ownerName(ownerName), _ownerTag(ownerTag)
 {
 }
 
@@ -127,6 +127,52 @@ void Room::StartGame()
 	Broadcast(sendBuffer);
 }
 
+void Room::MakeEnterRoomPacket(GameSessionRef gameSession, Protocol::S_ENTER_ROOM& pkt) const
+{
+	pkt.set_success(true);
+
+	// 방 정보
+	Protocol::RoomInfo* roomInfo = pkt.mutable_room();
+	roomInfo->set_room_id(GetRoomId());
+	roomInfo->set_room_name(GetRoomName());
+	roomInfo->set_current_count(GetCurrentCount());
+	roomInfo->set_max_count(GetMaxCount());
+	roomInfo->set_is_playing(IsPlaying());
+
+	// 방장 정보
+	Protocol::Player* host = roomInfo->mutable_host();
+	host->set_id(GetOwnerId());
+	host->set_name(GetOwnerName());
+	host->set_tag(GetOwnerTag());
+
+	// 멤버 리스트
+	auto members = GetMembersWithReadyStatus();
+	bool hasSelf = false;
+	for (const auto& [player, isReady] : members)
+	{
+		if (player->playerId == gameSession->GetPlayer()->playerId)
+		{
+			hasSelf = true;
+		}
+			
+		Protocol::RoomMemberInfo* memberInfo = pkt.add_members();
+		Protocol::Player* playerInfo = memberInfo->mutable_player();
+		playerInfo->set_id(player->playerId);
+		playerInfo->set_name(player->name);
+		playerInfo->set_tag(player->tag);
+		memberInfo->set_is_ready(isReady);
+	}
+	if (!hasSelf)
+	{
+		Protocol::RoomMemberInfo* memberInfo = pkt.add_members();
+		Protocol::Player* playerInfo = memberInfo->mutable_player();
+		playerInfo->set_id(gameSession->GetPlayer()->playerId);
+		playerInfo->set_name(gameSession->GetPlayer()->name);
+		playerInfo->set_tag(gameSession->GetPlayer()->tag);
+		memberInfo->set_is_ready(false);
+	}
+}
+
 void Room::EnterGame(PlayerRef player)
 {
 	WRITE_LOCK;
@@ -182,7 +228,7 @@ void Room::EnterGame(PlayerRef player)
 	auto newPlayerBuffer = ClientPacketHandler::MakeSendBuffer(newPlayerPkt);
 
 	// 자기 자신을 제외한 나머지 플레이어들에게 새로 들어온 플레이어 정보 브로드캐스트
-	BroadcastExcept(newPlayerBuffer, player->playerId);
+	Broadcast(newPlayerBuffer);
 }
 
 void Room::LeaveGame(PlayerRef player)
@@ -229,8 +275,6 @@ void Room::BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId)
 
 vector<pair<PlayerRef, bool>> Room::GetMembersWithReadyStatus() const
 {
-	//READ_LOCK;
-
 	vector<pair<PlayerRef, bool>> members;
 	members.reserve(_players.size());
 
@@ -250,6 +294,6 @@ vector<pair<PlayerRef, bool>> Room::GetMembersWithReadyStatus() const
 
 RoomRef GetGlobalTestRoom()
 {
-	static shared_ptr<Room> instance = make_shared<Room>(999999, "Global Test Room", 0);
+	static shared_ptr<Room> instance = make_shared<Room>(999999, "Global Test Room", 0, "test", 0000);
 	return instance;
 }

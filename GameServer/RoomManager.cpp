@@ -14,7 +14,7 @@ RoomRef RoomManager::CreateRoom(uint64 hostPlayerId, const string& hostName, int
 {
 	uint64 newRoomId = GenerateRoomId();
 	string roomName = hostName + "'s Room";
-	RoomRef room = MakeShared<Room>(newRoomId, roomName, hostPlayerId);
+	RoomRef room = MakeShared<Room>(newRoomId, roomName, hostPlayerId, hostName, hostTag);
 
 	WRITE_LOCK;
 	_rooms[newRoomId] = room;
