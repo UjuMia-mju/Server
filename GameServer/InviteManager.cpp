@@ -109,10 +109,10 @@ bool InviteManager::AcceptInvite(uint64 inviteId, GameSessionRef accepter)
 	room->DoAsync(&Room::EnterLobby, accepter->GetPlayer());
 
 	// 초대 정보 삭제
-	_invites.erase(it);
-
 	std::cout << "[InviteManager] Player " << accepter->GetPlayer()->name
 		<< " accepted invite " << inviteId << " and joined room " << it->second->roomId << endl;
+
+	_invites.erase(it);
 
 	return true;
 }

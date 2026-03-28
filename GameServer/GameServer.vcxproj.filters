@@ -69,6 +69,12 @@
     <ClCompile Include="GachaManager.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
+    <ClCompile Include="DBCacheManager.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="StageManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -120,6 +126,12 @@
       <Filter>GameContents</Filter>
     </ClInclude>
     <ClInclude Include="GachaManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="DBCacheManager.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="StageManager.h">
       <Filter>GameContents</Filter>
     </ClInclude>
   </ItemGroup>

@@ -113,8 +113,6 @@ bool AccountDB::GetPlayerInfo(const string& email,const std::string& password, O
 		return true; // 로그인 성공 + 정보 추출 완료!
 	}
 
-	cout << "heeeeeeeeeeeeeeeeeeeeeeeeer" << endl;
-
 	return false;
 }
 
