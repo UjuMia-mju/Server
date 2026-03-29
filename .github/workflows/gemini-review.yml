@@ -42,7 +42,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: "gemini-1.5-pro"
+          GEMINI_MODEL: "gemini-1.5-flash"
           EXCLUDE: "*.md, *.txt, *.yml, *.yaml, .gitignore, *.sln, *.vcxproj"
           # ★ 여기에 C++ 서버 전문가 프롬프트를 넣습니다 ★
           CUSTOM_PROMPT: |
