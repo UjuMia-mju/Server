@@ -48,6 +48,11 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_S_GET_CURRENCY(PacketSessionRef& session, Protocol::S_GET_CURRENCY& pkt)
+{
+	return false;
+}
+
 bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 {
 	if (pkt.success())
