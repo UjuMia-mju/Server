@@ -15,6 +15,7 @@ enum class ServiceType : uint8
 	역할: 서비스의 기본 클래스 (서버, 클라이언트 공통)
 ----------------*/
 
+// session을 생성하는 함수 타입 정의
 using SessionFactory = function<SessionRef(void)>;
 
 class Service : public enable_shared_from_this<Service>

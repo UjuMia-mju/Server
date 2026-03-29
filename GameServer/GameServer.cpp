@@ -13,6 +13,7 @@
 #include "DBConnectionPool.h"
 #include "DBBind.h"
 #include "TypeCast.h"
+#include "DBCacheManager.h"
 
 enum
 {
@@ -34,109 +35,68 @@ void DoWorkerJob(ServerServiceRef& service)
 	}
 }
 
-using TL = TypeList<class A, class B, class C>;
-
-class A
-{
-public:
-	A()
-	{
-		INIT_TL(A);
-	}
-	virtual ~A() {}
-
-	DECLARE_TL;
-};
-
-class B : public A
-{
-public:
-	B() { INIT_TL(B); }
-};
-
-class C : public A
-{
-public:
-	C() { INIT_TL(C); }
-};
-
 int main()
 {
-	{
-		shared_ptr<B> b = MakeShared<B>();
-		shared_ptr<A> a = TypeCast<A>(b);
-		bool canCast = CanCast<A>(b);
+	::SetConsoleOutputCP(CP_UTF8);
+	cout << "Game Server Start!" << endl;
+
+	// Config 파일 로드
+	WCHAR exePath[MAX_PATH];
+	GetModuleFileNameW(NULL, exePath, MAX_PATH);
+
+	// 디렉터리 부분만 추출
+	std::wstring exeDir = exePath;
+	size_t pos = exeDir.find_last_of(L"\\/");
+	if (pos != std::wstring::npos) {
+		exeDir = exeDir.substr(0, pos + 1);  // 마지막 '\' 포함
 	}
 
-	//
-	//ASSERT_CRASH(GDBConnectionPool->Connect(1, L"DRIVER={MySQL ODBC 9.6 Unicode Driver};SERVER=localhost;PORT=3306;DATABASE=UjuMia;UID=root;PWD=Willylee0309!;"));
+	// config.ini 전체 경로 생성
+	std::wstring configPath = exeDir + L"config.ini";
 
-	////Query Read
-	//{		
-	//	DBConnection* dbConn = GDBConnectionPool->Pop();
+	wcout << L"Exe location: " << exeDir << endl;
+	wcout << L"Config path: " << configPath << endl;
 
-	//	DBBind<0, 2> dbBind(*dbConn, L"SELECT id, username FROM users");
-	//	
-	//	int id = 0;
-	//	WCHAR username[51] = { 0 };
+	// Config 파일 로드
+	if (!GConfigManager->LoadConfig(configPath))
+	{
+		wcout << L"Failed to load config.ini!" << endl;
+		wcout << L"Make sure config.ini is in the same folder as GameServer.exe" << endl;
+		return -1;
+	}
 
-	//	dbBind.BindCol(0, id);
-	//	dbBind.BindCol(1, username, sizeof(username));
+	std::wstring dbConnectionString = GConfigManager->GetDBConnectionString();
+	ASSERT_CRASH(GDBConnectionPool->Connect(4, dbConnectionString.c_str()));
 
-	//	ASSERT_CRASH(dbBind.Execute());
+	// DB 정보 미리 로드 (뽑기 풀, 스테이지 정보등..)
+	DBCacheManager::GetInstance().InitAsync();
+	DBCacheManager::GetInstance().WaitAll();
 
-	//	while (dbConn->Fetch())
-	//	{
-	//		wstring userStr(username);
-	//		wcout << "User Id: " << id << L", Username: " << userStr << endl;
-	//	}
+	ClientPacketHandler::Init();
 
-		//dbConn->Unbind();
+	// Config에서 서버 설정 가져오기
+	std::wstring serverIP = GConfigManager->GetServerIP();
+	uint16 serverPort = GConfigManager->GetServerPort();
+	int32 workerThreads = GConfigManager->GetWorkerThreadCount();
 
-		//int id;
-		//SQLLEN outIdLen = 0;
-		//dbConn->BindCol(1, &id, &outIdLen);
+	ServerServiceRef service = MakeShared<ServerService>(
+		NetAddress(serverIP, serverPort),
+		MakeShared<IocpCore>(),
+		MakeShared<GameSession>,
+		100
+	);
 
-		//WCHAR username[51] = { 0 };
-		//SQLLEN outUsernameLen = 0;
-		//dbConn->BindCol(2, username, sizeof(username), &outUsernameLen);
+	ASSERT_CRASH(service->Start());
 
-		//ASSERT_CRASH(dbConn->Execute(L"SELECT * FROM users"));
+	for (int32 i = 0; i < workerThreads; i++)
+	{
+		GThreadManager->Launch([&service]()
+			{
+				DoWorkerJob(service);
+			});
+	}
 
-		//while (dbConn->Fetch())
-		//{
-		//	wstring userStr(username, outUsernameLen / sizeof(WCHAR));
-		//	wcout << "User Id: " << id << L", Username: " << userStr << endl;
-		//}
-		//GDBConnectionPool->Push(dbConn);
-	//}
+	DoWorkerJob(service);
 
-	// ---------------------------- 
-	//GRoom->DoTimer(1000, [] {cout << "Hello 1000" << endl;});
-	//GRoom->DoTimer(2000, [] {cout << "Hello 1000" << endl;});
-	//GRoom->DoTimer(3000, [] {cout << "Hello 1000" << endl;});
-
-
-	//ClientPacketHandler::Init();
-
-	//ServerServiceRef service = MakeShared<ServerService>(
-	//	NetAddress(L"127.0.0.1", 7777),
-	//	MakeShared<IocpCore>(),
-	//	MakeShared<GameSession>,
-	//	100
-	//);
-
-	//ASSERT_CRASH(service->Start());
-
-	//for (int32 i = 0; i < 5; i++)
-	//{
-	//	GThreadManager->Launch([&service]()
-	//		{
-	//			DoWorkerJob(service);
-	//		});
-	//}
-
-	//DoWorkerJob(service);
-
-	//GThreadManager->Join();
+	GThreadManager->Join();
 }

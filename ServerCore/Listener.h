@@ -2,7 +2,7 @@
 #include "IocpCore.h"
 #include "NetAdress.h"
 
-class AcceptEvent;
+class AcceptEvent; // 전방 선언
 class ServerService;
 
 /*----------------------
@@ -23,7 +23,7 @@ public:
 	bool StartAccept(ServerServiceRef server);
 	void CloseAccept();
 
-	virtual HANDLE GetHandel() override;
+	virtual HANDLE GetHandle() override;
 	virtual void Dispatch(class IocpEvent* iocpEvent, int32 numOfBytes = 0) override;
 
 private:

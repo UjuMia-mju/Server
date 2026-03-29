@@ -13,6 +13,9 @@
     <Filter Include="GameContents">
       <UniqueIdentifier>{f5ddda5d-a26e-4e37-9af4-b9f62d2c2a07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DB">
+      <UniqueIdentifier>{ecff08cf-9886-466e-870e-4a900adb03eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameServer.cpp">
@@ -45,6 +48,33 @@
     <ClCompile Include="Room.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
+    <ClCompile Include="AccountDB.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="InviteManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthValidator.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="GachaManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
+    <ClCompile Include="DBCacheManager.cpp">
+      <Filter>DB</Filter>
+    </ClCompile>
+    <ClCompile Include="StageManager.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -74,6 +104,36 @@
     <ClInclude Include="Room.h">
       <Filter>GameContents</Filter>
     </ClInclude>
+    <ClInclude Include="AccountDB.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="InviteManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthValidator.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketResult.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="GachaManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
+    <ClInclude Include="DBCacheManager.h">
+      <Filter>DB</Filter>
+    </ClInclude>
+    <ClInclude Include="StageManager.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Common\protoc-21.12-win64\bin\Protocol.proto">
@@ -88,5 +148,7 @@
     <None Include="..\Common\protoc-21.12-win64\bin\GenPackets.bat">
       <Filter>Protocol</Filter>
     </None>
+    <None Include="config.ini" />
+    <None Include="config.example.ini" />
   </ItemGroup>
 </Project>

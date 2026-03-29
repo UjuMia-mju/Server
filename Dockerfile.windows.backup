@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+SHELL ["powershell", "-Command"]
+RUN Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "vc_redist.x64.exe" ; \
+    .\vc_redist.x64.exe /quiet /norestart ; \
+    Remove-Item vc_redist.x64.exe
+
+WORKDIR /app
+# Debug 폴더 전체 복사 (ServerCore 포함)
+COPY Binary/Debug/ ./
+EXPOSE 25000
+CMD ["GameServer.exe"]

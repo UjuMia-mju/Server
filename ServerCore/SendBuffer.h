@@ -15,7 +15,7 @@ public:
 	BYTE*			Buffer() { return _buffer; }
 	uint32			AllocSize() { return _allocSize; }
 	uint32			WriteSize() { return _writeSize; }
-	void			Close(uint32 writeSize);
+	void			Close(uint32 writeSize); // 실제 작성된 크기 지정.(닫는게 아님)
 private:
 	BYTE*				_buffer;
 	uint32				_allocSize = 0;

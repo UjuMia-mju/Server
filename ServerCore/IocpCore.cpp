@@ -19,7 +19,7 @@ IocpCore::~IocpCore()
 
 bool IocpCore::Register(IocpObjectRef iocpObj)
 {
-	return ::CreateIoCompletionPort(iocpObj->GetHandel(), _iocpHandle, /*key*/0, 0);
+	return ::CreateIoCompletionPort(iocpObj->GetHandle(), _iocpHandle, /*key*/0, 0);
 }
 
 bool IocpCore::Dispatch(uint32 timeoutMs)
@@ -35,7 +35,7 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 	}
 	else
 	{
-		int32 errorCode = ::WSAGetLastError();
+		int32 errorCode = ::WSAGetLastError(); // 경우에 따라 에러가 에러가 아닐 수 있음. (타임아웃이면 정상 처리)
 		switch (errorCode)
 		{
 		case WAIT_TIMEOUT:

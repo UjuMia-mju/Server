@@ -5,6 +5,7 @@
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include <Windows.h>
+#include <chrono>
 
 #include "Types.h"
 #include "CoreMacro.h"
@@ -22,3 +23,4 @@ using namespace std;
 #include "Session.h"
 #include "LockQueue.h"
 
+#include "ConfigManager.h"

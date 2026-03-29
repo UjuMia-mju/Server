@@ -22,21 +22,35 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[1];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[8];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nEnum.proto\022\010Protocol*h\n\nPlayerType\022\024\n\020"
-  "PLAYER_TYPE_NONE\020\000\022\026\n\022PLAYER_TYPE_KNIGHT"
-  "\020\001\022\024\n\020PLAYER_TYPE_MAGE\020\002\022\026\n\022PLAYER_TYPE_"
-  "ARCHER\020\003b\006proto3"
+  "\n\nEnum.proto\022\010Protocol*e\n\rStatEventType\022"
+  "\023\n\017STAT_EVENT_NONE\020\000\022\020\n\014DAMAGE_TAKEN\020\001\022\n"
+  "\n\006HEALED\020\002\022\r\n\tITEM_USED\020\003\022\022\n\016OXYGEN_CHAN"
+  "GED\020\004*4\n\nObjectType\022\022\n\016OBJECT_ID_NONE\020\000\022"
+  "\010\n\004TOOL\020\001\022\010\n\004ITEM\020\002*E\n\010ItemType\022\010\n\004NONE\020"
+  "\000\022\010\n\004WOOD\020d\022\t\n\005STONE\020e\022\014\n\010IRON_ORE\020f\022\014\n\010"
+  "GOLD_ORE\020g*\?\n\010ToolType\022\022\n\016TOOL_TYPE_NONE"
+  "\020\000\022\007\n\003AXE\020d\022\013\n\007PICKAXE\020e\022\t\n\005DRILL\020f*I\n\tI"
+  "temState\022\023\n\017ITEM_STATE_NONE\020\000\022\r\n\tON_GROU"
+  "ND\020\001\022\n\n\006IN_AIR\020\002\022\014\n\010EQUIPPED\020\003*^\n\014Damage"
+  "Source\022\026\n\022DAMAGE_SOURCE_NONE\020\000\022\017\n\013SUFFOC"
+  "ATION\020\001\022\021\n\rENVIRONMENTAL\020\002\022\022\n\016MONSTER_AT"
+  "TACK\020\003*B\n\nHealSource\022\024\n\020HEAL_SOURCE_NONE"
+  "\020\000\022\r\n\tREST_AREA\020\001\022\017\n\013MEDICAL_KIT\020\002*x\n\020Ox"
+  "ygenChangeType\022\026\n\022OXYGEN_CHANGE_NONE\020\000\022\023"
+  "\n\017CONSUME_NATURAL\020\001\022\023\n\017CONSUME_RUNNING\020\002"
+  "\022\020\n\014RESTORE_TANK\020\003\022\020\n\014RESTORE_AREA\020\004b\006pr"
+  "oto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 136, descriptor_table_protodef_Enum_2eproto,
+    false, false, 684, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -50,16 +64,129 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_Enum_2ep
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_Enum_2eproto(&descriptor_table_Enum_2eproto);
 namespace Protocol {
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PlayerType_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* StatEventType_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
   return file_level_enum_descriptors_Enum_2eproto[0];
 }
-bool PlayerType_IsValid(int value) {
+bool StatEventType_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
     case 2:
     case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ObjectType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[1];
+}
+bool ObjectType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ItemType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[2];
+}
+bool ItemType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 100:
+    case 101:
+    case 102:
+    case 103:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ToolType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[3];
+}
+bool ToolType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 100:
+    case 101:
+    case 102:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ItemState_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[4];
+}
+bool ItemState_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* DamageSource_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[5];
+}
+bool DamageSource_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* HealSource_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[6];
+}
+bool HealSource_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* OxygenChangeType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[7];
+}
+bool OxygenChangeType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
       return true;
     default:
       return false;
