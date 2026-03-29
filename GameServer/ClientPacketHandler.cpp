@@ -248,6 +248,11 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_C_GET_CURRENCY(PacketSessionRef& session, Protocol::C_GET_CURRENCY& pkt)
+{
+	return false;
+}
+
 bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 {
 	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
