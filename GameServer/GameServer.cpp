@@ -13,7 +13,7 @@
 #include "DBConnectionPool.h"
 #include "DBBind.h"
 #include "TypeCast.h"
-#include "GachaManager.h"
+#include "DBCacheManager.h"
 
 enum
 {
@@ -68,12 +68,9 @@ int main()
 	std::wstring dbConnectionString = GConfigManager->GetDBConnectionString();
 	ASSERT_CRASH(GDBConnectionPool->Connect(4, dbConnectionString.c_str()));
 
-	// 뽑기 매니저 초기화 (DB에서 가챠 풀과 아이템 정보 로드)
-	if (GGACHA.Init(L"ko") == false)
-	{
-		cout << "가챠 매니저 초기화 실패! DB를 확인하세요." << endl;
-		return -1; // 핵심 데이터가 없으면 서버 부팅을 막아야 함
-	}
+	// DB 정보 미리 로드 (뽑기 풀, 스테이지 정보등..)
+	DBCacheManager::GetInstance().InitAsync();
+	DBCacheManager::GetInstance().WaitAll();
 
 	ClientPacketHandler::Init();
 

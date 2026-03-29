@@ -1,10 +1,11 @@
 #pragma once
 #include "JobQueue.h"
+#include "Protocol.pb.h"
 
 class Room : public JobQueue
 {
 public:
-	Room(uint64 roomId, const string& roomName, uint64 ownerId);
+	Room(uint64 roomId, const string& roomName, uint64 ownerId, string ownerString, int32 ownerTag);
 	~Room();
 
 	// ========== 대기실 관련 ==========
@@ -13,6 +14,7 @@ public:
 	void SetReady(uint64 playerId, bool isReady);  // 준비 상태
 	bool CanStartGame();
 	void StartGame();                       // 게임 시작
+	void MakeEnterRoomPacket(GameSessionRef gameSession, Protocol::S_ENTER_ROOM& pkt) const;
 	
 	// ========== 게임 시작 후, 스테이지 진행 관련 ==========
 
@@ -32,6 +34,8 @@ public:
 	bool IsPlaying() const { return _isPlaying; }
 	int32 GetCurrentCount() const { return static_cast<int32>(_players.size()); }
 	int32 GetMaxCount() const { return MAX_ROOM_CAPACITY; }
+	string GetOwnerName() const { return _ownerName; }
+	int32 GetOwnerTag() const { return _ownerTag; }
 
 	vector<pair<PlayerRef, bool>> GetMembersWithReadyStatus() const;
 private:
@@ -41,6 +45,8 @@ private:
 	uint64 _roomId = 0;
 	string _roomName;
 	uint64 _ownerId = 0;
+	string _ownerName;
+	int32 _ownerTag;
 	bool _isPlaying = false;
 
 	unordered_map<uint64, PlayerRef> _players;

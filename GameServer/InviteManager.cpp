@@ -87,13 +87,11 @@ bool InviteManager::AcceptInvite(uint64 inviteId, GameSessionRef accepter)
 		return false;
 	}
 
-	auto inviteInfo = it->second;
-
 	// 방 찾기
-	auto room = RoomManager::Instance().FindRoom(inviteInfo->roomId);
+	auto room = RoomManager::Instance().FindRoom(it->second->roomId);
 	if (!room)
 	{
-		std::cout << "[InviteManager] Room not found: " << inviteInfo->roomId << endl;
+		std::cout << "[InviteManager] Room not found: " << it->second->roomId << endl;
 		_invites.erase(it);
 		return false;
 	}
@@ -107,14 +105,14 @@ bool InviteManager::AcceptInvite(uint64 inviteId, GameSessionRef accepter)
 	}
 
 	// 방에 입장
-	accepter->GetRoom() = room;
+	accepter->SetRoom(room);
 	room->DoAsync(&Room::EnterLobby, accepter->GetPlayer());
 
 	// 초대 정보 삭제
-	_invites.erase(it);
-
 	std::cout << "[InviteManager] Player " << accepter->GetPlayer()->name
-		<< " accepted invite " << inviteId << " and joined room " << inviteInfo->roomId << endl;
+		<< " accepted invite " << inviteId << " and joined room " << it->second->roomId << endl;
+
+	_invites.erase(it);
 
 	return true;
 }

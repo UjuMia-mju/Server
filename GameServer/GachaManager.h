@@ -13,12 +13,18 @@ struct GachaPoolInfo
 	int32 poolId;
 	string name;
 	string poolType;
-	int maxPull; // 1회 최대 뽑기 가능 횟수 (예: 10회 뽑기)
+	int32 maxPull; // 1회 최대 뽑기 가능 횟수 (예: 10회 뽑기)
 	int32 costCoin;
 	int32 costGem;
 	int64 startAt;
 	int64 endAt;
 	xvector<GachaItem> items; // 이 풀에서 나오는 아이템 목록
+
+	bool IsActive() const
+	{
+		int64 now = std::time(nullptr);
+		return now >= startAt && now <= endAt;
+	}
 };
 
 struct SkinMetaData
@@ -57,6 +63,16 @@ public:
 		if (it != _skinCache.end())
 			return &(it->second);
 		return nullptr;
+	}
+
+	xmap<int32, GachaPoolInfo> GetAllGachaPools() const
+	{
+		return _poolCache;
+	}
+
+	xmap<int32, SkinMetaData> GetAllSkinMetaData() const
+	{
+		return _skinCache;
 	}
 
 private:
