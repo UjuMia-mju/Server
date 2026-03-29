@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Gemini AI Code Review
-        uses: google-gemini/generative-ai-code-review@v1 # 사용하시는 액션 버전에 따라 확인 필요
+        uses: google-gemini/generative-ai-code-review@main # 사용하시는 액션 버전에 따라 확인 필요
         with:
           node-version: '20'
           # 아래 'system_instruction' 부분이 Gemini에게 주는 특수 지침입니다.
