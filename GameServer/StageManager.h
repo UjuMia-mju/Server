@@ -1,5 +1,6 @@
 #pragma once
 #include "Protocol.pb.h"
+#include <optional>
 
 struct StageInfo
 {
@@ -18,9 +19,9 @@ struct StageInfo
 
 struct StageClearInfo
 {
-	int stage_id;
+	int stageId;
 	int star; // 클리어 별 개수 (예: 0~3)
-	int clear_time; // 실제 클리어 시간 (초 단위)
+	int clearTime; // 실제 클리어 시간 (초 단위)
 };
 
 class StageManager
@@ -31,6 +32,29 @@ public:
 	{
 		static StageManager instance;
 		return instance;
+	}
+
+	optional<StageInfo> GetStageInfo(int mapId, int chapter, int stage) const
+	{
+		auto it = _stageCache.find(mapId);
+		if (it != _stageCache.end())
+		{
+			if (it->second.chapter == chapter && it->second.stage == stage)
+			{
+				return it->second;
+			}
+			else
+			{
+				cout << "error: stage cahche miss" << endl;
+				return nullopt;
+			}
+		}
+		return nullopt;
+	}
+
+	unordered_map<int32_t, StageInfo> GetAllStages() const
+	{
+		return _stageCache;
 	}
 
 	bool GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>& clears);

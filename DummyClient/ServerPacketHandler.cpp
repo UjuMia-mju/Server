@@ -79,7 +79,56 @@ bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 
 bool Handle_S_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::S_GACHA_POOL_LIST& pkt)
 {
-	return false;
+
+	cout << "\n========== Gacha Pools ==========" << endl;
+	
+	if (pkt.pools_size() == 0)
+	{
+		cout << "No gacha pools available." << endl;
+	}
+	else
+	{
+		for (const auto& pool : pkt.pools())
+		{
+			cout << "Pool ID: " << pool.pool_id() << endl;
+			cout << "Name: " << pool.pool_name() << endl;
+			cout << "SKINS: " << endl;
+
+			for (const auto& skin : pool.skins())
+			{
+				cout << "  - Skin ID: " << skin.skin_id() << endl;
+				cout << "    Name: " << skin.skin_name() << endl;
+				cout << "    Description: " << skin.skin_des() << endl;
+				cout << "    Rarity: " << skin.rarity() << endl;
+			}
+
+			cout << "-----------------------------" << endl;
+		}
+	}
+
+	return true;
+}
+
+bool Handle_S_SKIN_LIST(PacketSessionRef& session, Protocol::S_SKIN_LIST& pkt)
+{
+	cout << "\n========== All Skins ==========" << endl;
+	if (pkt.skins_size() == 0)
+	{
+		cout << "No skins available." << endl;
+	}
+	else
+	{
+		for (const auto& skin : pkt.skins())
+		{
+			cout << "Skin ID: " << skin.skin_id() << endl;
+			cout << "Name: " << skin.skin_name() << endl;
+			cout << "Description: " << skin.skin_des() << endl;
+			cout << "Rarity: " << skin.rarity() << endl;
+			cout << "-----------------------------" << endl;
+		}
+	}
+
+	return true;
 }
 
 bool Handle_S_MY_SKINS(PacketSessionRef& session, Protocol::S_MY_SKINS& pkt)
@@ -245,7 +294,16 @@ bool Handle_S_START_ROOM(PacketSessionRef& session, Protocol::S_START_ROOM& pkt)
 
 bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt)
 {
-	return false;
+	if (!pkt.success())
+	{
+		cout << "[Client] Failed to show stage: " << endl;
+		return false;
+	}
+	cout << "\n========== Stage Info ==========" << endl;
+	auto stageInfo = pkt.stage();
+	cout << "Map ID: " << stageInfo.map_id() << "-" << stageInfo.stage_name() << "-" << stageInfo.description() << endl;
+
+	return true;
 }
 
 bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pkt)
@@ -267,7 +325,7 @@ bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_IN
 	for (int i = 0; i < pkt.stage_clears_size(); i++)
 	{
 		const auto& clearInfo = pkt.stage_clears(i);
-		cout << "Stage " << clearInfo.stage() << "-" << clearInfo.level()
+		cout << "Stage " << clearInfo.map_id() << "-"
 			<< " | Stars: " << clearInfo.star()
 			<< " | Clear Time: " << clearInfo.clear_time() << endl;
 	}
@@ -279,6 +337,20 @@ bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_IN
 
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 {
+	return true;
+}
+
+bool Handle_S_STAGE_INFO(PacketSessionRef& session, Protocol::S_STAGE_INFO& pkt)
+{
+	cout << "\n========== Stage Info ==========" << endl;
+	auto stageInfo = pkt.stages();
+	for (int i = 0; i < stageInfo.size(); i++)
+	{
+		const auto& stage = stageInfo[i];
+		cout << "Stage " << stage.map_id() << "-"
+			<< stage.stage_name() << ": " << stage.description() << endl;
+	}
+
 	return true;
 }
 

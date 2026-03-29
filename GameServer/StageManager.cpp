@@ -77,9 +77,9 @@ bool StageManager::GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>
         L"WHERE user_id = ?"
     );
 
-    int stageId = 0;
-    int star = 0;
-    int clearTime = 0;
+    int32 stageId = 0;
+    int32 star = 0;
+    int32 clearTime = 0;
 
     dbBind.BindParam(0, userId);
     dbBind.BindCol(0, stageId);
@@ -91,9 +91,9 @@ bool StageManager::GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>
         while (dbBind.Fetch())
         {
             StageClearInfo info;
-            info.stage_id = stageId;
+            info.stageId = stageId;
             info.star = star;
-            info.clear_time = clearTime;
+            info.clearTime = clearTime;
             clears.push_back(info);
         }
         return true;

@@ -22,4 +22,3 @@ private:
 	vector<future<void>> _futures;
 	USE_LOCK;
 };
-

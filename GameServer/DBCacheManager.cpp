@@ -15,6 +15,7 @@ void DBCacheManager::InitAsync()
 			CacheGachaData();
 		}
 	));
+
 	// 스테이지 정보 캐싱
 	_tasks.emplace_back(packaged_task<void()>(
 		[this]() {

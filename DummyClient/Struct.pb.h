@@ -1212,15 +1212,35 @@ class GachaPoolInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kSkinsFieldNumber = 10,
     kPoolNameFieldNumber = 2,
     kPoolTypeFieldNumber = 3,
     kPoolIdFieldNumber = 1,
     kCostGemFieldNumber = 4,
-    kMaxPullFieldNumber = 5,
-    kIsActiveFieldNumber = 6,
-    kStartAtFieldNumber = 7,
-    kEndAtFieldNumber = 8,
+    kCostCoinFieldNumber = 5,
+    kMaxPullFieldNumber = 6,
+    kStartAtFieldNumber = 8,
+    kEndAtFieldNumber = 9,
+    kIsActiveFieldNumber = 7,
   };
+  // repeated .Protocol.SkinInfo skins = 10;
+  int skins_size() const;
+  private:
+  int _internal_skins_size() const;
+  public:
+  void clear_skins();
+  ::Protocol::SkinInfo* mutable_skins(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::SkinInfo >*
+      mutable_skins();
+  private:
+  const ::Protocol::SkinInfo& _internal_skins(int index) const;
+  ::Protocol::SkinInfo* _internal_add_skins();
+  public:
+  const ::Protocol::SkinInfo& skins(int index) const;
+  ::Protocol::SkinInfo* add_skins();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::SkinInfo >&
+      skins() const;
+
   // string pool_name = 2;
   void clear_pool_name();
   const std::string& pool_name() const;
@@ -1267,7 +1287,16 @@ class GachaPoolInfo final :
   void _internal_set_cost_gem(int32_t value);
   public:
 
-  // int32 max_pull = 5;
+  // int32 cost_coin = 5;
+  void clear_cost_coin();
+  int32_t cost_coin() const;
+  void set_cost_coin(int32_t value);
+  private:
+  int32_t _internal_cost_coin() const;
+  void _internal_set_cost_coin(int32_t value);
+  public:
+
+  // int32 max_pull = 6;
   void clear_max_pull();
   int32_t max_pull() const;
   void set_max_pull(int32_t value);
@@ -1276,16 +1305,7 @@ class GachaPoolInfo final :
   void _internal_set_max_pull(int32_t value);
   public:
 
-  // bool is_active = 6;
-  void clear_is_active();
-  bool is_active() const;
-  void set_is_active(bool value);
-  private:
-  bool _internal_is_active() const;
-  void _internal_set_is_active(bool value);
-  public:
-
-  // int64 start_at = 7;
+  // int64 start_at = 8;
   void clear_start_at();
   int64_t start_at() const;
   void set_start_at(int64_t value);
@@ -1294,13 +1314,22 @@ class GachaPoolInfo final :
   void _internal_set_start_at(int64_t value);
   public:
 
-  // int64 end_at = 8;
+  // int64 end_at = 9;
   void clear_end_at();
   int64_t end_at() const;
   void set_end_at(int64_t value);
   private:
   int64_t _internal_end_at() const;
   void _internal_set_end_at(int64_t value);
+  public:
+
+  // bool is_active = 7;
+  void clear_is_active();
+  bool is_active() const;
+  void set_is_active(bool value);
+  private:
+  bool _internal_is_active() const;
+  void _internal_set_is_active(bool value);
   public:
 
   // @@protoc_insertion_point(class_scope:Protocol.GachaPoolInfo)
@@ -1311,14 +1340,16 @@ class GachaPoolInfo final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::SkinInfo > skins_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr pool_name_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr pool_type_;
     int32_t pool_id_;
     int32_t cost_gem_;
+    int32_t cost_coin_;
     int32_t max_pull_;
-    bool is_active_;
     int64_t start_at_;
     int64_t end_at_;
+    bool is_active_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2183,13 +2214,16 @@ class StageInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStageNameFieldNumber = 3,
-    kDescriptionFieldNumber = 4,
-    kStageLevelFieldNumber = 1,
-    kStageIndexFieldNumber = 2,
-    kDifficultyFieldNumber = 5,
+    kStageNameFieldNumber = 4,
+    kDescriptionFieldNumber = 5,
+    kMapIdFieldNumber = 1,
+    kChapterFieldNumber = 2,
+    kStageFieldNumber = 3,
+    kDifficultyFieldNumber = 6,
+    kIsBossStageFieldNumber = 7,
+    kEstimatedClearTimeFieldNumber = 8,
   };
-  // string stage_name = 3;
+  // string stage_name = 4;
   void clear_stage_name();
   const std::string& stage_name() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -2203,7 +2237,7 @@ class StageInfo final :
   std::string* _internal_mutable_stage_name();
   public:
 
-  // string description = 4;
+  // string description = 5;
   void clear_description();
   const std::string& description() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -2217,31 +2251,58 @@ class StageInfo final :
   std::string* _internal_mutable_description();
   public:
 
-  // int32 stage_level = 1;
-  void clear_stage_level();
-  int32_t stage_level() const;
-  void set_stage_level(int32_t value);
+  // int32 map_id = 1;
+  void clear_map_id();
+  int32_t map_id() const;
+  void set_map_id(int32_t value);
   private:
-  int32_t _internal_stage_level() const;
-  void _internal_set_stage_level(int32_t value);
+  int32_t _internal_map_id() const;
+  void _internal_set_map_id(int32_t value);
   public:
 
-  // int32 stage_index = 2;
-  void clear_stage_index();
-  int32_t stage_index() const;
-  void set_stage_index(int32_t value);
+  // int32 chapter = 2;
+  void clear_chapter();
+  int32_t chapter() const;
+  void set_chapter(int32_t value);
   private:
-  int32_t _internal_stage_index() const;
-  void _internal_set_stage_index(int32_t value);
+  int32_t _internal_chapter() const;
+  void _internal_set_chapter(int32_t value);
   public:
 
-  // int32 difficulty = 5;
+  // int32 stage = 3;
+  void clear_stage();
+  int32_t stage() const;
+  void set_stage(int32_t value);
+  private:
+  int32_t _internal_stage() const;
+  void _internal_set_stage(int32_t value);
+  public:
+
+  // int32 difficulty = 6;
   void clear_difficulty();
   int32_t difficulty() const;
   void set_difficulty(int32_t value);
   private:
   int32_t _internal_difficulty() const;
   void _internal_set_difficulty(int32_t value);
+  public:
+
+  // bool isBossStage = 7;
+  void clear_isbossstage();
+  bool isbossstage() const;
+  void set_isbossstage(bool value);
+  private:
+  bool _internal_isbossstage() const;
+  void _internal_set_isbossstage(bool value);
+  public:
+
+  // int32 estimated_clear_time = 8;
+  void clear_estimated_clear_time();
+  int32_t estimated_clear_time() const;
+  void set_estimated_clear_time(int32_t value);
+  private:
+  int32_t _internal_estimated_clear_time() const;
+  void _internal_set_estimated_clear_time(int32_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:Protocol.StageInfo)
@@ -2254,9 +2315,12 @@ class StageInfo final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr stage_name_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr description_;
-    int32_t stage_level_;
-    int32_t stage_index_;
+    int32_t map_id_;
+    int32_t chapter_;
+    int32_t stage_;
     int32_t difficulty_;
+    bool isbossstage_;
+    int32_t estimated_clear_time_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2385,45 +2449,35 @@ class StageClearInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStageFieldNumber = 1,
-    kLevelFieldNumber = 2,
-    kClearTimeFieldNumber = 4,
-    kStarFieldNumber = 3,
+    kMapIdFieldNumber = 1,
+    kStarFieldNumber = 2,
+    kClearTimeFieldNumber = 3,
   };
-  // int32 stage = 1;
-  void clear_stage();
-  int32_t stage() const;
-  void set_stage(int32_t value);
+  // int32 map_id = 1;
+  void clear_map_id();
+  int32_t map_id() const;
+  void set_map_id(int32_t value);
   private:
-  int32_t _internal_stage() const;
-  void _internal_set_stage(int32_t value);
+  int32_t _internal_map_id() const;
+  void _internal_set_map_id(int32_t value);
   public:
 
-  // int32 level = 2;
-  void clear_level();
-  int32_t level() const;
-  void set_level(int32_t value);
-  private:
-  int32_t _internal_level() const;
-  void _internal_set_level(int32_t value);
-  public:
-
-  // int64 clear_time = 4;
-  void clear_clear_time();
-  int64_t clear_time() const;
-  void set_clear_time(int64_t value);
-  private:
-  int64_t _internal_clear_time() const;
-  void _internal_set_clear_time(int64_t value);
-  public:
-
-  // int32 star = 3;
+  // int32 star = 2;
   void clear_star();
   int32_t star() const;
   void set_star(int32_t value);
   private:
   int32_t _internal_star() const;
   void _internal_set_star(int32_t value);
+  public:
+
+  // int64 clear_time = 3;
+  void clear_clear_time();
+  int64_t clear_time() const;
+  void set_clear_time(int64_t value);
+  private:
+  int64_t _internal_clear_time() const;
+  void _internal_set_clear_time(int64_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:Protocol.StageClearInfo)
@@ -2434,10 +2488,9 @@ class StageClearInfo final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    int32_t stage_;
-    int32_t level_;
-    int64_t clear_time_;
+    int32_t map_id_;
     int32_t star_;
+    int64_t clear_time_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -4389,7 +4442,27 @@ inline void GachaPoolInfo::set_cost_gem(int32_t value) {
   // @@protoc_insertion_point(field_set:Protocol.GachaPoolInfo.cost_gem)
 }
 
-// int32 max_pull = 5;
+// int32 cost_coin = 5;
+inline void GachaPoolInfo::clear_cost_coin() {
+  _impl_.cost_coin_ = 0;
+}
+inline int32_t GachaPoolInfo::_internal_cost_coin() const {
+  return _impl_.cost_coin_;
+}
+inline int32_t GachaPoolInfo::cost_coin() const {
+  // @@protoc_insertion_point(field_get:Protocol.GachaPoolInfo.cost_coin)
+  return _internal_cost_coin();
+}
+inline void GachaPoolInfo::_internal_set_cost_coin(int32_t value) {
+  
+  _impl_.cost_coin_ = value;
+}
+inline void GachaPoolInfo::set_cost_coin(int32_t value) {
+  _internal_set_cost_coin(value);
+  // @@protoc_insertion_point(field_set:Protocol.GachaPoolInfo.cost_coin)
+}
+
+// int32 max_pull = 6;
 inline void GachaPoolInfo::clear_max_pull() {
   _impl_.max_pull_ = 0;
 }
@@ -4409,7 +4482,7 @@ inline void GachaPoolInfo::set_max_pull(int32_t value) {
   // @@protoc_insertion_point(field_set:Protocol.GachaPoolInfo.max_pull)
 }
 
-// bool is_active = 6;
+// bool is_active = 7;
 inline void GachaPoolInfo::clear_is_active() {
   _impl_.is_active_ = false;
 }
@@ -4429,7 +4502,7 @@ inline void GachaPoolInfo::set_is_active(bool value) {
   // @@protoc_insertion_point(field_set:Protocol.GachaPoolInfo.is_active)
 }
 
-// int64 start_at = 7;
+// int64 start_at = 8;
 inline void GachaPoolInfo::clear_start_at() {
   _impl_.start_at_ = int64_t{0};
 }
@@ -4449,7 +4522,7 @@ inline void GachaPoolInfo::set_start_at(int64_t value) {
   // @@protoc_insertion_point(field_set:Protocol.GachaPoolInfo.start_at)
 }
 
-// int64 end_at = 8;
+// int64 end_at = 9;
 inline void GachaPoolInfo::clear_end_at() {
   _impl_.end_at_ = int64_t{0};
 }
@@ -4467,6 +4540,46 @@ inline void GachaPoolInfo::_internal_set_end_at(int64_t value) {
 inline void GachaPoolInfo::set_end_at(int64_t value) {
   _internal_set_end_at(value);
   // @@protoc_insertion_point(field_set:Protocol.GachaPoolInfo.end_at)
+}
+
+// repeated .Protocol.SkinInfo skins = 10;
+inline int GachaPoolInfo::_internal_skins_size() const {
+  return _impl_.skins_.size();
+}
+inline int GachaPoolInfo::skins_size() const {
+  return _internal_skins_size();
+}
+inline void GachaPoolInfo::clear_skins() {
+  _impl_.skins_.Clear();
+}
+inline ::Protocol::SkinInfo* GachaPoolInfo::mutable_skins(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.GachaPoolInfo.skins)
+  return _impl_.skins_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::SkinInfo >*
+GachaPoolInfo::mutable_skins() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.GachaPoolInfo.skins)
+  return &_impl_.skins_;
+}
+inline const ::Protocol::SkinInfo& GachaPoolInfo::_internal_skins(int index) const {
+  return _impl_.skins_.Get(index);
+}
+inline const ::Protocol::SkinInfo& GachaPoolInfo::skins(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.GachaPoolInfo.skins)
+  return _internal_skins(index);
+}
+inline ::Protocol::SkinInfo* GachaPoolInfo::_internal_add_skins() {
+  return _impl_.skins_.Add();
+}
+inline ::Protocol::SkinInfo* GachaPoolInfo::add_skins() {
+  ::Protocol::SkinInfo* _add = _internal_add_skins();
+  // @@protoc_insertion_point(field_add:Protocol.GachaPoolInfo.skins)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::SkinInfo >&
+GachaPoolInfo::skins() const {
+  // @@protoc_insertion_point(field_list:Protocol.GachaPoolInfo.skins)
+  return _impl_.skins_;
 }
 
 // -------------------------------------------------------------------
@@ -4959,47 +5072,67 @@ inline void RoomMemberInfo::set_is_ready(bool value) {
 
 // StageInfo
 
-// int32 stage_level = 1;
-inline void StageInfo::clear_stage_level() {
-  _impl_.stage_level_ = 0;
+// int32 map_id = 1;
+inline void StageInfo::clear_map_id() {
+  _impl_.map_id_ = 0;
 }
-inline int32_t StageInfo::_internal_stage_level() const {
-  return _impl_.stage_level_;
+inline int32_t StageInfo::_internal_map_id() const {
+  return _impl_.map_id_;
 }
-inline int32_t StageInfo::stage_level() const {
-  // @@protoc_insertion_point(field_get:Protocol.StageInfo.stage_level)
-  return _internal_stage_level();
+inline int32_t StageInfo::map_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.map_id)
+  return _internal_map_id();
 }
-inline void StageInfo::_internal_set_stage_level(int32_t value) {
+inline void StageInfo::_internal_set_map_id(int32_t value) {
   
-  _impl_.stage_level_ = value;
+  _impl_.map_id_ = value;
 }
-inline void StageInfo::set_stage_level(int32_t value) {
-  _internal_set_stage_level(value);
-  // @@protoc_insertion_point(field_set:Protocol.StageInfo.stage_level)
+inline void StageInfo::set_map_id(int32_t value) {
+  _internal_set_map_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.map_id)
 }
 
-// int32 stage_index = 2;
-inline void StageInfo::clear_stage_index() {
-  _impl_.stage_index_ = 0;
+// int32 chapter = 2;
+inline void StageInfo::clear_chapter() {
+  _impl_.chapter_ = 0;
 }
-inline int32_t StageInfo::_internal_stage_index() const {
-  return _impl_.stage_index_;
+inline int32_t StageInfo::_internal_chapter() const {
+  return _impl_.chapter_;
 }
-inline int32_t StageInfo::stage_index() const {
-  // @@protoc_insertion_point(field_get:Protocol.StageInfo.stage_index)
-  return _internal_stage_index();
+inline int32_t StageInfo::chapter() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.chapter)
+  return _internal_chapter();
 }
-inline void StageInfo::_internal_set_stage_index(int32_t value) {
+inline void StageInfo::_internal_set_chapter(int32_t value) {
   
-  _impl_.stage_index_ = value;
+  _impl_.chapter_ = value;
 }
-inline void StageInfo::set_stage_index(int32_t value) {
-  _internal_set_stage_index(value);
-  // @@protoc_insertion_point(field_set:Protocol.StageInfo.stage_index)
+inline void StageInfo::set_chapter(int32_t value) {
+  _internal_set_chapter(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.chapter)
 }
 
-// string stage_name = 3;
+// int32 stage = 3;
+inline void StageInfo::clear_stage() {
+  _impl_.stage_ = 0;
+}
+inline int32_t StageInfo::_internal_stage() const {
+  return _impl_.stage_;
+}
+inline int32_t StageInfo::stage() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.stage)
+  return _internal_stage();
+}
+inline void StageInfo::_internal_set_stage(int32_t value) {
+  
+  _impl_.stage_ = value;
+}
+inline void StageInfo::set_stage(int32_t value) {
+  _internal_set_stage(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.stage)
+}
+
+// string stage_name = 4;
 inline void StageInfo::clear_stage_name() {
   _impl_.stage_name_.ClearToEmpty();
 }
@@ -5049,7 +5182,7 @@ inline void StageInfo::set_allocated_stage_name(std::string* stage_name) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.StageInfo.stage_name)
 }
 
-// string description = 4;
+// string description = 5;
 inline void StageInfo::clear_description() {
   _impl_.description_.ClearToEmpty();
 }
@@ -5099,7 +5232,7 @@ inline void StageInfo::set_allocated_description(std::string* description) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.StageInfo.description)
 }
 
-// int32 difficulty = 5;
+// int32 difficulty = 6;
 inline void StageInfo::clear_difficulty() {
   _impl_.difficulty_ = 0;
 }
@@ -5119,51 +5252,71 @@ inline void StageInfo::set_difficulty(int32_t value) {
   // @@protoc_insertion_point(field_set:Protocol.StageInfo.difficulty)
 }
 
+// bool isBossStage = 7;
+inline void StageInfo::clear_isbossstage() {
+  _impl_.isbossstage_ = false;
+}
+inline bool StageInfo::_internal_isbossstage() const {
+  return _impl_.isbossstage_;
+}
+inline bool StageInfo::isbossstage() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.isBossStage)
+  return _internal_isbossstage();
+}
+inline void StageInfo::_internal_set_isbossstage(bool value) {
+  
+  _impl_.isbossstage_ = value;
+}
+inline void StageInfo::set_isbossstage(bool value) {
+  _internal_set_isbossstage(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.isBossStage)
+}
+
+// int32 estimated_clear_time = 8;
+inline void StageInfo::clear_estimated_clear_time() {
+  _impl_.estimated_clear_time_ = 0;
+}
+inline int32_t StageInfo::_internal_estimated_clear_time() const {
+  return _impl_.estimated_clear_time_;
+}
+inline int32_t StageInfo::estimated_clear_time() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageInfo.estimated_clear_time)
+  return _internal_estimated_clear_time();
+}
+inline void StageInfo::_internal_set_estimated_clear_time(int32_t value) {
+  
+  _impl_.estimated_clear_time_ = value;
+}
+inline void StageInfo::set_estimated_clear_time(int32_t value) {
+  _internal_set_estimated_clear_time(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageInfo.estimated_clear_time)
+}
+
 // -------------------------------------------------------------------
 
 // StageClearInfo
 
-// int32 stage = 1;
-inline void StageClearInfo::clear_stage() {
-  _impl_.stage_ = 0;
+// int32 map_id = 1;
+inline void StageClearInfo::clear_map_id() {
+  _impl_.map_id_ = 0;
 }
-inline int32_t StageClearInfo::_internal_stage() const {
-  return _impl_.stage_;
+inline int32_t StageClearInfo::_internal_map_id() const {
+  return _impl_.map_id_;
 }
-inline int32_t StageClearInfo::stage() const {
-  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.stage)
-  return _internal_stage();
+inline int32_t StageClearInfo::map_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.map_id)
+  return _internal_map_id();
 }
-inline void StageClearInfo::_internal_set_stage(int32_t value) {
+inline void StageClearInfo::_internal_set_map_id(int32_t value) {
   
-  _impl_.stage_ = value;
+  _impl_.map_id_ = value;
 }
-inline void StageClearInfo::set_stage(int32_t value) {
-  _internal_set_stage(value);
-  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.stage)
+inline void StageClearInfo::set_map_id(int32_t value) {
+  _internal_set_map_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.map_id)
 }
 
-// int32 level = 2;
-inline void StageClearInfo::clear_level() {
-  _impl_.level_ = 0;
-}
-inline int32_t StageClearInfo::_internal_level() const {
-  return _impl_.level_;
-}
-inline int32_t StageClearInfo::level() const {
-  // @@protoc_insertion_point(field_get:Protocol.StageClearInfo.level)
-  return _internal_level();
-}
-inline void StageClearInfo::_internal_set_level(int32_t value) {
-  
-  _impl_.level_ = value;
-}
-inline void StageClearInfo::set_level(int32_t value) {
-  _internal_set_level(value);
-  // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.level)
-}
-
-// int32 star = 3;
+// int32 star = 2;
 inline void StageClearInfo::clear_star() {
   _impl_.star_ = 0;
 }
@@ -5183,7 +5336,7 @@ inline void StageClearInfo::set_star(int32_t value) {
   // @@protoc_insertion_point(field_set:Protocol.StageClearInfo.star)
 }
 
-// int64 clear_time = 4;
+// int64 clear_time = 3;
 inline void StageClearInfo::clear_clear_time() {
   _impl_.clear_time_ = int64_t{0};
 }

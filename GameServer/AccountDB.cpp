@@ -116,47 +116,6 @@ bool AccountDB::GetPlayerInfo(const string& email,const std::string& password, O
 	return false;
 }
 
-bool AccountDB::GetPlayerClearInfo(int32 playerId, OUT vector<StageClearData>& outClearData)
-{
-	DBConnectionGuard guard(GDBConnectionPool);
-	if (!guard)
-	{
-		return false;
-	}
-
-	// 플레이어 ID로 클리어 정보 조회 (스테이지, 레벨 순으로 정렬)
-	DBBind<1, 4> dbBind(guard, L"SELECT stage, level, star, UNIX_TIMESTAMP(clear_time) FROM user_map_clears WHERE user_id = ? ORDER BY stage, level");
-
-	int32 stage = 0;
-	int32 level = 0;
-	int32 star = 0;
-	int64 clearTime = 0;
-
-	dbBind.BindParam(0, playerId);
-	dbBind.BindCol(0, stage);
-	dbBind.BindCol(1, level);
-	dbBind.BindCol(2, star);
-	dbBind.BindCol(3, clearTime);
-
-	bool result = false;
-	if (dbBind.Execute())
-	{
-		while (guard->Fetch())
-		{
-			StageClearData data;
-			data.stage = stage;
-			data.level = level;
-			data.star = star;
-			data.clearTime = clearTime;
-			outClearData.push_back(data);
-		}
-		result = true;
-	}
-
-	return result;
-}
-
-
 bool AccountDB::GetUserProfileInfo(int32 dbUserId, OUT int32& outCoin, OUT int32& outGem, OUT vector<OwnedSkinInfo>& outOwnedSkins)
 {
 	// 초기화

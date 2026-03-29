@@ -59,6 +59,13 @@ int32 ServerSession::GetPlayerTag() const
 	return _playerTag;
 }
 
+void ServerSession::SendGetDbDataPacket()
+{
+	Protocol::C_GET_DB_DATA pkt;
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendLoginPacket(string id, string psw)
 {
 	Protocol::C_LOGIN loginPkt;
@@ -100,6 +107,26 @@ void ServerSession::SendEnterRoom()
 	cout << "[Client] Show members packet sent" << endl;
 }
 
+void ServerSession::SendStageData(int32 map_id, int32 chapter, int32 stageIndex)
+{
+	Protocol::C_SHOW_STAGE pkt;
+
+	pkt.set_chapter(chapter);
+	pkt.set_map_id(map_id);
+	pkt.set_stageindex(stageIndex);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendMyClearStageData()
+{
+	Protocol::C_GET_CLEAR_INFO pkt;
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendReady(bool isReady)
 {
 	Protocol::C_READY readyPkt;
@@ -118,15 +145,15 @@ void ServerSession::SendStartRoom()
 }
 
 
-void ServerSession::SendShowStage(int32 stage, int32 level)
+void ServerSession::SendShowStage(int32 chapter, int32 stage)
 {
 	Protocol::C_SHOW_STAGE pkt;
-	pkt.set_stagelevel(stage);
-	pkt.set_stageindex(level);
+	pkt.set_chapter(chapter);
+	pkt.set_stageindex(stage);
 
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);
 
-	cout << "[Client] Show stage packet sent - Stage " << stage << "-" << level << endl;
+	cout << "[Client] Show stage packet sent - Stage " << chapter << "-" << stage << endl;
 }
 
