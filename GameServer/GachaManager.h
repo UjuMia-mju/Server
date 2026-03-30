@@ -75,6 +75,10 @@ public:
 		return _skinCache;
 	}
 
+
+	void FillGachaPoolListPacket(Protocol::S_GACHA_POOL_LIST& pkt) const;
+	void FillSkinListPacket(Protocol::S_SKIN_LIST& pkt) const;
+
 private:
 	xmap<int32, GachaPoolInfo> _poolCache;
 	xmap<int32, SkinMetaData> _skinCache;

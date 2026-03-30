@@ -142,30 +142,29 @@ int main()
 			
 			cout << "[Step 1] Both players logged in successfully!\n" << endl;
 
-			
-
-			player1Session->SendStageData(1, 1, 1);
-			player1Session->SendMyClearStageData();
-
-			cout << "end" << endl;
-
 			// 2. Player1 방 생성
-			//cout << "[Step 2 - 1] Player1 creating room..." << endl;
-			//player1Session->SendCreateRoom();
-			//this_thread::sleep_for(2s); // 방 생성 대기
-			//cout << "[Step 2 - 2] Room created!\n" << endl;
+			cout << "[Step 2 - 1] Player1 creating room..." << endl;
+			player1Session->SendCreateRoom();
+			this_thread::sleep_for(2s); // 방 생성 대기
+			cout << "[Step 2 - 2] Room created!\n" << endl;
 
-			//// 3. Player1이 Player2 초대
-			//cout << "[Step 3] Player1 inviting Player2..." << endl;
-			//cout << "Target: " << player2Session->GetPlayerName()
-			//	<< "#" << player2Session->GetPlayerTag() << endl;
+			// 3. Player1이 Player2 초대
+			cout << "[Step 3] Player1 inviting Player2..." << endl;
+			cout << "Target: " << player2Session->GetPlayerName()
+				<< "#" << player2Session->GetPlayerTag() << endl;
 
-			//player1Session->SendInvitePacket(
-			//	player2Session->GetPlayerName(),
-			//	player2Session->GetPlayerTag()
-			//);
-			//this_thread::sleep_for(2s); // 초대 처리 대기
-			//cout << "[Step 3] Invitation success!\n" << endl;
+			player1Session->SendInvitePacket(
+				player2Session->GetPlayerName(),
+				player2Session->GetPlayerTag()
+			);
+			this_thread::sleep_for(2s); // 초대 처리 대기
+			cout << "[Step 3] Invitation success!\n" << endl;
+
+			player1Session->SendGachaPool();
+
+			//player1Session->SendLeaveRoom();
+
+			//cout << "[Step 3] Player1 left the room...\n" << endl;
 
 			//cout << "[Step 4] Both players getting ready..." << endl;
 			//player1Session->SendReady(true);

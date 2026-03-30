@@ -99,6 +99,13 @@ void ServerSession::SendInvitePacket(string name, int32 tag)
 	cout << "[Client] Invite packet sent - Target: " << name << "#" << tag << endl;
 }
 
+void ServerSession::SendLeaveRoom()
+{
+	Protocol::C_LEAVE_ROOM pkt;
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendEnterRoom()
 {
 	Protocol::C_ENTER_ROOM pkt;
@@ -123,6 +130,13 @@ void ServerSession::SendMyClearStageData()
 {
 	Protocol::C_GET_CLEAR_INFO pkt;
 
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendGachaPool()
+{
+	Protocol::C_GACHA_POOL_LIST pkt;
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);
 }
