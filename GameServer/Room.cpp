@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "GameSession.h"
 #include "ClientPacketHandler.h"
+#include "RoomManager.h"
 
 RoomRef GTestRoom = nullptr;
 
@@ -59,6 +60,7 @@ void Room::LeaveLobby(PlayerRef player)
 	else if (_players.empty())
 	{
 		// πÊ ªË¡¶
+		RoomManager::Instance().RemoveRoom(_roomId);
 	}
 	else
 	{

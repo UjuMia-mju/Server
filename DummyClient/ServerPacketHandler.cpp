@@ -48,6 +48,11 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_S_GET_CURRENCY(PacketSessionRef& session, Protocol::S_GET_CURRENCY& pkt)
+{
+	return false;
+}
+
 bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 {
 	if (pkt.success())
@@ -79,7 +84,6 @@ bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 
 bool Handle_S_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::S_GACHA_POOL_LIST& pkt)
 {
-
 	cout << "\n========== Gacha Pools ==========" << endl;
 	
 	if (pkt.pools_size() == 0)
@@ -207,7 +211,14 @@ bool Handle_S_ENTER_ROOM(PacketSessionRef& session, Protocol::S_ENTER_ROOM& pkt)
 
 bool Handle_S_LEAVE_ROOM(PacketSessionRef& session, Protocol::S_LEAVE_ROOM& pkt)
 {
-	return false;
+	if (!pkt.success())
+	{
+		cout << "[Client] Leave room failed: " << endl;
+		return false;
+	}
+
+	cout << "[Client] Successfully left the room" << endl;
+	return true;
 }
 
 bool Handle_S_INVITE_PLAYER(PacketSessionRef& session, Protocol::S_INVITE_PLAYER& pkt)

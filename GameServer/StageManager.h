@@ -59,6 +59,8 @@ public:
 
 	bool GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>& clears);
 
+	void FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const;
+
 private:
 	unordered_map<int32_t, StageInfo> _stageCache;
 };

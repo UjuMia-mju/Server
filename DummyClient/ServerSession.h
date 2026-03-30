@@ -23,12 +23,14 @@ public:
 	void SendLoginPacket(string id, string psw);
 	void SendCreateRoom();
 	void SendInvitePacket(string name, int32 tag);
+	void SendLeaveRoom();
 	void SendReady(bool isReady);
 	void SendStartRoom();
 	void SendShowStage(int32 stage, int32 level);
 	void SendEnterRoom();
 	void SendStageData(int32 map_id, int32 chapter, int32 stageIndex);
 	void SendMyClearStageData();
+	void SendGachaPool();
 
 private:
 	string _email;

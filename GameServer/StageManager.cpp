@@ -101,3 +101,20 @@ bool StageManager::GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>
 
     return false;
 }
+
+void StageManager::FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const
+{
+    for (const auto& pair : _stageCache)
+    {
+        const StageInfo& info = pair.second;
+        Protocol::StageInfo* stageInfo = pkt.add_stages();
+        stageInfo->set_map_id(info.stage_id);
+        stageInfo->set_chapter(info.chapter);
+        stageInfo->set_stage(info.stage);
+        stageInfo->set_difficulty(info.difficulty);
+        stageInfo->set_estimated_clear_time(info.estimated_clearTime);
+        stageInfo->set_isbossstage(info.isBoss);
+        stageInfo->set_stage_name(info.mapName);
+        stageInfo->set_description(info.mapDescription);
+	}
+}

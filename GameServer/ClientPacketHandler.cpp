@@ -75,82 +75,23 @@ bool Handle_C_GET_DB_DATA(PacketSessionRef& session, Protocol::C_GET_DB_DATA& pk
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 
-	//if (gameSession->GetPlayerInfo() == nullptr)
-	//{
-	//	cout << "PlayerInfo is null. Cannot retrieve DB data." << endl;
-	//	return false;
-	//}
-
 	// DB에서 정보를 보낸다. (가차 리스트, 스킨 리스트, 스테이지 리스트)
 
 	// 스테이지 리스트
 	Protocol::S_STAGE_INFO sStageInfoPkt;
-	auto stageList = StageManager::GetInstance().GetAllStages();
-
-	for (const auto& [stageId, stageInfo] : stageList)
-	{
-		auto stageEntry = sStageInfoPkt.add_stages();
-		stageEntry->set_map_id(stageInfo.stage_id);
-		stageEntry->set_chapter(stageInfo.chapter);
-		stageEntry->set_stage(stageInfo.stage);
-		stageEntry->set_difficulty(stageInfo.difficulty);
-		stageEntry->set_estimated_clear_time(stageInfo.estimated_clearTime);
-		stageEntry->set_isbossstage(stageInfo.isBoss);
-		stageEntry->set_stage_name(stageInfo.mapName);
-		stageEntry->set_description(stageInfo.mapDescription);
-	}
-
+	GStageManager.FillStageListPacket(sStageInfoPkt);
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(sStageInfoPkt);
 	session->Send(sendBuffer);
 
 	// 스킨 폴 리스트
 	Protocol::S_GACHA_POOL_LIST skinPoolList;
-	auto poolList = GGACHA.GetAllGachaPools();
-	for (const auto& [poolId, poolInfo] : poolList)
-	{
-		auto poolEntry = skinPoolList.add_pools();
-		poolEntry->set_pool_id(poolInfo.poolId);
-		poolEntry->set_pool_name(poolInfo.name);
-		poolEntry->set_cost_gem(poolInfo.costGem);
-		poolEntry->set_cost_coin(poolInfo.costCoin);
-		poolEntry->set_max_pull(poolInfo.maxPull);
-		poolEntry->set_is_active(poolInfo.IsActive());
-		poolEntry->set_start_at(poolInfo.startAt);
-		poolEntry->set_end_at(poolInfo.endAt);
-
-		for (const auto& skinId : poolInfo.items)
-		{
-			auto skinMeta = GGACHA.GetSkinMetaData(skinId.skinId);
-			if (skinMeta)
-			{
-				auto itemEntry = poolEntry->add_skins();
-				itemEntry->set_skin_id(skinMeta->skinId);
-				itemEntry->set_skin_name(skinMeta->name);
-				itemEntry->set_skin_des(skinMeta->description);
-				itemEntry->set_rarity(skinMeta->rarity);
-			}
-			else
-			{
-				cout << "Failed to retrieve skin metadata for skin ID: " << skinId.skinId << endl;
-			}
-		}
-	}
-
+	GGACHA.FillGachaPoolListPacket(skinPoolList);
 	auto skinPoolSendBuffer = ClientPacketHandler::MakeSendBuffer(skinPoolList);
 	session->Send(skinPoolSendBuffer);
 
 	// 스킨 리스트
 	Protocol::S_SKIN_LIST skinListPkt;
-	auto skinList = GGACHA.GetAllSkinMetaData();
-	for (const auto& [skinId, skinMeta] : skinList)
-	{
-		auto skinEntry = skinListPkt.add_skins();
-		skinEntry->set_skin_id(skinMeta.skinId);
-		skinEntry->set_skin_name(skinMeta.name);
-		skinEntry->set_skin_des(skinMeta.description);
-		skinEntry->set_rarity(skinMeta.rarity);
-	}
-
+	GGACHA.FillSkinListPacket(skinListPkt);
 	auto skinListSendBuffer = ClientPacketHandler::MakeSendBuffer(skinListPkt);
 	session->Send(skinListSendBuffer);
 
@@ -248,6 +189,34 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_C_GET_CURRENCY(PacketSessionRef& session, Protocol::C_GET_CURRENCY& pkt)
+{
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+
+	int32 dbPlayerId = gameSession->GetPlayerInfo()->GetDbUserId();
+	int32 dbCoin = 0;
+	int32 dbGem = 0;
+	Protocol::S_GET_CURRENCY resPkt;
+
+	if (AccountDB::GetUserGoods(dbPlayerId, dbCoin, dbGem))
+	{
+		resPkt.set_success(true);
+		resPkt.set_coin(dbCoin);
+		resPkt.set_gem(dbGem);
+		
+		cout << "Sent currency info - Player ID: " << dbPlayerId << ", Coin: " << dbCoin << ", Gem: " << dbGem << endl;
+	}
+	else
+	{
+		resPkt.set_success(false);
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(resPkt);
+	session->Send(sendBuffer);
+
+	return true;
+}
+
 bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 {
 	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
@@ -324,6 +293,21 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 bool Handle_C_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::C_GACHA_POOL_LIST& pkt)
 {
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+
+	if (gameSession->GetPlayerInfo() == nullptr)
+	{
+		cout << "PlayerInfo is null. Cannot retrieve gacha pool list." << endl;
+		return false;
+	}
+
+	
+	Protocol::S_GACHA_POOL_LIST resPkt;
+	GGACHA.FillGachaPoolListPacket(resPkt);
+	
+	SendBufferRef sendBuffer = ClientPacketHandler::MakeSendBuffer(resPkt);
+	session->Send(sendBuffer);
+
 	return true;
 }
 
@@ -485,6 +469,33 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 
 bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
 {
+	auto gameSession = static_pointer_cast<GameSession>(session);
+
+	Protocol::S_LEAVE_ROOM responsePkt;
+	// 방에 속해있는지 확인
+	auto room = gameSession->GetRoom().lock();
+	responsePkt.set_player_id(gameSession->GetPlayer()->playerId);
+
+	if (!room)
+	{
+		responsePkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(responsePkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 방에서 나가기 처리
+	room->DoAsync(&Room::LeaveLobby, gameSession->GetPlayer());
+
+	// 세션의 방 정보 초기화
+	gameSession->SetRoom(weak_ptr<Room>());
+
+	responsePkt.set_success(true);
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(responsePkt);
+	session->Send(sendBuffer);
+
+	cout << "[Room] Player " << gameSession->GetPlayer()->name << " left the room." << endl;
+	cout << "[Room] Current player count: " << room->GetCurrentCount() << endl;
 	return false;
 }
 
