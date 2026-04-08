@@ -4,7 +4,7 @@
 
 struct StageInfo
 {
-	int stage_id;
+	int map_id;
 	int chapter;
 	int stage;
 
@@ -58,8 +58,10 @@ public:
 	}
 
 	bool GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>& clears);
-
 	void FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const;
+	StageInfo GetStageInfoById(int stageId) const;
+	void ChangeProtocolToStageInfo(const Protocol::StageInfo& proto, OUT StageInfo& stageInfo) const;
+	void ChangeStageInfoToProtocol(const StageInfo& stageInfo, OUT Protocol::StageInfo& proto) const;
 
 private:
 	unordered_map<int32_t, StageInfo> _stageCache;

@@ -45,25 +45,27 @@ enum : uint16
 	PKT_S_STAGE_INFO = 1036,
 	PKT_C_SHOW_STAGE = 1037,
 	PKT_S_SHOW_STAGE = 1038,
-	PKT_C_START_STAGE = 1039,
-	PKT_S_START_STAGE = 1040,
-	PKT_C_GET_CLEAR_INFO = 1041,
-	PKT_S_GET_CLEAR_INFO = 1042,
-	PKT_C_MOVE = 1043,
-	PKT_S_MOVE = 1044,
-	PKT_S_PLAYER_LIST = 1045,
-	PKT_S_PLAYER_ENTER = 1046,
-	PKT_S_PLAYER_LEAVE = 1047,
-	PKT_C_PLAYER_ANIMATION = 1048,
-	PKT_S_PLAYER_ANIMATION = 1049,
-	PKT_C_PLAYER_STAT_EVENT = 1050,
-	PKT_S_PLAYER_STAT = 1051,
-	PKT_C_OBJECT_PICKUP = 1052,
-	PKT_S_OBJECT_PICKUP = 1053,
-	PKT_C_OBJECT_DROP = 1054,
-	PKT_S_OBJECT_DROP = 1055,
-	PKT_C_OBJECT_MOVE = 1056,
-	PKT_S_OBJECT_MOVE = 1057,
+	PKT_C_HOST_SHOW_STAGE = 1039,
+	PKT_S_HOST_SHOW_STAGE = 1040,
+	PKT_C_START_STAGE = 1041,
+	PKT_S_START_STAGE = 1042,
+	PKT_C_GET_CLEAR_INFO = 1043,
+	PKT_S_GET_CLEAR_INFO = 1044,
+	PKT_C_MOVE = 1045,
+	PKT_S_MOVE = 1046,
+	PKT_S_PLAYER_LIST = 1047,
+	PKT_S_PLAYER_ENTER = 1048,
+	PKT_S_PLAYER_LEAVE = 1049,
+	PKT_C_PLAYER_ANIMATION = 1050,
+	PKT_S_PLAYER_ANIMATION = 1051,
+	PKT_C_PLAYER_STAT_EVENT = 1052,
+	PKT_S_PLAYER_STAT = 1053,
+	PKT_C_OBJECT_PICKUP = 1054,
+	PKT_S_OBJECT_PICKUP = 1055,
+	PKT_C_OBJECT_DROP = 1056,
+	PKT_S_OBJECT_DROP = 1057,
+	PKT_C_OBJECT_MOVE = 1058,
+	PKT_S_OBJECT_MOVE = 1059,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -93,6 +95,7 @@ bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
 bool Handle_S_STAGE_INFO(PacketSessionRef& session, Protocol::S_STAGE_INFO& pkt);
 bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt);
+bool Handle_S_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::S_HOST_SHOW_STAGE& pkt);
 bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pkt);
 bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_INFO& pkt);
 bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
@@ -198,6 +201,10 @@ public:
 		GPacketHandler[PKT_S_SHOW_STAGE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::S_SHOW_STAGE>(Handle_S_SHOW_STAGE, session, buffer, len);
+		};
+		GPacketHandler[PKT_S_HOST_SHOW_STAGE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_HOST_SHOW_STAGE>(Handle_S_HOST_SHOW_STAGE, session, buffer, len);
 		};
 		GPacketHandler[PKT_S_START_STAGE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
@@ -321,6 +328,10 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::C_SHOW_STAGE& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_C_SHOW_STAGE);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::C_HOST_SHOW_STAGE& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_C_HOST_SHOW_STAGE);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_START_STAGE& pkt)
 	{

@@ -291,9 +291,27 @@ bool Handle_S_START_ROOM(PacketSessionRef& session, Protocol::S_START_ROOM& pkt)
 {
 	if (!pkt.success())
 	{
-		cout << "[Client] Start room failed: " << pkt.error_msg() << endl;
+		cout << "[Client] Start room failed123123: " << pkt.error_msg() << endl;
 		return false;
 	}
+
+	// 호스트의 클리어 스테이지 정보 출력
+	cout << "\n========Host Clear Stages===========:" << endl;
+	if (pkt.host_clear_stages_size() > 0)
+	{
+		for (int i = 0; i < pkt.host_clear_stages_size(); i++)
+		{
+			const auto& clearInfo = pkt.host_clear_stages(i);
+			cout << "  - Stage " << clearInfo.map_id()
+				<< " | Stars: " << clearInfo.star()
+				<< " | Clear Time: " << clearInfo.clear_time() << endl;
+		}
+	}
+	else
+	{
+		cout << "  No stages cleared yet." << endl;
+	}
+
 	Protocol::C_ENTER_GAME enterGamePkt;
 	enterGamePkt.set_playerindex(0);
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
@@ -311,6 +329,15 @@ bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt)
 		return false;
 	}
 	cout << "\n========== Stage Info ==========" << endl;
+	auto stageInfo = pkt.stage();
+	cout << "Map ID: " << stageInfo.map_id() << "-" << stageInfo.stage_name() << "-" << stageInfo.description() << endl;
+
+	return true;
+}
+
+bool Handle_S_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::S_HOST_SHOW_STAGE& pkt)
+{
+	cout << "\n========== Host Stage Info ==========" << endl;
 	auto stageInfo = pkt.stage();
 	cout << "Map ID: " << stageInfo.map_id() << "-" << stageInfo.stage_name() << "-" << stageInfo.description() << endl;
 
