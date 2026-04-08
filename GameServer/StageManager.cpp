@@ -35,7 +35,7 @@ bool StageManager::Init(const WCHAR* langCode)
         while (dbBind.Fetch())
         {
             StageInfo info;
-			info.stage_id = stage_id;
+			info.map_id = stage_id;
             info.chapter = chapter;
             info.stage = stage;
             info.isBoss = isBoss;
@@ -108,7 +108,7 @@ void StageManager::FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const
     {
         const StageInfo& info = pair.second;
         Protocol::StageInfo* stageInfo = pkt.add_stages();
-        stageInfo->set_map_id(info.stage_id);
+        stageInfo->set_map_id(info.map_id);
         stageInfo->set_chapter(info.chapter);
         stageInfo->set_stage(info.stage);
         stageInfo->set_difficulty(info.difficulty);
@@ -117,4 +117,48 @@ void StageManager::FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const
         stageInfo->set_stage_name(info.mapName);
         stageInfo->set_description(info.mapDescription);
 	}
+}
+
+StageInfo StageManager::GetStageInfoById(int mapId) const
+{
+	auto it = _stageCache.find(mapId);
+
+    if (it != _stageCache.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        cout << "error: stage cahche miss for mapId " << mapId << endl;
+        return StageInfo(); // 기본값 반환
+	}
+
+}
+
+void StageManager::ChangeProtocolToStageInfo(const Protocol::StageInfo& proto, OUT StageInfo& stageInfo) const
+{
+	stageInfo.map_id = proto.map_id();
+	stageInfo.chapter = proto.chapter();
+	stageInfo.stage = proto.stage();
+    
+	stageInfo.difficulty = proto.difficulty();
+	stageInfo.estimated_clearTime = proto.estimated_clear_time();
+	stageInfo.isBoss = proto.isbossstage();
+	stageInfo.estimated_clearTime = proto.estimated_clear_time();
+	
+    stageInfo.mapName = proto.stage_name();
+	stageInfo.mapDescription = proto.description();
+}
+
+void StageManager::ChangeStageInfoToProtocol(const StageInfo& stageInfo, OUT Protocol::StageInfo& proto) const
+{
+    proto.set_map_id(stageInfo.map_id);
+    proto.set_chapter(stageInfo.chapter);
+    proto.set_stage(stageInfo.stage);
+    
+    proto.set_difficulty(stageInfo.difficulty);
+    proto.set_estimated_clear_time(stageInfo.estimated_clearTime);
+    proto.set_isbossstage(stageInfo.isBoss);
+    proto.set_stage_name(stageInfo.mapName);
+	proto.set_description(stageInfo.mapDescription);
 }

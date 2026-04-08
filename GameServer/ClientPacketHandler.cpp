@@ -389,6 +389,8 @@ bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pk
 	newRoom->DoAsync([session, sendBuffer]() {
 		session->Send(sendBuffer);
 		});
+
+	std::cout << "Create Room Success" << endl;
 	
 	return true;
 }
@@ -663,8 +665,7 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 	// 게임 시작
 	room->DoAsync(&Room::StartGame);
 
-	std::cout << "Room " << room->GetRoomId() << " game started by "
-		<< gameSession->GetPlayer()->name << endl;
+	std::cout << "Room " << room->GetRoomId() << " game started by " << gameSession->GetPlayer()->name << endl;
 
 	return true;
 }
@@ -754,6 +755,31 @@ bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt)
 	session->Send(sendBuffer);
 
 	return true;
+}
+
+bool Handle_C_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::C_HOST_SHOW_STAGE& pkt)
+{
+	// 호스트가 뭘 선택하고 있는지 보여줌
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 자신이 방장인지 확인
+	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
+	{
+		std::cout << "Show stage failed: Only room owner" << endl;
+		SendStartRoomError(session, "Only room owner can show stage");
+		return false;
+	}
+
+	int32 map_id = pkt.map_id();
+	
+	Protocol::S_HOST_SHOW_STAGE showStagePkt;
+	showStagePkt.set_success(true);
+
+	Protocol::StageInfo* stageInfoPkt = showStagePkt.mutable_stage();
+	GStageManager.ChangeStageInfoToProtocol(GStageManager.GetStageInfoById(map_id), *stageInfoPkt);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(showStagePkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
 }
 
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt)

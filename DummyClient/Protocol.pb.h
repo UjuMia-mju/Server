@@ -75,6 +75,9 @@ extern C_GET_CURRENCYDefaultTypeInternal _C_GET_CURRENCY_default_instance_;
 class C_GET_DB_DATA;
 struct C_GET_DB_DATADefaultTypeInternal;
 extern C_GET_DB_DATADefaultTypeInternal _C_GET_DB_DATA_default_instance_;
+class C_HOST_SHOW_STAGE;
+struct C_HOST_SHOW_STAGEDefaultTypeInternal;
+extern C_HOST_SHOW_STAGEDefaultTypeInternal _C_HOST_SHOW_STAGE_default_instance_;
 class C_INVITE_PLAYER;
 struct C_INVITE_PLAYERDefaultTypeInternal;
 extern C_INVITE_PLAYERDefaultTypeInternal _C_INVITE_PLAYER_default_instance_;
@@ -150,6 +153,9 @@ extern S_GET_CLEAR_INFODefaultTypeInternal _S_GET_CLEAR_INFO_default_instance_;
 class S_GET_CURRENCY;
 struct S_GET_CURRENCYDefaultTypeInternal;
 extern S_GET_CURRENCYDefaultTypeInternal _S_GET_CURRENCY_default_instance_;
+class S_HOST_SHOW_STAGE;
+struct S_HOST_SHOW_STAGEDefaultTypeInternal;
+extern S_HOST_SHOW_STAGEDefaultTypeInternal _S_HOST_SHOW_STAGE_default_instance_;
 class S_INVITE_NOTIFICATION;
 struct S_INVITE_NOTIFICATIONDefaultTypeInternal;
 extern S_INVITE_NOTIFICATIONDefaultTypeInternal _S_INVITE_NOTIFICATION_default_instance_;
@@ -233,6 +239,7 @@ template<> ::Protocol::C_GACHA_POOL_LIST* Arena::CreateMaybeMessage<::Protocol::
 template<> ::Protocol::C_GET_CLEAR_INFO* Arena::CreateMaybeMessage<::Protocol::C_GET_CLEAR_INFO>(Arena*);
 template<> ::Protocol::C_GET_CURRENCY* Arena::CreateMaybeMessage<::Protocol::C_GET_CURRENCY>(Arena*);
 template<> ::Protocol::C_GET_DB_DATA* Arena::CreateMaybeMessage<::Protocol::C_GET_DB_DATA>(Arena*);
+template<> ::Protocol::C_HOST_SHOW_STAGE* Arena::CreateMaybeMessage<::Protocol::C_HOST_SHOW_STAGE>(Arena*);
 template<> ::Protocol::C_INVITE_PLAYER* Arena::CreateMaybeMessage<::Protocol::C_INVITE_PLAYER>(Arena*);
 template<> ::Protocol::C_INVITE_RESPONSE* Arena::CreateMaybeMessage<::Protocol::C_INVITE_RESPONSE>(Arena*);
 template<> ::Protocol::C_LEAVE_ROOM* Arena::CreateMaybeMessage<::Protocol::C_LEAVE_ROOM>(Arena*);
@@ -258,6 +265,7 @@ template<> ::Protocol::S_GACHA* Arena::CreateMaybeMessage<::Protocol::S_GACHA>(A
 template<> ::Protocol::S_GACHA_POOL_LIST* Arena::CreateMaybeMessage<::Protocol::S_GACHA_POOL_LIST>(Arena*);
 template<> ::Protocol::S_GET_CLEAR_INFO* Arena::CreateMaybeMessage<::Protocol::S_GET_CLEAR_INFO>(Arena*);
 template<> ::Protocol::S_GET_CURRENCY* Arena::CreateMaybeMessage<::Protocol::S_GET_CURRENCY>(Arena*);
+template<> ::Protocol::S_HOST_SHOW_STAGE* Arena::CreateMaybeMessage<::Protocol::S_HOST_SHOW_STAGE>(Arena*);
 template<> ::Protocol::S_INVITE_NOTIFICATION* Arena::CreateMaybeMessage<::Protocol::S_INVITE_NOTIFICATION>(Arena*);
 template<> ::Protocol::S_INVITE_PLAYER* Arena::CreateMaybeMessage<::Protocol::S_INVITE_PLAYER>(Arena*);
 template<> ::Protocol::S_INVITE_RESPONSE* Arena::CreateMaybeMessage<::Protocol::S_INVITE_RESPONSE>(Arena*);
@@ -5053,9 +5061,28 @@ class S_START_ROOM final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kHostClearStagesFieldNumber = 3,
     kErrorMsgFieldNumber = 2,
     kSuccessFieldNumber = 1,
   };
+  // repeated .Protocol.StageClearInfo host_clear_stages = 3;
+  int host_clear_stages_size() const;
+  private:
+  int _internal_host_clear_stages_size() const;
+  public:
+  void clear_host_clear_stages();
+  ::Protocol::StageClearInfo* mutable_host_clear_stages(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::StageClearInfo >*
+      mutable_host_clear_stages();
+  private:
+  const ::Protocol::StageClearInfo& _internal_host_clear_stages(int index) const;
+  ::Protocol::StageClearInfo* _internal_add_host_clear_stages();
+  public:
+  const ::Protocol::StageClearInfo& host_clear_stages(int index) const;
+  ::Protocol::StageClearInfo* add_host_clear_stages();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::StageClearInfo >&
+      host_clear_stages() const;
+
   // string error_msg = 2;
   void clear_error_msg();
   const std::string& error_msg() const;
@@ -5087,6 +5114,7 @@ class S_START_ROOM final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::StageClearInfo > host_clear_stages_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_msg_;
     bool success_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -6352,6 +6380,322 @@ class S_SHOW_STAGE final :
 };
 // -------------------------------------------------------------------
 
+class C_HOST_SHOW_STAGE final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C_HOST_SHOW_STAGE) */ {
+ public:
+  inline C_HOST_SHOW_STAGE() : C_HOST_SHOW_STAGE(nullptr) {}
+  ~C_HOST_SHOW_STAGE() override;
+  explicit PROTOBUF_CONSTEXPR C_HOST_SHOW_STAGE(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C_HOST_SHOW_STAGE(const C_HOST_SHOW_STAGE& from);
+  C_HOST_SHOW_STAGE(C_HOST_SHOW_STAGE&& from) noexcept
+    : C_HOST_SHOW_STAGE() {
+    *this = ::std::move(from);
+  }
+
+  inline C_HOST_SHOW_STAGE& operator=(const C_HOST_SHOW_STAGE& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C_HOST_SHOW_STAGE& operator=(C_HOST_SHOW_STAGE&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C_HOST_SHOW_STAGE& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C_HOST_SHOW_STAGE* internal_default_instance() {
+    return reinterpret_cast<const C_HOST_SHOW_STAGE*>(
+               &_C_HOST_SHOW_STAGE_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    39;
+
+  friend void swap(C_HOST_SHOW_STAGE& a, C_HOST_SHOW_STAGE& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C_HOST_SHOW_STAGE* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C_HOST_SHOW_STAGE* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C_HOST_SHOW_STAGE* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C_HOST_SHOW_STAGE>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const C_HOST_SHOW_STAGE& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const C_HOST_SHOW_STAGE& from) {
+    C_HOST_SHOW_STAGE::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(C_HOST_SHOW_STAGE* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C_HOST_SHOW_STAGE";
+  }
+  protected:
+  explicit C_HOST_SHOW_STAGE(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMapIdFieldNumber = 1,
+  };
+  // int32 map_id = 1;
+  void clear_map_id();
+  int32_t map_id() const;
+  void set_map_id(int32_t value);
+  private:
+  int32_t _internal_map_id() const;
+  void _internal_set_map_id(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.C_HOST_SHOW_STAGE)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    int32_t map_id_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S_HOST_SHOW_STAGE final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S_HOST_SHOW_STAGE) */ {
+ public:
+  inline S_HOST_SHOW_STAGE() : S_HOST_SHOW_STAGE(nullptr) {}
+  ~S_HOST_SHOW_STAGE() override;
+  explicit PROTOBUF_CONSTEXPR S_HOST_SHOW_STAGE(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S_HOST_SHOW_STAGE(const S_HOST_SHOW_STAGE& from);
+  S_HOST_SHOW_STAGE(S_HOST_SHOW_STAGE&& from) noexcept
+    : S_HOST_SHOW_STAGE() {
+    *this = ::std::move(from);
+  }
+
+  inline S_HOST_SHOW_STAGE& operator=(const S_HOST_SHOW_STAGE& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S_HOST_SHOW_STAGE& operator=(S_HOST_SHOW_STAGE&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S_HOST_SHOW_STAGE& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S_HOST_SHOW_STAGE* internal_default_instance() {
+    return reinterpret_cast<const S_HOST_SHOW_STAGE*>(
+               &_S_HOST_SHOW_STAGE_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    40;
+
+  friend void swap(S_HOST_SHOW_STAGE& a, S_HOST_SHOW_STAGE& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S_HOST_SHOW_STAGE* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S_HOST_SHOW_STAGE* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S_HOST_SHOW_STAGE* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S_HOST_SHOW_STAGE>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S_HOST_SHOW_STAGE& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S_HOST_SHOW_STAGE& from) {
+    S_HOST_SHOW_STAGE::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S_HOST_SHOW_STAGE* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S_HOST_SHOW_STAGE";
+  }
+  protected:
+  explicit S_HOST_SHOW_STAGE(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kStageFieldNumber = 2,
+    kSuccessFieldNumber = 1,
+  };
+  // .Protocol.StageInfo stage = 2;
+  bool has_stage() const;
+  private:
+  bool _internal_has_stage() const;
+  public:
+  void clear_stage();
+  const ::Protocol::StageInfo& stage() const;
+  PROTOBUF_NODISCARD ::Protocol::StageInfo* release_stage();
+  ::Protocol::StageInfo* mutable_stage();
+  void set_allocated_stage(::Protocol::StageInfo* stage);
+  private:
+  const ::Protocol::StageInfo& _internal_stage() const;
+  ::Protocol::StageInfo* _internal_mutable_stage();
+  public:
+  void unsafe_arena_set_allocated_stage(
+      ::Protocol::StageInfo* stage);
+  ::Protocol::StageInfo* unsafe_arena_release_stage();
+
+  // bool success = 1;
+  void clear_success();
+  bool success() const;
+  void set_success(bool value);
+  private:
+  bool _internal_success() const;
+  void _internal_set_success(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.S_HOST_SHOW_STAGE)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::Protocol::StageInfo* stage_;
+    bool success_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
 class C_START_STAGE final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C_START_STAGE) */ {
  public:
@@ -6400,7 +6744,7 @@ class C_START_STAGE final :
                &_C_START_STAGE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    41;
 
   friend void swap(C_START_STAGE& a, C_START_STAGE& b) {
     a.Swap(&b);
@@ -6473,19 +6817,29 @@ class C_START_STAGE final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStageLevelFieldNumber = 1,
-    kStageIndexFieldNumber = 2,
+    kMapIdFieldNumber = 1,
+    kChapterFieldNumber = 2,
+    kStageIndexFieldNumber = 3,
   };
-  // int32 stageLevel = 1;
-  void clear_stagelevel();
-  int32_t stagelevel() const;
-  void set_stagelevel(int32_t value);
+  // int32 map_id = 1;
+  void clear_map_id();
+  int32_t map_id() const;
+  void set_map_id(int32_t value);
   private:
-  int32_t _internal_stagelevel() const;
-  void _internal_set_stagelevel(int32_t value);
+  int32_t _internal_map_id() const;
+  void _internal_set_map_id(int32_t value);
   public:
 
-  // int32 stageIndex = 2;
+  // int32 chapter = 2;
+  void clear_chapter();
+  int32_t chapter() const;
+  void set_chapter(int32_t value);
+  private:
+  int32_t _internal_chapter() const;
+  void _internal_set_chapter(int32_t value);
+  public:
+
+  // int32 stageIndex = 3;
   void clear_stageindex();
   int32_t stageindex() const;
   void set_stageindex(int32_t value);
@@ -6502,7 +6856,8 @@ class C_START_STAGE final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    int32_t stagelevel_;
+    int32_t map_id_;
+    int32_t chapter_;
     int32_t stageindex_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -6559,7 +6914,7 @@ class S_START_STAGE final :
                &_S_START_STAGE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    40;
+    42;
 
   friend void swap(S_START_STAGE& a, S_START_STAGE& b) {
     a.Swap(&b);
@@ -6726,7 +7081,7 @@ class C_GET_CLEAR_INFO final :
                &_C_GET_CLEAR_INFO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    41;
+    43;
 
   friend void swap(C_GET_CLEAR_INFO& a, C_GET_CLEAR_INFO& b) {
     a.Swap(&b);
@@ -6845,7 +7200,7 @@ class S_GET_CLEAR_INFO final :
                &_S_GET_CLEAR_INFO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    42;
+    44;
 
   friend void swap(S_GET_CLEAR_INFO& a, S_GET_CLEAR_INFO& b) {
     a.Swap(&b);
@@ -7013,7 +7368,7 @@ class C_MOVE final :
                &_C_MOVE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    43;
+    45;
 
   friend void swap(C_MOVE& a, C_MOVE& b) {
     a.Swap(&b);
@@ -7190,7 +7545,7 @@ class S_MOVE final :
                &_S_MOVE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    44;
+    46;
 
   friend void swap(S_MOVE& a, S_MOVE& b) {
     a.Swap(&b);
@@ -7378,7 +7733,7 @@ class S_PLAYER_LIST final :
                &_S_PLAYER_LIST_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    45;
+    47;
 
   friend void swap(S_PLAYER_LIST& a, S_PLAYER_LIST& b) {
     a.Swap(&b);
@@ -7535,7 +7890,7 @@ class S_PLAYER_ENTER final :
                &_S_PLAYER_ENTER_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    46;
+    48;
 
   friend void swap(S_PLAYER_ENTER& a, S_PLAYER_ENTER& b) {
     a.Swap(&b);
@@ -7692,7 +8047,7 @@ class S_PLAYER_LEAVE final :
                &_S_PLAYER_LEAVE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    47;
+    49;
 
   friend void swap(S_PLAYER_LEAVE& a, S_PLAYER_LEAVE& b) {
     a.Swap(&b);
@@ -7849,7 +8204,7 @@ class C_PLAYER_ANIMATION final :
                &_C_PLAYER_ANIMATION_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    48;
+    50;
 
   friend void swap(C_PLAYER_ANIMATION& a, C_PLAYER_ANIMATION& b) {
     a.Swap(&b);
@@ -7997,7 +8352,7 @@ class S_PLAYER_ANIMATION final :
                &_S_PLAYER_ANIMATION_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    49;
+    51;
 
   friend void swap(S_PLAYER_ANIMATION& a, S_PLAYER_ANIMATION& b) {
     a.Swap(&b);
@@ -8164,7 +8519,7 @@ class C_PLAYER_STAT_EVENT final :
                &_C_PLAYER_STAT_EVENT_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    50;
+    52;
 
   friend void swap(C_PLAYER_STAT_EVENT& a, C_PLAYER_STAT_EVENT& b) {
     a.Swap(&b);
@@ -8418,7 +8773,7 @@ class S_PLAYER_STAT final :
                &_S_PLAYER_STAT_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    51;
+    53;
 
   friend void swap(S_PLAYER_STAT& a, S_PLAYER_STAT& b) {
     a.Swap(&b);
@@ -8588,7 +8943,7 @@ class C_OBJECT_PICKUP final :
                &_C_OBJECT_PICKUP_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    52;
+    54;
 
   friend void swap(C_OBJECT_PICKUP& a, C_OBJECT_PICKUP& b) {
     a.Swap(&b);
@@ -8745,7 +9100,7 @@ class S_OBJECT_PICKUP final :
                &_S_OBJECT_PICKUP_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    53;
+    55;
 
   friend void swap(S_OBJECT_PICKUP& a, S_OBJECT_PICKUP& b) {
     a.Swap(&b);
@@ -8940,7 +9295,7 @@ class C_OBJECT_DROP final :
                &_C_OBJECT_DROP_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    54;
+    56;
 
   friend void swap(C_OBJECT_DROP& a, C_OBJECT_DROP& b) {
     a.Swap(&b);
@@ -9097,7 +9452,7 @@ class S_OBJECT_DROP final :
                &_S_OBJECT_DROP_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    55;
+    57;
 
   friend void swap(S_OBJECT_DROP& a, S_OBJECT_DROP& b) {
     a.Swap(&b);
@@ -9265,7 +9620,7 @@ class C_OBJECT_MOVE final :
                &_C_OBJECT_MOVE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    56;
+    58;
 
   friend void swap(C_OBJECT_MOVE& a, C_OBJECT_MOVE& b) {
     a.Swap(&b);
@@ -9462,7 +9817,7 @@ class S_OBJECT_MOVE final :
                &_S_OBJECT_MOVE_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    57;
+    59;
 
   friend void swap(S_OBJECT_MOVE& a, S_OBJECT_MOVE& b) {
     a.Swap(&b);
@@ -11605,6 +11960,43 @@ inline void S_START_ROOM::set_allocated_error_msg(std::string* error_msg) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.S_START_ROOM.error_msg)
 }
 
+// repeated .Protocol.StageClearInfo host_clear_stages = 3;
+inline int S_START_ROOM::_internal_host_clear_stages_size() const {
+  return _impl_.host_clear_stages_.size();
+}
+inline int S_START_ROOM::host_clear_stages_size() const {
+  return _internal_host_clear_stages_size();
+}
+inline ::Protocol::StageClearInfo* S_START_ROOM::mutable_host_clear_stages(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.S_START_ROOM.host_clear_stages)
+  return _impl_.host_clear_stages_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::StageClearInfo >*
+S_START_ROOM::mutable_host_clear_stages() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.S_START_ROOM.host_clear_stages)
+  return &_impl_.host_clear_stages_;
+}
+inline const ::Protocol::StageClearInfo& S_START_ROOM::_internal_host_clear_stages(int index) const {
+  return _impl_.host_clear_stages_.Get(index);
+}
+inline const ::Protocol::StageClearInfo& S_START_ROOM::host_clear_stages(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.S_START_ROOM.host_clear_stages)
+  return _internal_host_clear_stages(index);
+}
+inline ::Protocol::StageClearInfo* S_START_ROOM::_internal_add_host_clear_stages() {
+  return _impl_.host_clear_stages_.Add();
+}
+inline ::Protocol::StageClearInfo* S_START_ROOM::add_host_clear_stages() {
+  ::Protocol::StageClearInfo* _add = _internal_add_host_clear_stages();
+  // @@protoc_insertion_point(field_add:Protocol.S_START_ROOM.host_clear_stages)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::StageClearInfo >&
+S_START_ROOM::host_clear_stages() const {
+  // @@protoc_insertion_point(field_list:Protocol.S_START_ROOM.host_clear_stages)
+  return _impl_.host_clear_stages_;
+}
+
 // -------------------------------------------------------------------
 
 // C_CHAT
@@ -12021,29 +12413,182 @@ inline void S_SHOW_STAGE::set_allocated_stage(::Protocol::StageInfo* stage) {
 
 // -------------------------------------------------------------------
 
+// C_HOST_SHOW_STAGE
+
+// int32 map_id = 1;
+inline void C_HOST_SHOW_STAGE::clear_map_id() {
+  _impl_.map_id_ = 0;
+}
+inline int32_t C_HOST_SHOW_STAGE::_internal_map_id() const {
+  return _impl_.map_id_;
+}
+inline int32_t C_HOST_SHOW_STAGE::map_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_HOST_SHOW_STAGE.map_id)
+  return _internal_map_id();
+}
+inline void C_HOST_SHOW_STAGE::_internal_set_map_id(int32_t value) {
+  
+  _impl_.map_id_ = value;
+}
+inline void C_HOST_SHOW_STAGE::set_map_id(int32_t value) {
+  _internal_set_map_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_HOST_SHOW_STAGE.map_id)
+}
+
+// -------------------------------------------------------------------
+
+// S_HOST_SHOW_STAGE
+
+// bool success = 1;
+inline void S_HOST_SHOW_STAGE::clear_success() {
+  _impl_.success_ = false;
+}
+inline bool S_HOST_SHOW_STAGE::_internal_success() const {
+  return _impl_.success_;
+}
+inline bool S_HOST_SHOW_STAGE::success() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_HOST_SHOW_STAGE.success)
+  return _internal_success();
+}
+inline void S_HOST_SHOW_STAGE::_internal_set_success(bool value) {
+  
+  _impl_.success_ = value;
+}
+inline void S_HOST_SHOW_STAGE::set_success(bool value) {
+  _internal_set_success(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_HOST_SHOW_STAGE.success)
+}
+
+// .Protocol.StageInfo stage = 2;
+inline bool S_HOST_SHOW_STAGE::_internal_has_stage() const {
+  return this != internal_default_instance() && _impl_.stage_ != nullptr;
+}
+inline bool S_HOST_SHOW_STAGE::has_stage() const {
+  return _internal_has_stage();
+}
+inline const ::Protocol::StageInfo& S_HOST_SHOW_STAGE::_internal_stage() const {
+  const ::Protocol::StageInfo* p = _impl_.stage_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::StageInfo&>(
+      ::Protocol::_StageInfo_default_instance_);
+}
+inline const ::Protocol::StageInfo& S_HOST_SHOW_STAGE::stage() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_HOST_SHOW_STAGE.stage)
+  return _internal_stage();
+}
+inline void S_HOST_SHOW_STAGE::unsafe_arena_set_allocated_stage(
+    ::Protocol::StageInfo* stage) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.stage_);
+  }
+  _impl_.stage_ = stage;
+  if (stage) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.S_HOST_SHOW_STAGE.stage)
+}
+inline ::Protocol::StageInfo* S_HOST_SHOW_STAGE::release_stage() {
+  
+  ::Protocol::StageInfo* temp = _impl_.stage_;
+  _impl_.stage_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::StageInfo* S_HOST_SHOW_STAGE::unsafe_arena_release_stage() {
+  // @@protoc_insertion_point(field_release:Protocol.S_HOST_SHOW_STAGE.stage)
+  
+  ::Protocol::StageInfo* temp = _impl_.stage_;
+  _impl_.stage_ = nullptr;
+  return temp;
+}
+inline ::Protocol::StageInfo* S_HOST_SHOW_STAGE::_internal_mutable_stage() {
+  
+  if (_impl_.stage_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::StageInfo>(GetArenaForAllocation());
+    _impl_.stage_ = p;
+  }
+  return _impl_.stage_;
+}
+inline ::Protocol::StageInfo* S_HOST_SHOW_STAGE::mutable_stage() {
+  ::Protocol::StageInfo* _msg = _internal_mutable_stage();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_HOST_SHOW_STAGE.stage)
+  return _msg;
+}
+inline void S_HOST_SHOW_STAGE::set_allocated_stage(::Protocol::StageInfo* stage) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.stage_);
+  }
+  if (stage) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(stage));
+    if (message_arena != submessage_arena) {
+      stage = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, stage, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.stage_ = stage;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_HOST_SHOW_STAGE.stage)
+}
+
+// -------------------------------------------------------------------
+
 // C_START_STAGE
 
-// int32 stageLevel = 1;
-inline void C_START_STAGE::clear_stagelevel() {
-  _impl_.stagelevel_ = 0;
+// int32 map_id = 1;
+inline void C_START_STAGE::clear_map_id() {
+  _impl_.map_id_ = 0;
 }
-inline int32_t C_START_STAGE::_internal_stagelevel() const {
-  return _impl_.stagelevel_;
+inline int32_t C_START_STAGE::_internal_map_id() const {
+  return _impl_.map_id_;
 }
-inline int32_t C_START_STAGE::stagelevel() const {
-  // @@protoc_insertion_point(field_get:Protocol.C_START_STAGE.stageLevel)
-  return _internal_stagelevel();
+inline int32_t C_START_STAGE::map_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_START_STAGE.map_id)
+  return _internal_map_id();
 }
-inline void C_START_STAGE::_internal_set_stagelevel(int32_t value) {
+inline void C_START_STAGE::_internal_set_map_id(int32_t value) {
   
-  _impl_.stagelevel_ = value;
+  _impl_.map_id_ = value;
 }
-inline void C_START_STAGE::set_stagelevel(int32_t value) {
-  _internal_set_stagelevel(value);
-  // @@protoc_insertion_point(field_set:Protocol.C_START_STAGE.stageLevel)
+inline void C_START_STAGE::set_map_id(int32_t value) {
+  _internal_set_map_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_START_STAGE.map_id)
 }
 
-// int32 stageIndex = 2;
+// int32 chapter = 2;
+inline void C_START_STAGE::clear_chapter() {
+  _impl_.chapter_ = 0;
+}
+inline int32_t C_START_STAGE::_internal_chapter() const {
+  return _impl_.chapter_;
+}
+inline int32_t C_START_STAGE::chapter() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_START_STAGE.chapter)
+  return _internal_chapter();
+}
+inline void C_START_STAGE::_internal_set_chapter(int32_t value) {
+  
+  _impl_.chapter_ = value;
+}
+inline void C_START_STAGE::set_chapter(int32_t value) {
+  _internal_set_chapter(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_START_STAGE.chapter)
+}
+
+// int32 stageIndex = 3;
 inline void C_START_STAGE::clear_stageindex() {
   _impl_.stageindex_ = 0;
 }
@@ -14260,6 +14805,10 @@ inline void S_OBJECT_MOVE::set_allocated_rot(::Protocol::RotInfo* rot) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

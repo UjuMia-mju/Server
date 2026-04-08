@@ -141,6 +141,15 @@ void ServerSession::SendGachaPool()
 	Send(sendBuffer);
 }
 
+void ServerSession::SendHostStageSelect(int32 map_id)
+{
+	Protocol::C_HOST_SHOW_STAGE pkt;
+	pkt.set_map_id(map_id);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendReady(bool isReady)
 {
 	Protocol::C_READY readyPkt;

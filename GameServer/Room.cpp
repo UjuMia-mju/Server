@@ -4,6 +4,7 @@
 #include "GameSession.h"
 #include "ClientPacketHandler.h"
 #include "RoomManager.h"
+#include "StageManager.h"
 
 RoomRef GTestRoom = nullptr;
 
@@ -122,6 +123,20 @@ void Room::StartGame()
 	// 게임 시작 알림 브로드캐스트
 	Protocol::S_START_ROOM gameStartPkt;
 	gameStartPkt.set_success(true);
+
+	// 호스트의 클리어 스테이지 정보 가져오기
+	xvector<StageClearInfo> clearStages; 
+	GStageManager.GetMyStageClearInfo(_ownerId, clearStages);
+
+	auto hostClearStages = gameStartPkt.mutable_host_clear_stages();
+	for (const auto& clearStage : clearStages)
+	{
+		Protocol::StageClearInfo* stageInfo = hostClearStages->Add();
+		stageInfo->set_map_id(clearStage.stageId);
+		stageInfo->set_star(clearStage.star);
+		stageInfo->set_clear_time(clearStage.clearTime);
+	}
+
 	_isPlaying = true;
 	std::cout << "Game started in room " << _roomId << endl;
 
