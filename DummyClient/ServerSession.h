@@ -32,6 +32,7 @@ public:
 	void SendMyClearStageData();
 	void SendGachaPool();
 	void SendHostStageSelect(int32 map_id);
+	void SendStartStage(int32 map_id);
 
 private:
 	string _email;

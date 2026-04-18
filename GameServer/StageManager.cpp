@@ -65,6 +65,24 @@ bool StageManager::Init(const WCHAR* langCode)
     return true;
 }
 
+optional<StageInfo> StageManager::GetStageInfo(int mapId, int chapter, int stage)
+{
+    auto it = _stageCache.find(mapId);
+    if (it != _stageCache.end())
+    {
+        if (it->second.chapter == chapter && it->second.stage == stage)
+        {
+            return it->second;
+        }
+        else
+        {
+            cout << "error: stage cahche miss" << endl;
+            return nullopt;
+        }
+    }
+    return nullopt;
+}
+
 bool StageManager::GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>& clears)
 {
     clears.clear();

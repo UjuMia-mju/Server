@@ -14,6 +14,11 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 	return true;
 }
 
+bool Handle_S_RELAY_PACKET(PacketSessionRef& session, Protocol::S_RELAY_PACKET& pkt)
+{
+	return true;
+}
+
 bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 {	
 	if (pkt.success() == false)
@@ -346,7 +351,14 @@ bool Handle_S_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::S_HOST_SHOW_S
 
 bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pkt)
 {
-	return false;
+	if (!pkt.success())
+	{
+		cout << "[Client] Failed to start stage: " << endl;
+		return false;
+	}
+
+	cout << "[Client] Stage started successfully!" << endl;
+	return true;
 }
 
 bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_INFO& pkt)

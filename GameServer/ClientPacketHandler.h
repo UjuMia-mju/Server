@@ -7,41 +7,41 @@ extern PacketHandleFunc GPacketHandler[UINT16_MAX];
 enum : uint16 
 {
 	PKT_C_GET_DB_DATA = 1000,
-	PKT_C_LOGIN = 1001,
-	PKT_S_LOGIN = 1002,
-	PKT_C_GET_CURRENCY = 1003,
-	PKT_S_GET_CURRENCY = 1004,
-	PKT_C_GACHA = 1005,
-	PKT_S_GACHA = 1006,
-	PKT_C_GACHA_POOL_LIST = 1007,
-	PKT_S_GACHA_POOL_LIST = 1008,
-	PKT_S_SKIN_LIST = 1009,
-	PKT_C_MY_SKINS = 1010,
-	PKT_S_MY_SKINS = 1011,
-	PKT_C_CREATE_ROOM = 1012,
-	PKT_S_CREATE_ROOM = 1013,
-	PKT_C_ROOM_LIST = 1014,
-	PKT_S_ROOM_LIST = 1015,
-	PKT_C_ENTER_ROOM = 1016,
-	PKT_S_ENTER_ROOM = 1017,
-	PKT_C_LEAVE_ROOM = 1018,
-	PKT_S_LEAVE_ROOM = 1019,
-	PKT_C_INVITE_PLAYER = 1020,
-	PKT_S_INVITE_PLAYER = 1021,
-	PKT_S_INVITE_NOTIFICATION = 1022,
-	PKT_C_INVITE_RESPONSE = 1023,
-	PKT_S_INVITE_RESPONSE = 1024,
-	PKT_S_ROOM_MEMBER_ENTER = 1025,
-	PKT_S_ROOM_MEMBER_LEAVE = 1026,
-	PKT_C_READY = 1027,
-	PKT_S_READY = 1028,
-	PKT_C_START_ROOM = 1029,
-	PKT_S_START_ROOM = 1030,
-	PKT_C_CHAT = 1031,
-	PKT_S_CHAT = 1032,
-	PKT_C_ENTER_GAME = 1033,
-	PKT_S_ENTER_GAME = 1034,
-	PKT_C_TEST_ENTER_GAME = 1035,
+	PKT_C_TEST_ENTER_ROOM = 1001,
+	PKT_C_RELAY_PACKET = 1002,
+	PKT_S_RELAY_PACKET = 1003,
+	PKT_C_LOGIN = 1004,
+	PKT_S_LOGIN = 1005,
+	PKT_C_GET_CURRENCY = 1006,
+	PKT_S_GET_CURRENCY = 1007,
+	PKT_C_GACHA = 1008,
+	PKT_S_GACHA = 1009,
+	PKT_C_GACHA_POOL_LIST = 1010,
+	PKT_S_GACHA_POOL_LIST = 1011,
+	PKT_S_SKIN_LIST = 1012,
+	PKT_C_MY_SKINS = 1013,
+	PKT_S_MY_SKINS = 1014,
+	PKT_C_CREATE_ROOM = 1015,
+	PKT_S_CREATE_ROOM = 1016,
+	PKT_C_ROOM_LIST = 1017,
+	PKT_S_ROOM_LIST = 1018,
+	PKT_C_ENTER_ROOM = 1019,
+	PKT_S_ENTER_ROOM = 1020,
+	PKT_C_LEAVE_ROOM = 1021,
+	PKT_S_LEAVE_ROOM = 1022,
+	PKT_C_INVITE_PLAYER = 1023,
+	PKT_S_INVITE_PLAYER = 1024,
+	PKT_S_INVITE_NOTIFICATION = 1025,
+	PKT_C_INVITE_RESPONSE = 1026,
+	PKT_S_INVITE_RESPONSE = 1027,
+	PKT_S_ROOM_MEMBER_ENTER = 1028,
+	PKT_S_ROOM_MEMBER_LEAVE = 1029,
+	PKT_C_READY = 1030,
+	PKT_S_READY = 1031,
+	PKT_C_START_ROOM = 1032,
+	PKT_S_START_ROOM = 1033,
+	PKT_C_CHAT = 1034,
+	PKT_S_CHAT = 1035,
 	PKT_S_STAGE_INFO = 1036,
 	PKT_C_SHOW_STAGE = 1037,
 	PKT_S_SHOW_STAGE = 1038,
@@ -51,21 +51,25 @@ enum : uint16
 	PKT_S_START_STAGE = 1042,
 	PKT_C_GET_CLEAR_INFO = 1043,
 	PKT_S_GET_CLEAR_INFO = 1044,
-	PKT_C_MOVE = 1045,
-	PKT_S_MOVE = 1046,
-	PKT_S_PLAYER_LIST = 1047,
-	PKT_S_PLAYER_ENTER = 1048,
-	PKT_S_PLAYER_LEAVE = 1049,
-	PKT_C_PLAYER_ANIMATION = 1050,
-	PKT_S_PLAYER_ANIMATION = 1051,
-	PKT_C_PLAYER_STAT_EVENT = 1052,
-	PKT_S_PLAYER_STAT = 1053,
-	PKT_C_OBJECT_PICKUP = 1054,
-	PKT_S_OBJECT_PICKUP = 1055,
-	PKT_C_OBJECT_DROP = 1056,
-	PKT_S_OBJECT_DROP = 1057,
-	PKT_C_OBJECT_MOVE = 1058,
-	PKT_S_OBJECT_MOVE = 1059,
+	PKT_C_ENTER_GAME = 1045,
+	PKT_S_ENTER_GAME = 1046,
+	PKT_C_TEST_ENTER_GAME = 1047,
+	PKT_S_GAME_READY_TO_START = 1048,
+	PKT_C_MOVE = 1049,
+	PKT_S_MOVE = 1050,
+	PKT_S_PLAYER_LIST = 1051,
+	PKT_S_PLAYER_ENTER = 1052,
+	PKT_S_PLAYER_LEAVE = 1053,
+	PKT_C_PLAYER_ANIMATION = 1054,
+	PKT_S_PLAYER_ANIMATION = 1055,
+	PKT_C_PLAYER_STAT_EVENT = 1056,
+	PKT_S_PLAYER_STAT = 1057,
+	PKT_C_OBJECT_PICKUP = 1058,
+	PKT_S_OBJECT_PICKUP = 1059,
+	PKT_C_OBJECT_DROP = 1060,
+	PKT_S_OBJECT_DROP = 1061,
+	PKT_C_OBJECT_MOVE = 1062,
+	PKT_S_OBJECT_MOVE = 1063,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -75,6 +79,8 @@ enum : uint16
 // Custom Handlers
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
 bool Handle_C_GET_DB_DATA(PacketSessionRef& session, Protocol::C_GET_DB_DATA& pkt);
+bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_ROOM& pkt);
+bool Handle_C_RELAY_PACKET(PacketSessionRef& session, Protocol::C_RELAY_PACKET& pkt);
 bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt);
 bool Handle_C_GET_CURRENCY(PacketSessionRef& session, Protocol::C_GET_CURRENCY& pkt);
 bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt);
@@ -89,12 +95,12 @@ bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESP
 bool Handle_C_READY(PacketSessionRef& session, Protocol::C_READY& pkt);
 bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt);
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt);
-bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
-bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_GAME& pkt);
 bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt);
 bool Handle_C_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::C_HOST_SHOW_STAGE& pkt);
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt);
 bool Handle_C_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::C_GET_CLEAR_INFO& pkt);
+bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
+bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_GAME& pkt);
 bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt);
 bool Handle_C_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::C_PLAYER_ANIMATION& pkt);
 bool Handle_C_PLAYER_STAT_EVENT(PacketSessionRef& session, Protocol::C_PLAYER_STAT_EVENT& pkt);
@@ -115,6 +121,14 @@ public:
 		GPacketHandler[PKT_C_GET_DB_DATA] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::C_GET_DB_DATA>(Handle_C_GET_DB_DATA, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_TEST_ENTER_ROOM] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_TEST_ENTER_ROOM>(Handle_C_TEST_ENTER_ROOM, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_RELAY_PACKET] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_RELAY_PACKET>(Handle_C_RELAY_PACKET, session, buffer, len);
 		};
 		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
@@ -172,14 +186,6 @@ public:
 		{
 			return HandlePacket<Protocol::C_CHAT>(Handle_C_CHAT, session, buffer, len);
 		};
-		GPacketHandler[PKT_C_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
-		{
-			return HandlePacket<Protocol::C_ENTER_GAME>(Handle_C_ENTER_GAME, session, buffer, len);
-		};
-		GPacketHandler[PKT_C_TEST_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
-		{
-			return HandlePacket<Protocol::C_TEST_ENTER_GAME>(Handle_C_TEST_ENTER_GAME, session, buffer, len);
-		};
 		GPacketHandler[PKT_C_SHOW_STAGE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::C_SHOW_STAGE>(Handle_C_SHOW_STAGE, session, buffer, len);
@@ -195,6 +201,14 @@ public:
 		GPacketHandler[PKT_C_GET_CLEAR_INFO] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::C_GET_CLEAR_INFO>(Handle_C_GET_CLEAR_INFO, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_ENTER_GAME>(Handle_C_ENTER_GAME, session, buffer, len);
+		};
+		GPacketHandler[PKT_C_TEST_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::C_TEST_ENTER_GAME>(Handle_C_TEST_ENTER_GAME, session, buffer, len);
 		};
 		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
@@ -226,6 +240,10 @@ public:
 	{
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
 		return GPacketHandler[header->id](session, buffer, len);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_RELAY_PACKET& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_RELAY_PACKET);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_LOGIN& pkt)
 	{
@@ -299,10 +317,6 @@ public:
 	{
 		return MakeSendBuffer(pkt, PKT_S_CHAT);
 	}
-	static SendBufferRef MakeSendBuffer(Protocol::S_ENTER_GAME& pkt)
-	{
-		return MakeSendBuffer(pkt, PKT_S_ENTER_GAME);
-	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_STAGE_INFO& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_S_STAGE_INFO);
@@ -322,6 +336,14 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_GET_CLEAR_INFO& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_S_GET_CLEAR_INFO);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_ENTER_GAME& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_ENTER_GAME);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_GAME_READY_TO_START& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_GAME_READY_TO_START);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_MOVE& pkt)
 	{
