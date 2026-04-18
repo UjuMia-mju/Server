@@ -34,24 +34,7 @@ public:
 		return instance;
 	}
 
-	optional<StageInfo> GetStageInfo(int mapId, int chapter, int stage) const
-	{
-		auto it = _stageCache.find(mapId);
-		if (it != _stageCache.end())
-		{
-			if (it->second.chapter == chapter && it->second.stage == stage)
-			{
-				return it->second;
-			}
-			else
-			{
-				cout << "error: stage cahche miss" << endl;
-				return nullopt;
-			}
-		}
-		return nullopt;
-	}
-
+	optional<StageInfo> GetStageInfo(int mapId, int chapter, int stage);
 	unordered_map<int32_t, StageInfo> GetAllStages() const
 	{
 		return _stageCache;

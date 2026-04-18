@@ -193,6 +193,17 @@ int main()
 
 			player1Session->SendHostStageSelect(2);
 
+			this_thread::sleep_for(2s);
+
+			// 9. Player2가 게임 시작 패킷을 받는지 확인 (게임 시작 시 호스트의 클리어 스테이지 정보도 같이 받음)
+			player1Session->SendStartStage(1);
+			
+			this_thread::sleep_for(2s);
+
+			player1Session->SendStageEnter();
+			player2Session->SendStageEnter();
+
+
 			cout << "\n========== Test Scenario Complete ==========\n" << endl;
 		});
 

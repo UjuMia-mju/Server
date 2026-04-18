@@ -98,6 +98,65 @@ bool Handle_C_GET_DB_DATA(PacketSessionRef& session, Protocol::C_GET_DB_DATA& pk
 	return true;
 }
 
+bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_ROOM& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->GetPlayer();
+
+	if (player == nullptr)
+		return false;
+
+	auto room = GetGlobalTestRoom();
+	gameSession->SetRoom(room);
+
+	// 안전을 위해 Room의 락/작업큐 내부에서 한 번에 순차 처리합니다.
+	room->DoAsync([room, player, gameSession, session]()
+		{
+			// 1. 방장이 없으면 방장 권한 부여
+			if (room->GetOwnerId() == 0)
+			{
+				room->SetOwner(player->playerId, player->name, player->tag);
+				cout << "Test Room Owner Set! PlayerId: " << player->playerId << endl;
+			}
+
+			// 2. 방에 플레이어 완전히 입장 (기존 유저들에게 입장 패킷 브로드캐스트 포함)
+			// 테스트 환경에 맞게 EnterLobby 혹은 EnterGame을 선택 호출
+			room->EnterGame(player);
+
+			// 3. 본인 클라이언트에게 방/게임 입장 성공 사실과 방 정보(방장 정보 등)를 전송
+			Protocol::S_ENTER_ROOM enterRoomPkt;
+			room->MakeEnterRoomPacket(gameSession, enterRoomPkt);
+
+			auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
+			session->Send(sendBuffer);
+		});
+
+	cout << "Test Room Join process dispatched!" << endl;
+
+	return true;
+}
+
+bool Handle_C_RELAY_PACKET(PacketSessionRef& session, Protocol::C_RELAY_PACKET& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendCreateRoomError);
+
+	PlayerRef player = gameSession->GetPlayer();
+
+	// 전달할 새로운 봉투(S_RELAY_PACKET) 생성
+	Protocol::S_RELAY_PACKET relayPkt;
+	relayPkt.set_sender_id(player->playerId); // 누가 보냈는지 태그 (클라이언트에서 무시 처리 등에 사용)
+	relayPkt.set_packet_id(pkt.packet_id()); // 패킷 아이디 복사
+	relayPkt.set_payload(pkt.payload());      // 내용물 복사(이동)
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(relayPkt);
+
+	// 방 릴레이 함수 호출 (requireHostAuthority 플래그에 따라 분기)
+	room->RelayPacket(player, sendBuffer, pkt.require_host_authority());
+	cout << "relay call" << endl;
+
+	return true;
+}
+
 bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
@@ -672,24 +731,10 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
-
-	auto room = gameSession->GetRoom().lock();
-
-	if (!room)
-	{
-		std::cout << "Enter game failed: Room not available" << endl;
-		SendEnterGameError(session, "Room not available");
-		return false;
-	}
+	// 방에 있는지 체크
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
 
 	room->DoAsync(&Room::EnterGame, gameSession->GetPlayer());
-
-	Protocol::S_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_success(true);
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-	session->Send(sendBuffer);
-
 	return true;
 }
 
@@ -699,9 +744,8 @@ bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 
 	// 테스트 코드 부분
 	auto room = GetGlobalTestRoom();
-	gameSession->GetRoom() = room;
+	gameSession->SetRoom(room);
 
-	//
 	if (!room)
 	{
 		std::cout << "Enter game failed: Room not available" << endl;
@@ -710,11 +754,6 @@ bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 	}
 
 	room->DoAsync(&Room::EnterGame, gameSession->GetPlayer());
-
-	Protocol::S_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_success(true);
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-	session->Send(sendBuffer);
 
 	return true;
 }
@@ -784,7 +823,45 @@ bool Handle_C_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::C_HOST_SHOW_S
 
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt)
 {
-	return false;
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 자신이 방장인지 확인
+	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
+	{
+		std::cout << "Start stage failed: Only room owner" << endl;
+		SendStartRoomError(session, "Only room owner can start stage");
+		return false;
+	}
+
+	Protocol::S_START_STAGE startStagePkt;
+
+	int32 map_id = pkt.map_id();
+	int32 chapter = pkt.chapter();
+	int32 stage = pkt.stageindex();
+
+	// 3. StageManager에서 스테이지 데이터 가져오기
+	auto stageData = GStageManager.GetStageInfo(map_id, chapter, stage);
+	if (stageData == nullopt)
+	{
+		std::cout << "Start stage failed: Stage cache miss" << endl;
+		startStagePkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startStagePkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 4. 성공 패킷 구성 및 스테이지 정보 직렬화 (기존 헬퍼 사용)
+	startStagePkt.set_success(true);
+	Protocol::StageInfo* stageInfoPkt = startStagePkt.mutable_stage();
+	GStageManager.ChangeStageInfoToProtocol(stageData.value(), *stageInfoPkt);
+
+	// 5. 방에 있는 "모든" 유저에게 스테이지 시작 브로드캐스트
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startStagePkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
+
+	std::cout << "Room " << room->GetRoomId() << " started Map ID: " << map_id << endl;
+
+	return true;
 }
 
 bool Handle_C_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::C_GET_CLEAR_INFO& pkt)

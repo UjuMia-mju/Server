@@ -2,7 +2,6 @@
 #include "ServerSession.h"
 #include "ServerPacketHandler.h"
 
-
 ServerSession::ServerSession(const string& email, const string& password)
 	: _email(email), _password(password)
 {
@@ -145,6 +144,26 @@ void ServerSession::SendHostStageSelect(int32 map_id)
 {
 	Protocol::C_HOST_SHOW_STAGE pkt;
 	pkt.set_map_id(map_id);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendStartStage(int32 map_id)
+{
+	Protocol::C_START_STAGE pkt;
+
+	pkt.set_map_id(map_id);
+	pkt.set_chapter(1);
+	pkt.set_stageindex(1);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendStageEnter()
+{
+	Protocol::C_ENTER_GAME pkt;
 
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);
