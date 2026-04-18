@@ -24,6 +24,10 @@ public:
 	void EnterGame(PlayerRef player);       // 게임 입장 (위치 동기화)
 	void LeaveGame(PlayerRef player);       // 게임 퇴장
 
+	// ========== 브로드케스트(공통) ==========
+	void Broadcast(SendBufferRef sendBuffer);
+	void BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId);
+
 	// ========== relay 관련 ==========
 	void RelayPacket(PlayerRef sender, SendBufferRef sendBuffer, bool requireHostAuthority);
 

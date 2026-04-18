@@ -161,6 +161,14 @@ void ServerSession::SendStartStage(int32 map_id)
 	Send(sendBuffer);
 }
 
+void ServerSession::SendStageEnter()
+{
+	Protocol::C_ENTER_GAME pkt;
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendReady(bool isReady)
 {
 	Protocol::C_READY readyPkt;

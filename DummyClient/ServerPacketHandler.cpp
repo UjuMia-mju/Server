@@ -387,6 +387,31 @@ bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_IN
 
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 {
+	if (!pkt.success())
+	{
+		cout << "[Client] Enter game failed!" << endl;
+		return false;
+	}
+
+	cout << "\n========== [ENTER GAME] ==========" << endl;
+	cout << "Current Players in Game: " << pkt.players_size() << endl;
+
+	for (int i = 0; i < pkt.players_size(); ++i)
+	{
+		const auto& p = pkt.players(i);
+		cout << "  - [" << p.player_id() << "] " << p.name()
+			<< " | Pos: (" << p.pos().x() << ", " << p.pos().y() << ", " << p.pos().z() << ")" << endl;
+	}
+	cout << "==================================" << endl;
+
+	return true;
+}
+
+bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_READY_TO_START& pkt)
+{
+	int time = pkt.start_delay_seconds();	
+	cout << "[Client] Game is ready to start! time : " << time << " seconds" << endl;
+
 	return true;
 }
 
