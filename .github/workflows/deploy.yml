@@ -9,9 +9,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      # 1. Checkout the latest code and binaries from the repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 2. Stop the existing server process to release file locks
       - name: Stop Existing Server
         shell: powershell
         run: |
@@ -21,13 +23,14 @@ jobs:
           if ($process) {
               Write-Host "Found running process: $processName. Stopping..."
               Stop-Process -Name $processName -Force
-              
+              # Wait to ensure the OS releases the file handle
               Write-Host "Waiting 5 seconds for file lock to release..."
               Start-Sleep -Seconds 5
           } else {
-              Write-Host "No running process found."
+              Write-Host "No running process found. Proceeding to deployment."
           }
 
+      # 3. Copy the specific executable to the deployment folder
       - name: Deploy Executable
         shell: powershell
         run: |
@@ -38,23 +41,20 @@ jobs:
               New-Item -ItemType Directory -Path $destPath -Force 
           }
           
-          Write-Host "Copying: $sourceFile -> $destPath"
+          Write-Host "Copying executable: $sourceFile -> $destPath"
           Copy-Item -Path $sourceFile -Destination $destPath -Force
 
+      # 4. Launch the server in a new window
       - name: Start Server
         shell: powershell
         run: |
-          $taskName = "RunGameServer"
-          $exePath = "C:\Users\Administrator\Desktop\Server\GameServer.exe"
-          $workDir = "C:\Users\Administrator\Desktop\Server"
-
-          Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
-
-          $action = New-ScheduledTaskAction -Execute $exePath -WorkingDirectory $workDir
-          $principal = New-ScheduledTaskPrincipal -UserId "Administrator" -LogonType Interactive
+          $targetDir = "C:\Users\Administrator\Desktop\Server"
+          $exeName = "GameServer.exe"
           
-          Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Force
-
-          Start-ScheduledTask -TaskName $taskName
+          cd $targetDir
+          Write-Host "Starting $exeName in a new process..."
           
-          Write-Host "Server process started in interactive session."
+          # Using Start-Process to decouple the server from the runner session
+          Start-Process -FilePath ".\$exeName" -WorkingDirectory $targetDir -WindowStyle Normal
+          
+          Write-Host "Deployment process finished successfully."
