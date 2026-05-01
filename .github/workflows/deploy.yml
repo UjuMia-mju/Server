@@ -44,10 +44,17 @@ jobs:
       - name: Start Server
         shell: powershell
         run: |
-          cd "C:\Users\Administrator\Desktop\Server"
+          $taskName = "RunGameServer"
+          $exePath = "C:\Users\Administrator\Desktop\Server\GameServer.exe"
+          $workDir = "C:\Users\Administrator\Desktop\Server"
+
+          Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+
+          $action = New-ScheduledTaskAction -Execute $exePath -WorkingDirectory $workDir
+          $principal = New-ScheduledTaskPrincipal -UserId "Administrator" -LogonType Interactive
           
-          Write-Host "Starting GameServer.exe..."
-          # Start-Process ensures the server keeps running after the runner finishes
-          Start-Process -FilePath ".\GameServer.exe" -WorkingDirectory "C:\Users\Administrator\Desktop\Server"
+          Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Force
+
+          Start-ScheduledTask -TaskName $taskName
           
-          Write-Host "Deployment completed successfully!"
+          Write-Host "Server process started in interactive session."
