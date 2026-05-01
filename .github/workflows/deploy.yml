@@ -52,9 +52,12 @@ jobs:
           $exeName = "GameServer.exe"
           
           cd $targetDir
-          Write-Host "Starting $exeName in a new process..."
+          Write-Host "Starting $exeName and decoupling from runner..."
           
-          # Using Start-Process to decouple the server from the runner session
+          # [핵심] RUNNER_TRACKING_ID를 비워야 액션 종료 시 프로세스가 안 죽습니다.
+          $env:RUNNER_TRACKING_ID = ""
+          
+          # 독립된 창으로 실행
           Start-Process -FilePath ".\$exeName" -WorkingDirectory $targetDir -WindowStyle Normal
           
-          Write-Host "Deployment process finished successfully."
+          Write-Host "Deployment process finished. Process should remain active."
