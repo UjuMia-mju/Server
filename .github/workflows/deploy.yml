@@ -2,39 +2,48 @@ name: Deploy Game Server (Pre-built)
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev" ]  # dev 브랜치에 푸시될 때 실행
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted  # EC2에 설치한 러너에서 실행
 
     steps:
-      # 1. GitHub에 올라온 최신 파일들을 러너 폴더로 내려받기
+      # 1. GitHub 원격 저장소의 파일을 러너로 가져오기
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. 기존 서버 종료 (실행 중인 경우)
+      # 2. 기존에 실행 중인 서버 프로세스 종료 (파일 덮어쓰기를 위해 필수)
       - name: Stop Existing Server
         shell: powershell
         run: |
-          $process = Get-Process "Server" -ErrorAction SilentlyContinue
+          # 서버 실행 파일명이 'Server.exe'라고 가정합니다. (실제 파일명으로 수정 가능)
+          $processName = "Server" 
+          $process = Get-Process $processName -ErrorAction SilentlyContinue
           if ($process) {
-              Stop-Process -Name "Server" -Force
-              Start-Sleep -Seconds 2
+              Write-Host "Stopping existing server process..."
+              Stop-Process -Name $processName -Force
+              Start-Sleep -Seconds 3  # 프로세스가 완전히 죽을 때까지 대기
           }
 
-      # 3. 배포 폴더로 파일 복사
-      # Binary/Release 폴더 안에 있는 모든 내용을 바탕화면 Server 폴더로 복사합니다.
+      # 3. 배포 폴더로 파일 복사 (가장 중요한 부분)
       - name: Deploy Files
         shell: powershell
         run: |
+          # 깃허브 워크스페이스 내의 빌드 결과물 경로
           $sourcePath = "${{ github.workspace }}\Binary\Release\*"
+          
+          # 실제 서버를 구동할 바탕화면 경로
           $destPath = "C:\Users\Administrator\Desktop\Server"
           
-          # 목적지 폴더가 없으면 생성
-          if (!(Test-Path $destPath)) { New-Item -ItemType Directory -Path $destPath }
+          # 목적지 폴더가 없으면 새로 생성
+          if (!(Test-Path $destPath)) { 
+              New-Item -ItemType Directory -Path $destPath -Force 
+              Write-Host "Created destination directory: $destPath"
+          }
           
           # 파일 복사 (-Recurse: 하위폴더 포함, -Force: 덮어쓰기)
+          Write-Host "Copying files from $sourcePath to $destPath..."
           Copy-Item -Path $sourcePath -Destination $destPath -Recurse -Force
 
       # 4. 서버 재실행
@@ -42,4 +51,10 @@ jobs:
         shell: powershell
         run: |
           cd "C:\Users\Administrator\Desktop\Server"
-          Start-Process "run.bat"
+          # run.bat 파일이 있다면 실행, 없다면 직접 Server.exe 실행 가능
+          if (Test-Path "run.bat") {
+              Start-Process "run.bat"
+          } else {
+              Start-Process "Server.exe"
+          }
+          Write-Host "Server started successfully."
