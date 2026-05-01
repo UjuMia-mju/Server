@@ -20,11 +20,9 @@ Room::~Room()
 
 void Room::EnterLobby(PlayerRef player)
 {
-	{
-		WRITE_LOCK;
-		_players[player->playerId] = player;
-		_readyStatus[player->playerId] = false;
-	}
+	WRITE_LOCK;
+	_players[player->playerId] = player;
+	_readyStatus[player->playerId] = false;
 
 	// 방 멤버 입장 알림
 	Protocol::S_ROOM_MEMBER_ENTER enterPkt;
@@ -38,45 +36,36 @@ void Room::EnterLobby(PlayerRef player)
 	member->set_is_ready(false);
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterPkt);
-
 	BroadcastExcept(sendBuffer, player->playerId);
+
 	std::cout << "Player " << player->name << " entered lobby of Room " << _roomId << endl;
 }
 
 void Room::LeaveLobby(PlayerRef player)
 {
+	WRITE_LOCK;
+	_players.erase(player->playerId);
+	_readyStatus.erase(player->playerId);
+
+	// 퇴장 알림
 	Protocol::S_ROOM_MEMBER_LEAVE leavePkt;
-	vector<GameSessionRef> targetSessions; // Send를 날릴 타겟들을 수집할 바구니
+	leavePkt.set_player_id(player->playerId);
+	leavePkt.set_player_name(player->name);
 
-	// 1. 데이터 변경 및 "누구한테 보낼지" 캡처를 위한 타이트한 락 스코프
+	// 방장이 나갔다면 새 방장 지정
+	if (_ownerId == player->playerId && !_players.empty())
 	{
-		WRITE_LOCK;
-		_players.erase(player->playerId);
-		_readyStatus.erase(player->playerId);
-
-		leavePkt.set_player_id(player->playerId);
-		leavePkt.set_player_name(player->name);
-
-		if (_ownerId == player->playerId && !_players.empty())
-		{
-			_ownerId = _players.begin()->first;
-			leavePkt.set_new_owner_id(_ownerId);
-		}
-		else if (_players.empty())
-		{
-			RoomManager::Instance().RemoveRoom(_roomId);
-		}
-		else
-		{
-			leavePkt.set_new_owner_id(0);
-		}
-
-		// 현재 남은 사람들의 세션을 복사해둔다.
-		for (auto& p : _players)
-		{
-			if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
-				targetSessions.push_back(session);
-		}
+		_ownerId = _players.begin()->first;
+		leavePkt.set_new_owner_id(_ownerId);
+	}
+	else if (_players.empty())
+	{
+		// 방 삭제
+		RoomManager::Instance().RemoveRoom(_roomId);
+	}
+	else
+	{
+		leavePkt.set_new_owner_id(0); // 0이면 아무런 반응X
 	}
 
 	auto leaveBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
@@ -87,14 +76,14 @@ void Room::LeaveLobby(PlayerRef player)
 
 void Room::SetReady(uint64 playerId, bool isReady)
 {
+	WRITE_LOCK;
+
+	if (_players.find(playerId) == _players.end())
 	{
-		WRITE_LOCK;
-		if (_players.find(playerId) == _players.end())
-		{
-			return;
-		}
-		_readyStatus[playerId] = isReady;
+		return;
 	}
+
+	_readyStatus[playerId] = isReady;
 
 	// 준비 상태 브로드캐스트
 	Protocol::S_READY readyPkt;
@@ -123,15 +112,19 @@ bool Room::CanStartGame()
 
 void Room::StartGame()
 {
-	{
-		WRITE_LOCK;
-		if (_isPlaying) return;
-		_isPlaying = true;
-	}
+	WRITE_LOCK;
 
+	// 이미 게임 중이면 무시
+	if (_isPlaying)
+	{
+		std::cout << "Cannot start game: Already playing" << endl;
+		return;
+	}
+	// 게임 시작 알림 브로드캐스트
 	Protocol::S_START_ROOM gameStartPkt;
 	gameStartPkt.set_success(true);
 
+	// 호스트의 클리어 스테이지 정보 가져오기
 	xvector<StageClearInfo> clearStages; 
 	GStageManager.GetMyStageClearInfo(_ownerId, clearStages);
 
@@ -144,6 +137,7 @@ void Room::StartGame()
 		stageInfo->set_clear_time(clearStage.clearTime);
 	}
 
+	_isPlaying = true;
 	std::cout << "Game started in room " << _roomId << endl;
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(gameStartPkt);
@@ -196,81 +190,68 @@ void Room::MakeEnterRoomPacket(GameSessionRef gameSession, Protocol::S_ENTER_ROO
 	}
 }
 
-void Room::SetOwner(uint64 ownerId, const string& ownerName, int32 ownerTag)
-{
-	WRITE_LOCK;
-	_ownerId = ownerId;
-	_ownerName = ownerName;
-	_ownerTag = ownerTag;
-}
-
 void Room::EnterGame(PlayerRef player)
 {
-	Protocol::S_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_success(true);
-	bool isAllLoaded = false;
+	WRITE_LOCK;
+	_players[player->playerId] = player;
 
-	{
-		WRITE_LOCK;
-		_players[player->playerId] = player;
-		_loadedPlayers.insert(player->playerId);
+	// 새로 들어온 플레이어에게 기존 플레이어 정보 브로드캐스트
+	Protocol::S_PLAYER_LIST playerListPkt;
 
-		for (auto& p : _players)
-		{
-			auto playerInfo = enterGamePkt.add_players();
-			playerInfo->set_player_id(p.second->playerId);
-			playerInfo->set_name(p.second->name);
+    for (auto& p : _players)
+    {
+        if (p.first == player->playerId)
+            continue;
 
-			auto pos = playerInfo->mutable_pos();
-			pos->set_x(p.second->posX); pos->set_y(p.second->posY); pos->set_z(p.second->posZ);
+        auto playerInfo = playerListPkt.add_players();
+        playerInfo->set_player_id(p.second->playerId);
+        playerInfo->set_name(p.second->name);
 
-			auto rot = playerInfo->mutable_rot();
-			rot->set_x(p.second->rotX); rot->set_y(p.second->rotY); rot->set_z(p.second->rotZ); rot->set_w(p.second->rotW);
-		}
-		isAllLoaded = (_loadedPlayers.size() == _players.size());
-	}
+        auto pos = playerInfo->mutable_pos();
+        pos->set_x(p.second->posX);
+        pos->set_y(p.second->posY);
+        pos->set_z(p.second->posZ);
 
-	if (auto session = player->ownerSession.lock())
-	{
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-		session->Send(sendBuffer);
-	}
+        auto rot = playerInfo->mutable_rot();
+        rot->set_x(p.second->rotX);
+        rot->set_y(p.second->rotY);
+        rot->set_z(p.second->rotZ);
+        rot->set_w(p.second->rotW);
+    }
 
-	Protocol::S_PLAYER_ENTER newPlayerPkt;
+    if (auto session = player->ownerSession.lock())
+    {
+        auto sendBuffer = ClientPacketHandler::MakeSendBuffer(playerListPkt);
+        session->Send(sendBuffer);
+    }
+
+	// 새로 들어온 플레이어 정보를 기존 플레이어들에게 브로드캐스트
+    Protocol::S_PLAYER_ENTER newPlayerPkt;
 	auto newPlayerInfo = newPlayerPkt.mutable_player();
 	newPlayerInfo->set_player_id(player->playerId);
 	newPlayerInfo->set_name(player->name);
 
 	auto pos = newPlayerInfo->mutable_pos();
-	pos->set_x(player->posX); pos->set_y(player->posY); pos->set_z(player->posZ);
+	pos->set_x(player->posX);
+	pos->set_y(player->posY);
+	pos->set_z(player->posZ);
+
 	auto rot = newPlayerInfo->mutable_rot();
-	rot->set_x(player->rotX); rot->set_y(player->rotY); rot->set_z(player->rotZ); rot->set_w(player->rotW);
+	rot->set_x(player->rotX);
+	rot->set_y(player->rotY);
+	rot->set_z(player->rotZ);
+	rot->set_w(player->rotW);
 
 	auto newPlayerBuffer = ClientPacketHandler::MakeSendBuffer(newPlayerPkt);
-	BroadcastExcept(newPlayerBuffer, player->playerId);
 
-	if (isAllLoaded)
-	{
-		std::cout << "Room " << _roomId << " : All players loaded. Game Ready!" << endl;
-		Protocol::S_GAME_READY_TO_START readyStartPkt;
-		readyStartPkt.set_start_delay_seconds(3);
-
-		auto now = std::chrono::system_clock::now();
-		auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() + 3000;
-		readyStartPkt.set_server_start_timestamp(startTimestamp);
-		readyStartPkt.set_random_seed(rand());
-
-		auto readyStartBuffer = ClientPacketHandler::MakeSendBuffer(readyStartPkt);
-		Broadcast(readyStartBuffer);
-	}
+	// 자기 자신을 제외한 나머지 플레이어들에게 새로 들어온 플레이어 정보 브로드캐스트
+	Broadcast(newPlayerBuffer);
 }
 
 void Room::LeaveGame(PlayerRef player)
 {
-	{
-		WRITE_LOCK;
-		_players.erase(player->playerId);
-	}
+	WRITE_LOCK;
+	_players.erase(player->playerId);
 
 	// 퇴장 알림
 	Protocol::S_PLAYER_LEAVE leavePkt;
@@ -278,54 +259,34 @@ void Room::LeaveGame(PlayerRef player)
 	leavePlayerInfo->set_player_id(player->playerId);
 	auto leaveBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
 
+	Broadcast(leaveBuffer);
+}
+
+void Room::Broadcast(SendBufferRef sendBuffer)
+{
+	WRITE_LOCK;
 	for (auto& p : _players)
 	{
 		GameSessionRef session = static_pointer_cast<GameSession>(p.second->ownerSession.lock());
 		if (session != nullptr)
 		{
-			session->Send(leaveBuffer);
+			session->Send(sendBuffer);
 		}
 	}
 }
 
-void Room::RelayPacket(PlayerRef sender, SendBufferRef sendBuffer, bool requireHostAuthority)
+void Room::BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId)
 {
-	// Host 에게만 전송한다. (Peer -> Host)
-	if (requireHostAuthority)
+	WRITE_LOCK;
+	for (auto& p : _players)
 	{
-		if (sender->playerId != _ownerId)
-		{
-			GameSessionRef hostSession = nullptr;
+		if (p.first == excludePlayerId)
+			continue;
 
-			// 1. 필요한 호스트 세션만 빠르게 훔친다 (락 최소화)
-			{
-				READ_LOCK;
-				auto it = _players.find(_ownerId);
-				if (it != _players.end())
-				{
-					hostSession = static_pointer_cast<GameSession>(it->second->ownerSession.lock());
-				}
-			} // 락 해제
-
-			// 2. 락 밖에서 전송
-			if (hostSession != nullptr)
-			{
-				hostSession->Send(sendBuffer);
-			}
-			else
-			{
-				cout << "Host player not found in room " << _roomId << endl;
-			}
-		}
-		else
+		if (auto session = p.second->ownerSession.lock())
 		{
-			Broadcast(sendBuffer);
+			session->Send(sendBuffer);
 		}
-	}
-	// Host가 전체에게 전송한다. (Host -> Peer)
-	else
-	{
-		BroadcastExcept(sendBuffer, sender->playerId);
 	}
 }
 
@@ -353,48 +314,3 @@ RoomRef GetGlobalTestRoom()
 	static shared_ptr<Room> instance = make_shared<Room>(999999, "Global Test Room", 0, "test", 0000);
 	return instance;
 }
-
-void Room::Broadcast(SendBufferRef sendBuffer)
-{
-	vector<GameSessionRef> targetSessions;
-
-	{
-		READ_LOCK;
-		targetSessions.reserve(_players.size());
-		for (auto& p : _players)
-		{
-			if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
-				targetSessions.push_back(session);
-		}
-	} 
-
-	// 락이 해제된 안전한 상태에서 네트워크 I/O 실행
-	for (auto& session : targetSessions)
-	{
-		session->Send(sendBuffer);
-	}
-}
-
-void Room::BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId)
-{
-	vector<GameSessionRef> targetSessions;
-
-	{
-		READ_LOCK;
-		targetSessions.reserve(_players.size());
-		for (auto& p : _players)
-		{
-			if (p.first == excludePlayerId)
-				continue;
-
-			if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
-				targetSessions.push_back(session);
-		}
-	}
-
-	for (auto& session : targetSessions)
-	{
-		session->Send(sendBuffer);
-	}
-}
-
