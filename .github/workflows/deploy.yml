@@ -6,14 +6,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # EC2에 설치된 러너 사용
+    runs-on: self-hosted
 
     steps:
-      # 1. 깃허브에서 최신 코드(바이너리 포함) 가져오기
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. 실행 중인 서버 종료 (파일 잠금 해제)
       - name: Stop Existing Server
         shell: powershell
         run: |
@@ -21,43 +19,35 @@ jobs:
           $process = Get-Process $processName -ErrorAction SilentlyContinue
           
           if ($process) {
-              Write-Host "실행 중인 서버($processName)를 발견했습니다. 종료를 시작합니다..."
+              Write-Host "Found running process: $processName. Stopping..."
               Stop-Process -Name $processName -Force
               
-              # 프로세스가 완전히 종료되어 파일 핸들이 풀릴 때까지 대기
-              Write-Host "파일 잠금이 해제되기를 기다리는 중 (5초)..."
+              Write-Host "Waiting 5 seconds for file lock to release..."
               Start-Sleep -Seconds 5
           } else {
-              Write-Host "실행 중인 서버 프로세스가 없습니다."
+              Write-Host "No running process found."
           }
 
-      # 3. 새 실행 파일 배포 (핀포인트 복사)
       - name: Deploy Executable
         shell: powershell
         run: |
-          # 소스: 깃허브 워크스페이스에 올라온 실행 파일
           $sourceFile = "${{ github.workspace }}\Binary\Release\GameServer.exe"
-          
-          # 목적지: EC2 바탕화면 서버 폴더
           $destPath = "C:\Users\Administrator\Desktop\Server"
           
-          # 목적지 폴더가 없으면 생성
           if (!(Test-Path $destPath)) { 
               New-Item -ItemType Directory -Path $destPath -Force 
           }
           
-          Write-Host "새 버전을 복사합니다: $sourceFile -> $destPath"
-          # -Force를 사용하여 기존 파일을 덮어씁니다.
+          Write-Host "Copying: $sourceFile -> $destPath"
           Copy-Item -Path $sourceFile -Destination $destPath -Force
 
-      # 4. 서버 다시 실행
       - name: Start Server
         shell: powershell
         run: |
           cd "C:\Users\Administrator\Desktop\Server"
           
-          # 서버를 백그라운드에서 실행 (러너가 종료되어도 서버는 유지되도록)
-          Write-Host "서버를 재시작합니다..."
+          Write-Host "Starting GameServer.exe..."
+          # Start-Process ensures the server keeps running after the runner finishes
           Start-Process -FilePath ".\GameServer.exe" -WorkingDirectory "C:\Users\Administrator\Desktop\Server"
           
-          Write-Host "배포가 완료되었습니다!"
+          Write-Host "Deployment completed successfully!"
