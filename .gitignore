@@ -12,6 +12,9 @@ Debug/
 Release/
 x64/
 
+!Binary/Release/
+!Binary/Release/GameServer.exe
+
 # C++
 *.obj
 *.pdb
