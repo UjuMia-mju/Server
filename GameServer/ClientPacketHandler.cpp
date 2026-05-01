@@ -152,7 +152,6 @@ bool Handle_C_RELAY_PACKET(PacketSessionRef& session, Protocol::C_RELAY_PACKET& 
 
 	// 방 릴레이 함수 호출 (requireHostAuthority 플래그에 따라 분기)
 	room->RelayPacket(player, sendBuffer, pkt.require_host_authority());
-	cout << "relay call" << endl;
 
 	return true;
 }
