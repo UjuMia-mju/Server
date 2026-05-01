@@ -1,60 +1,63 @@
-name: Deploy Game Server (Pre-built)
+name: Deploy Game Server
 
 on:
   push:
-    branches: [ "dev" ]  # dev 브랜치에 푸시될 때 실행
+    branches: [ "dev" ]
 
 jobs:
   deploy:
-    runs-on: self-hosted  # EC2에 설치한 러너에서 실행
+    runs-on: self-hosted  # EC2에 설치된 러너 사용
 
     steps:
-      # 1. GitHub 원격 저장소의 파일을 러너로 가져오기
+      # 1. 깃허브에서 최신 코드(바이너리 포함) 가져오기
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. 기존에 실행 중인 서버 프로세스 종료 (파일 덮어쓰기를 위해 필수)
+      # 2. 실행 중인 서버 종료 (파일 잠금 해제)
       - name: Stop Existing Server
         shell: powershell
         run: |
-          # 서버 실행 파일명이 'Server.exe'라고 가정합니다. (실제 파일명으로 수정 가능)
-          $processName = "Server" 
+          $processName = "GameServer"
           $process = Get-Process $processName -ErrorAction SilentlyContinue
+          
           if ($process) {
-              Write-Host "Stopping existing server process..."
+              Write-Host "실행 중인 서버($processName)를 발견했습니다. 종료를 시작합니다..."
               Stop-Process -Name $processName -Force
-              Start-Sleep -Seconds 3  # 프로세스가 완전히 죽을 때까지 대기
+              
+              # 프로세스가 완전히 종료되어 파일 핸들이 풀릴 때까지 대기
+              Write-Host "파일 잠금이 해제되기를 기다리는 중 (5초)..."
+              Start-Sleep -Seconds 5
+          } else {
+              Write-Host "실행 중인 서버 프로세스가 없습니다."
           }
 
-      # 3. 배포 폴더로 파일 복사 (가장 중요한 부분)
-      - name: Deploy Files
+      # 3. 새 실행 파일 배포 (핀포인트 복사)
+      - name: Deploy Executable
         shell: powershell
         run: |
-          # 깃허브 워크스페이스 내의 빌드 결과물 경로
-          $sourcePath = "${{ github.workspace }}\Binary\Release\*"
+          # 소스: 깃허브 워크스페이스에 올라온 실행 파일
+          $sourceFile = "${{ github.workspace }}\Binary\Release\GameServer.exe"
           
-          # 실제 서버를 구동할 바탕화면 경로
+          # 목적지: EC2 바탕화면 서버 폴더
           $destPath = "C:\Users\Administrator\Desktop\Server"
           
-          # 목적지 폴더가 없으면 새로 생성
+          # 목적지 폴더가 없으면 생성
           if (!(Test-Path $destPath)) { 
               New-Item -ItemType Directory -Path $destPath -Force 
-              Write-Host "Created destination directory: $destPath"
           }
           
-          # 파일 복사 (-Recurse: 하위폴더 포함, -Force: 덮어쓰기)
-          Write-Host "Copying files from $sourcePath to $destPath..."
-          Copy-Item -Path $sourcePath -Destination $destPath -Recurse -Force
+          Write-Host "새 버전을 복사합니다: $sourceFile -> $destPath"
+          # -Force를 사용하여 기존 파일을 덮어씁니다.
+          Copy-Item -Path $sourceFile -Destination $destPath -Force
 
-      # 4. 서버 재실행
+      # 4. 서버 다시 실행
       - name: Start Server
         shell: powershell
         run: |
           cd "C:\Users\Administrator\Desktop\Server"
-          # run.bat 파일이 있다면 실행, 없다면 직접 Server.exe 실행 가능
-          if (Test-Path "run.bat") {
-              Start-Process "run.bat"
-          } else {
-              Start-Process "Server.exe"
-          }
-          Write-Host "Server started successfully."
+          
+          # 서버를 백그라운드에서 실행 (러너가 종료되어도 서버는 유지되도록)
+          Write-Host "서버를 재시작합니다..."
+          Start-Process -FilePath ".\GameServer.exe" -WorkingDirectory "C:\Users\Administrator\Desktop\Server"
+          
+          Write-Host "배포가 완료되었습니다!"
