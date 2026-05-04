@@ -38,7 +38,7 @@ void DoWorkerJob(ServerServiceRef& service)
 int main()
 {
 	::SetConsoleOutputCP(CP_UTF8);
-	cout << "Game Server Start! - git action CI/CD" << endl;
+	cout << "Game Server Start! - git action CI/CD - light sail HI!!" << endl;
 
 	// Config 파일 로드
 	WCHAR exePath[MAX_PATH];
