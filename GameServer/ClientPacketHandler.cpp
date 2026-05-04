@@ -757,6 +757,39 @@ bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 	return true;
 }
 
+bool Handle_C_GAME_CLEAR(PacketSessionRef& session, Protocol::C_GAME_CLEAR& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 2. 방장(Host) 권한 체크: 방장만 클리어 패킷을 보낼 수 있어야 함
+	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
+	{
+		std::cout << "[Game Clear Failed] Only room owner can send clear packet." << endl;
+		Protocol::S_GAME_CLEAR errorPkt;
+		errorPkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	int32 map_id = pkt.map_id();
+	int32 star = pkt.star();
+	int32 clear_time = pkt.clear_time_seconds();
+
+	// 3. StageManager에서 스테이지 클리어 정보 업데이트
+	bool updateSuccess = GStageManager.UpdateStageClearInfo(gameSession->GetPlayer()->playerId, map_id, star, clear_time);
+	Protocol::S_GAME_CLEAR clearPkt;
+	clearPkt.set_success(updateSuccess);
+	clearPkt.set_map_id(map_id); // 클라이언트에서 클리어 된 맵을 식별하기 위해 맵 ID도 내려줍니다
+	clearPkt.set_star(star);
+	clearPkt.set_clear_time_seconds(clear_time);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(clearPkt);
+	room->Broadcast(sendBuffer); // 방 전체 참가자들에게 결과 전송
+
+	return true;
+}
+
 bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt)
 {
 	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);

@@ -415,6 +415,18 @@ bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_RE
 	return true;
 }
 
+bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt)
+{
+	int mapId = pkt.map_id();
+	int star = pkt.star();
+	int clearTime = pkt.clear_time_seconds();
+	cout << "\n========== GAME CLEAR! ==========" << endl;
+	cout << "Congratulations! You cleared the stage " << mapId << " with " << star << " stars!" << endl;
+	cout << "Clear Time: " << clearTime << " seconds" << endl;
+
+	return true;
+}
+
 bool Handle_S_STAGE_INFO(PacketSessionRef& session, Protocol::S_STAGE_INFO& pkt)
 {
 	cout << "\n========== Stage Info ==========" << endl;

@@ -169,6 +169,16 @@ void ServerSession::SendStageEnter()
 	Send(sendBuffer);
 }
 
+void ServerSession::SendStageClear(int32 map_id, int32 star, int32 clearTime)
+{
+	Protocol::C_GAME_CLEAR pkt;
+	pkt.set_map_id(map_id);
+	pkt.set_star(star);
+	pkt.set_clear_time_seconds(clearTime);
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendReady(bool isReady)
 {
 	Protocol::C_READY readyPkt;
