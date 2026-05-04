@@ -180,3 +180,28 @@ void StageManager::ChangeStageInfoToProtocol(const StageInfo& stageInfo, OUT Pro
     proto.set_stage_name(stageInfo.mapName);
 	proto.set_description(stageInfo.mapDescription);
 }
+
+bool StageManager::UpdateStageClearInfo(int32 userId, int mapId, int star, int clearTime)
+{
+    DBConnectionGuard conn(GDBConnectionPool);
+
+    // MySQL 전용 Upsert 구문 (INSERT ON DUPLICATE KEY UPDATE)
+    DBBind<4, 0> dbBind(conn,
+        L"INSERT INTO user_map_clears (user_id, map_id, star, clear_time) "
+        L"VALUES (?, ?, ?, ?) AS new_val "
+        L"ON DUPLICATE KEY UPDATE "
+        L"    clear_time = CASE "
+        L"        WHEN new_val.star > user_map_clears.star THEN new_val.clear_time "
+        L"        WHEN new_val.star = user_map_clears.star AND new_val.clear_time < user_map_clears.clear_time THEN new_val.clear_time "
+        L"        ELSE user_map_clears.clear_time "
+        L"    END, "
+        L"    star = GREATEST(user_map_clears.star, new_val.star)"
+    );
+
+    dbBind.BindParam(0, userId);
+    dbBind.BindParam(1, mapId);
+    dbBind.BindParam(2, star);
+    dbBind.BindParam(3, clearTime);
+	
+    return dbBind.Execute();
+}

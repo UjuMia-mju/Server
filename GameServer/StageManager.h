@@ -45,7 +45,7 @@ public:
 	StageInfo GetStageInfoById(int stageId) const;
 	void ChangeProtocolToStageInfo(const Protocol::StageInfo& proto, OUT StageInfo& stageInfo) const;
 	void ChangeStageInfoToProtocol(const StageInfo& stageInfo, OUT Protocol::StageInfo& proto) const;
-
+	bool UpdateStageClearInfo(int32 userId, int mapId, int star, int clearTime);
 private:
 	unordered_map<int32_t, StageInfo> _stageCache;
 };

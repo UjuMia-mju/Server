@@ -55,21 +55,23 @@ enum : uint16
 	PKT_S_ENTER_GAME = 1046,
 	PKT_C_TEST_ENTER_GAME = 1047,
 	PKT_S_GAME_READY_TO_START = 1048,
-	PKT_C_MOVE = 1049,
-	PKT_S_MOVE = 1050,
-	PKT_S_PLAYER_LIST = 1051,
-	PKT_S_PLAYER_ENTER = 1052,
-	PKT_S_PLAYER_LEAVE = 1053,
-	PKT_C_PLAYER_ANIMATION = 1054,
-	PKT_S_PLAYER_ANIMATION = 1055,
-	PKT_C_PLAYER_STAT_EVENT = 1056,
-	PKT_S_PLAYER_STAT = 1057,
-	PKT_C_OBJECT_PICKUP = 1058,
-	PKT_S_OBJECT_PICKUP = 1059,
-	PKT_C_OBJECT_DROP = 1060,
-	PKT_S_OBJECT_DROP = 1061,
-	PKT_C_OBJECT_MOVE = 1062,
-	PKT_S_OBJECT_MOVE = 1063,
+	PKT_C_GAME_CLEAR = 1049,
+	PKT_S_GAME_CLEAR = 1050,
+	PKT_C_MOVE = 1051,
+	PKT_S_MOVE = 1052,
+	PKT_S_PLAYER_LIST = 1053,
+	PKT_S_PLAYER_ENTER = 1054,
+	PKT_S_PLAYER_LEAVE = 1055,
+	PKT_C_PLAYER_ANIMATION = 1056,
+	PKT_S_PLAYER_ANIMATION = 1057,
+	PKT_C_PLAYER_STAT_EVENT = 1058,
+	PKT_S_PLAYER_STAT = 1059,
+	PKT_C_OBJECT_PICKUP = 1060,
+	PKT_S_OBJECT_PICKUP = 1061,
+	PKT_C_OBJECT_DROP = 1062,
+	PKT_S_OBJECT_DROP = 1063,
+	PKT_C_OBJECT_MOVE = 1064,
+	PKT_S_OBJECT_MOVE = 1065,
 //  EXAMPLE:
 //	PKT_S_TEST = 1,
 //	PKT_S_LOGIN = 2,
@@ -104,6 +106,7 @@ bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pk
 bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_INFO& pkt);
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
 bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_READY_TO_START& pkt);
+bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt);
 bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
 bool Handle_S_PLAYER_LIST(PacketSessionRef& session, Protocol::S_PLAYER_LIST& pkt);
 bool Handle_S_PLAYER_ENTER(PacketSessionRef& session, Protocol::S_PLAYER_ENTER& pkt);
@@ -227,6 +230,10 @@ public:
 		GPacketHandler[PKT_S_GAME_READY_TO_START] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::S_GAME_READY_TO_START>(Handle_S_GAME_READY_TO_START, session, buffer, len);
+		};
+		GPacketHandler[PKT_S_GAME_CLEAR] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_GAME_CLEAR>(Handle_S_GAME_CLEAR, session, buffer, len);
 		};
 		GPacketHandler[PKT_S_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
@@ -362,6 +369,10 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::C_TEST_ENTER_GAME& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_C_TEST_ENTER_GAME);
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::C_GAME_CLEAR& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_C_GAME_CLEAR);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::C_MOVE& pkt)
 	{

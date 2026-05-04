@@ -34,6 +34,7 @@ public:
 	void SendHostStageSelect(int32 map_id);
 	void SendStartStage(int32 map_id);
 	void SendStageEnter();
+	void SendStageClear(int32 map_id, int32 star, int32 clearTime);
 
 private:
 	string _email;
