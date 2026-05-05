@@ -15,12 +15,9 @@ void GameSession::OnDisconnected()
 
 	cout << "GameSession::OnDisconnected Call Player Leave Room" << endl;
 
-	if (_player)
+	if (auto roomRef = _room.lock())
 	{
-		if (auto room = _room.lock())
-		{
-			room->DoAsync(&Room::LeaveGame, _player);
-		}
+		roomRef->DoAsync(&Room::LeaveLobby, _player);
 	}
 
 	_player = nullptr;

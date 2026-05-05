@@ -57,11 +57,11 @@ enum : uint16
 	PKT_S_GAME_READY_TO_START = 1048,
 	PKT_C_GAME_CLEAR = 1049,
 	PKT_S_GAME_CLEAR = 1050,
-	PKT_C_MOVE = 1051,
-	PKT_S_MOVE = 1052,
-	PKT_S_PLAYER_LIST = 1053,
-	PKT_S_PLAYER_ENTER = 1054,
-	PKT_S_PLAYER_LEAVE = 1055,
+	PKT_S_ROOM_DESTROY = 1051,
+	PKT_C_MOVE = 1052,
+	PKT_S_MOVE = 1053,
+	PKT_S_PLAYER_LIST = 1054,
+	PKT_S_PLAYER_ENTER = 1055,
 	PKT_C_PLAYER_ANIMATION = 1056,
 	PKT_S_PLAYER_ANIMATION = 1057,
 	PKT_C_PLAYER_STAT_EVENT = 1058,
@@ -358,6 +358,10 @@ public:
 	{
 		return MakeSendBuffer(pkt, PKT_S_GAME_CLEAR);
 	}
+	static SendBufferRef MakeSendBuffer(Protocol::S_ROOM_DESTROY& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_S_ROOM_DESTROY);
+	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_MOVE& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_S_MOVE);
@@ -369,10 +373,6 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_PLAYER_ENTER& pkt)
 	{
 		return MakeSendBuffer(pkt, PKT_S_PLAYER_ENTER);
-	}
-	static SendBufferRef MakeSendBuffer(Protocol::S_PLAYER_LEAVE& pkt)
-	{
-		return MakeSendBuffer(pkt, PKT_S_PLAYER_LEAVE);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_PLAYER_ANIMATION& pkt)
 	{

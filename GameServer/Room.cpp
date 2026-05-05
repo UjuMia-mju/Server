@@ -45,44 +45,66 @@ void Room::EnterLobby(PlayerRef player)
 
 void Room::LeaveLobby(PlayerRef player)
 {
-	Protocol::S_ROOM_MEMBER_LEAVE leavePkt;
-	vector<GameSessionRef> targetSessions; // Send를 날릴 타겟들을 수집할 바구니
+	vector<GameSessionRef> targetSessions;
+	SendBufferRef sendBuffer = nullptr;
+	bool isDestroyed = false;
 
-	// 1. 데이터 변경 및 "누구한테 보낼지" 캡처를 위한 타이트한 락 스코프
 	{
 		WRITE_LOCK;
-		_players.erase(player->playerId);
-		_readyStatus.erase(player->playerId);
 
-		leavePkt.set_player_id(player->playerId);
-		leavePkt.set_player_name(player->name);
+		// 1. 방장인지 확인 (방장이 나가는 경우)
+		if (_ownerId == player->playerId)
+		{
+			isDestroyed = true;
 
-		if (_ownerId == player->playerId && !_players.empty())
-		{
-			_ownerId = _players.begin()->first;
-			leavePkt.set_new_owner_id(_ownerId);
+			Protocol::S_ROOM_DESTROY destroyPkt;
+			destroyPkt.set_room_id(_roomId);
+			sendBuffer = ClientPacketHandler::MakeSendBuffer(destroyPkt);
+
+			// 현재 방에 남은 모든 사람에게 보낼 세션 수집
+			for (auto& p : _players)
+			{
+				if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
+					targetSessions.push_back(session);
+			}
 		}
-		else if (_players.empty())
-		{
-			RoomManager::Instance().RemoveRoom(_roomId);
-		}
+		// 2. 일반 유저가 나가는 경우
 		else
 		{
-			leavePkt.set_new_owner_id(0);
-		}
+			_players.erase(player->playerId);
+			_readyStatus.erase(player->playerId);
 
-		// 현재 남은 사람들의 세션을 복사해둔다.
-		for (auto& p : _players)
-		{
-			if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
-				targetSessions.push_back(session);
+			Protocol::S_ROOM_MEMBER_LEAVE leavePkt;
+			leavePkt.set_player_id(player->playerId);
+			leavePkt.set_player_name(player->name);
+			sendBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
+
+			// 남은 사람들에게만 전송하기 위해 세션 수집
+			for (auto& p : _players)
+			{
+				if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
+					targetSessions.push_back(session);
+			}
 		}
 	}
 
-	auto leaveBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
-	Broadcast(leaveBuffer);
+	// 락 밖에서 안전하게 패킷 전송
+	if (sendBuffer)
+	{
+		for (auto& session : targetSessions)
+			session->Send(sendBuffer);
+	}
 
-	std::cout << "Player " << player->name << " left lobby room " << _roomId << endl;
+	// 방이 파괴되었다면 매니저에서 제거
+	if (isDestroyed)
+	{
+		std::cout << "Room " << _roomId << " destroyed by owner exit." << endl;
+		RoomManager::Instance().RemoveRoom(_roomId);
+	}
+	else
+	{
+		std::cout << "Player " << player->name << " left lobby room " << _roomId << endl;
+	}
 }
 
 void Room::SetReady(uint64 playerId, bool isReady)
@@ -262,29 +284,6 @@ void Room::EnterGame(PlayerRef player)
 
 		auto readyStartBuffer = ClientPacketHandler::MakeSendBuffer(readyStartPkt);
 		Broadcast(readyStartBuffer);
-	}
-}
-
-void Room::LeaveGame(PlayerRef player)
-{
-	{
-		WRITE_LOCK;
-		_players.erase(player->playerId);
-	}
-
-	// 퇴장 알림
-	Protocol::S_PLAYER_LEAVE leavePkt;
-	auto leavePlayerInfo = leavePkt.mutable_player();
-	leavePlayerInfo->set_player_id(player->playerId);
-	auto leaveBuffer = ClientPacketHandler::MakeSendBuffer(leavePkt);
-
-	for (auto& p : _players)
-	{
-		GameSessionRef session = static_pointer_cast<GameSession>(p.second->ownerSession.lock());
-		if (session != nullptr)
-		{
-			session->Send(leaveBuffer);
-		}
 	}
 }
 

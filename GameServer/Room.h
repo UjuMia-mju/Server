@@ -22,7 +22,6 @@ public:
 
 	// ========== 게임 플레이 관련(실제 이동하는 씬) ==========
 	void EnterGame(PlayerRef player);       // 게임 입장 (위치 동기화)
-	void LeaveGame(PlayerRef player);       // 게임 퇴장
 
 	// ========== 브로드케스트(공통) ==========
 	void Broadcast(SendBufferRef sendBuffer);

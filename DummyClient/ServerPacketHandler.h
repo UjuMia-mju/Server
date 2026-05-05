@@ -57,11 +57,11 @@ enum : uint16
 	PKT_S_GAME_READY_TO_START = 1048,
 	PKT_C_GAME_CLEAR = 1049,
 	PKT_S_GAME_CLEAR = 1050,
-	PKT_C_MOVE = 1051,
-	PKT_S_MOVE = 1052,
-	PKT_S_PLAYER_LIST = 1053,
-	PKT_S_PLAYER_ENTER = 1054,
-	PKT_S_PLAYER_LEAVE = 1055,
+	PKT_S_ROOM_DESTROY = 1051,
+	PKT_C_MOVE = 1052,
+	PKT_S_MOVE = 1053,
+	PKT_S_PLAYER_LIST = 1054,
+	PKT_S_PLAYER_ENTER = 1055,
 	PKT_C_PLAYER_ANIMATION = 1056,
 	PKT_S_PLAYER_ANIMATION = 1057,
 	PKT_C_PLAYER_STAT_EVENT = 1058,
@@ -107,10 +107,10 @@ bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_IN
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
 bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_READY_TO_START& pkt);
 bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt);
+bool Handle_S_ROOM_DESTROY(PacketSessionRef& session, Protocol::S_ROOM_DESTROY& pkt);
 bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
 bool Handle_S_PLAYER_LIST(PacketSessionRef& session, Protocol::S_PLAYER_LIST& pkt);
 bool Handle_S_PLAYER_ENTER(PacketSessionRef& session, Protocol::S_PLAYER_ENTER& pkt);
-bool Handle_S_PLAYER_LEAVE(PacketSessionRef& session, Protocol::S_PLAYER_LEAVE& pkt);
 bool Handle_S_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::S_PLAYER_ANIMATION& pkt);
 bool Handle_S_PLAYER_STAT(PacketSessionRef& session, Protocol::S_PLAYER_STAT& pkt);
 bool Handle_S_OBJECT_PICKUP(PacketSessionRef& session, Protocol::S_OBJECT_PICKUP& pkt);
@@ -235,6 +235,10 @@ public:
 		{
 			return HandlePacket<Protocol::S_GAME_CLEAR>(Handle_S_GAME_CLEAR, session, buffer, len);
 		};
+		GPacketHandler[PKT_S_ROOM_DESTROY] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
+		{
+			return HandlePacket<Protocol::S_ROOM_DESTROY>(Handle_S_ROOM_DESTROY, session, buffer, len);
+		};
 		GPacketHandler[PKT_S_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::S_MOVE>(Handle_S_MOVE, session, buffer, len);
@@ -246,10 +250,6 @@ public:
 		GPacketHandler[PKT_S_PLAYER_ENTER] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
 			return HandlePacket<Protocol::S_PLAYER_ENTER>(Handle_S_PLAYER_ENTER, session, buffer, len);
-		};
-		GPacketHandler[PKT_S_PLAYER_LEAVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
-		{
-			return HandlePacket<Protocol::S_PLAYER_LEAVE>(Handle_S_PLAYER_LEAVE, session, buffer, len);
 		};
 		GPacketHandler[PKT_S_PLAYER_ANIMATION] = [](PacketSessionRef& session, BYTE* buffer, int32 len)
 		{
