@@ -15,7 +15,7 @@ public:
 	virtual void OnConnected() override
 	{
 		_connected = true;
-		cout << "[Admin] Thread Loop StAart!!!!!!!!!!!!!!!!!!!!!!." << endl;
+		cout << "[Admin] Thread Loop start" << endl;
 		// 목적을 달성하고 바로 끊는 부분(Disconnect) 삭제
 		auto self = static_pointer_cast<AdminSession>(shared_from_this());
 
@@ -62,8 +62,6 @@ public:
 			"|" + to_string(roomCount) +
 			"|" + to_string(inPPS) +
 			"|" + to_string(outPPS);
-
-		cout << "Generated Status: " << status << endl; // Send 호출 전에 출력이 되는지 확인
 
 		// 데이터 전송
 		SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
