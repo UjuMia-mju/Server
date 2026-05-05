@@ -246,6 +246,8 @@ public:
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+		g_inboundPacketCount.fetch_add(1);
+
 		return GPacketHandler[header->id](session, buffer, len);
 	}
 	static SendBufferRef MakeSendBuffer(Protocol::S_RELAY_PACKET& pkt)
@@ -418,6 +420,7 @@ private:
 		header->id = pktId;
 
 		ASSERT_CRASH(pkt.SerializeToArray(&header[1], dataSize));
+		g_outboundPacketCount.fetch_add(1);
 
 		sendBuffer->Close(packetSize);
 

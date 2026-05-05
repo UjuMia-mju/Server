@@ -20,6 +20,12 @@ public:
 	void RemoveRoom(uint64 roomId);
 	RoomRef FindRoom(uint64 roomId);
 
+	int RoomCount()
+	{
+		READ_LOCK;
+		return static_cast<int>(_rooms.size());
+	}
+
 private:
 	USE_LOCK;
 	unordered_map<uint64, RoomRef> _rooms;
