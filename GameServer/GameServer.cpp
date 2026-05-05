@@ -42,7 +42,7 @@ void DoWorkerJob(ServerServiceRef& service)
 int main()
 {
 	::SetConsoleOutputCP(CP_UTF8);
-	cout << "Game Server Start! - git action CI/CD - light sail HI!!!!!" << endl;
+	cout << "Game Server Start! - git action CI/CD - ip change" << endl;
 
 	// Config 파일 로드
 	WCHAR exePath[MAX_PATH];
@@ -95,7 +95,7 @@ int main()
 
 	// --- 추가: WPF 툴 전용 서비스 (9000번 포트) ---
 	ServerServiceRef adminService = MakeShared<ServerService>(
-		NetAddress(serverIP, 9000), // 혹은 Config에서 가져오기
+		NetAddress(serverIP, 9000),
 		service->GetIocpCore(),        // 기존 IOCP Core 재사용 가능
 		MakeShared<AdminSession>,      // 관리자 전용 세션 사용
 		10                             // 관리자용은 소수면 충분
