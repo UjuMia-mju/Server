@@ -781,6 +781,19 @@ struct S_PLAYER_ENTERDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_PLAYER_ENTERDefaultTypeInternal _S_PLAYER_ENTER_default_instance_;
+PROTOBUF_CONSTEXPR S_PLAYER_LEAVE::S_PLAYER_LEAVE(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.player_)*/nullptr
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct S_PLAYER_LEAVEDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR S_PLAYER_LEAVEDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~S_PLAYER_LEAVEDefaultTypeInternal() {}
+  union {
+    S_PLAYER_LEAVE _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_PLAYER_LEAVEDefaultTypeInternal _S_PLAYER_LEAVE_default_instance_;
 PROTOBUF_CONSTEXPR C_PLAYER_ANIMATION::C_PLAYER_ANIMATION(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.state_)*/0
@@ -926,7 +939,7 @@ struct S_OBJECT_MOVEDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_OBJECT_MOVEDefaultTypeInternal _S_OBJECT_MOVE_default_instance_;
 }  // namespace Protocol
-static ::_pb::Metadata file_level_metadata_Protocol_2eproto[66];
+static ::_pb::Metadata file_level_metadata_Protocol_2eproto[67];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_Protocol_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Protocol_2eproto = nullptr;
 
@@ -1366,6 +1379,13 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S_PLAYER_ENTER, _impl_.player_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_PLAYER_LEAVE, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_PLAYER_LEAVE, _impl_.player_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::C_PLAYER_ANIMATION, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -1510,16 +1530,17 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 411, -1, -1, sizeof(::Protocol::S_MOVE)},
   { 420, -1, -1, sizeof(::Protocol::S_PLAYER_LIST)},
   { 427, -1, -1, sizeof(::Protocol::S_PLAYER_ENTER)},
-  { 434, -1, -1, sizeof(::Protocol::C_PLAYER_ANIMATION)},
-  { 441, -1, -1, sizeof(::Protocol::S_PLAYER_ANIMATION)},
-  { 449, -1, -1, sizeof(::Protocol::C_PLAYER_STAT_EVENT)},
-  { 462, -1, -1, sizeof(::Protocol::S_PLAYER_STAT)},
-  { 471, -1, -1, sizeof(::Protocol::C_OBJECT_PICKUP)},
-  { 478, -1, -1, sizeof(::Protocol::S_OBJECT_PICKUP)},
-  { 488, -1, -1, sizeof(::Protocol::C_OBJECT_DROP)},
-  { 495, -1, -1, sizeof(::Protocol::S_OBJECT_DROP)},
-  { 503, -1, -1, sizeof(::Protocol::C_OBJECT_MOVE)},
-  { 512, -1, -1, sizeof(::Protocol::S_OBJECT_MOVE)},
+  { 434, -1, -1, sizeof(::Protocol::S_PLAYER_LEAVE)},
+  { 441, -1, -1, sizeof(::Protocol::C_PLAYER_ANIMATION)},
+  { 448, -1, -1, sizeof(::Protocol::S_PLAYER_ANIMATION)},
+  { 456, -1, -1, sizeof(::Protocol::C_PLAYER_STAT_EVENT)},
+  { 469, -1, -1, sizeof(::Protocol::S_PLAYER_STAT)},
+  { 478, -1, -1, sizeof(::Protocol::C_OBJECT_PICKUP)},
+  { 485, -1, -1, sizeof(::Protocol::S_OBJECT_PICKUP)},
+  { 495, -1, -1, sizeof(::Protocol::C_OBJECT_DROP)},
+  { 502, -1, -1, sizeof(::Protocol::S_OBJECT_DROP)},
+  { 510, -1, -1, sizeof(::Protocol::C_OBJECT_MOVE)},
+  { 519, -1, -1, sizeof(::Protocol::S_OBJECT_MOVE)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -1579,6 +1600,7 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::Protocol::_S_MOVE_default_instance_._instance,
   &::Protocol::_S_PLAYER_LIST_default_instance_._instance,
   &::Protocol::_S_PLAYER_ENTER_default_instance_._instance,
+  &::Protocol::_S_PLAYER_LEAVE_default_instance_._instance,
   &::Protocol::_C_PLAYER_ANIMATION_default_instance_._instance,
   &::Protocol::_S_PLAYER_ANIMATION_default_instance_._instance,
   &::Protocol::_C_PLAYER_STAT_EVENT_default_instance_._instance,
@@ -1674,31 +1696,33 @@ const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABL
   "\":\n\rS_PLAYER_LIST\022)\n\007players\030\001 \003(\0132\030.Pro"
   "tocol.PlayerGameInfo\":\n\016S_PLAYER_ENTER\022("
   "\n\006player\030\001 \001(\0132\030.Protocol.PlayerGameInfo"
-  "\"#\n\022C_PLAYER_ANIMATION\022\r\n\005state\030\001 \001(\005\"5\n"
-  "\022S_PLAYER_ANIMATION\022\020\n\010playerId\030\001 \001(\004\022\r\n"
-  "\005state\030\002 \001(\005\"\235\002\n\023C_PLAYER_STAT_EVENT\022\030\n\020"
-  "target_player_id\030\001 \001(\004\022+\n\nevent_type\030\002 \001"
-  "(\0162\027.Protocol.StatEventType\022+\n\006damage\030\n "
-  "\001(\0132\031.Protocol.DamageEventDataH\000\022\'\n\004heal"
-  "\030\013 \001(\0132\027.Protocol.HealEventDataH\000\022.\n\010ite"
-  "m_use\030\014 \001(\0132\032.Protocol.ItemUseEventDataH"
-  "\000\022+\n\006oxygen\030\r \001(\0132\031.Protocol.OxygenEvent"
-  "DataH\000B\014\n\nevent_data\"=\n\rS_PLAYER_STAT\022\020\n"
-  "\010playerId\030\001 \001(\004\022\n\n\002hp\030\002 \001(\005\022\016\n\006oxygen\030\003 "
-  "\001(\002\"8\n\017C_OBJECT_PICKUP\022%\n\tobject_id\030\001 \001("
-  "\0132\022.Protocol.ObjectId\"o\n\017S_OBJECT_PICKUP"
-  "\022\017\n\007success\030\001 \001(\010\022%\n\tobject_id\030\002 \001(\0132\022.P"
-  "rotocol.ObjectId\022\021\n\tplayer_id\030\003 \001(\004\022\021\n\te"
-  "rror_msg\030\004 \001(\t\"6\n\rC_OBJECT_DROP\022%\n\tobjec"
-  "t_id\030\001 \001(\0132\022.Protocol.ObjectId\"I\n\rS_OBJE"
-  "CT_DROP\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.Ob"
-  "jectId\022\021\n\tplayer_id\030\002 \001(\004\"v\n\rC_OBJECT_MO"
-  "VE\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.ObjectI"
-  "d\022\036\n\003pos\030\002 \001(\0132\021.Protocol.PosInfo\022\036\n\003rot"
-  "\030\003 \001(\0132\021.Protocol.RotInfo\"v\n\rS_OBJECT_MO"
-  "VE\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.ObjectI"
-  "d\022\036\n\003pos\030\002 \001(\0132\021.Protocol.PosInfo\022\036\n\003rot"
-  "\030\003 \001(\0132\021.Protocol.RotInfob\006proto3"
+  "\":\n\016S_PLAYER_LEAVE\022(\n\006player\030\001 \001(\0132\030.Pro"
+  "tocol.PlayerGameInfo\"#\n\022C_PLAYER_ANIMATI"
+  "ON\022\r\n\005state\030\001 \001(\005\"5\n\022S_PLAYER_ANIMATION\022"
+  "\020\n\010playerId\030\001 \001(\004\022\r\n\005state\030\002 \001(\005\"\235\002\n\023C_P"
+  "LAYER_STAT_EVENT\022\030\n\020target_player_id\030\001 \001"
+  "(\004\022+\n\nevent_type\030\002 \001(\0162\027.Protocol.StatEv"
+  "entType\022+\n\006damage\030\n \001(\0132\031.Protocol.Damag"
+  "eEventDataH\000\022\'\n\004heal\030\013 \001(\0132\027.Protocol.He"
+  "alEventDataH\000\022.\n\010item_use\030\014 \001(\0132\032.Protoc"
+  "ol.ItemUseEventDataH\000\022+\n\006oxygen\030\r \001(\0132\031."
+  "Protocol.OxygenEventDataH\000B\014\n\nevent_data"
+  "\"=\n\rS_PLAYER_STAT\022\020\n\010playerId\030\001 \001(\004\022\n\n\002h"
+  "p\030\002 \001(\005\022\016\n\006oxygen\030\003 \001(\002\"8\n\017C_OBJECT_PICK"
+  "UP\022%\n\tobject_id\030\001 \001(\0132\022.Protocol.ObjectI"
+  "d\"o\n\017S_OBJECT_PICKUP\022\017\n\007success\030\001 \001(\010\022%\n"
+  "\tobject_id\030\002 \001(\0132\022.Protocol.ObjectId\022\021\n\t"
+  "player_id\030\003 \001(\004\022\021\n\terror_msg\030\004 \001(\t\"6\n\rC_"
+  "OBJECT_DROP\022%\n\tobject_id\030\001 \001(\0132\022.Protoco"
+  "l.ObjectId\"I\n\rS_OBJECT_DROP\022%\n\tobject_id"
+  "\030\001 \001(\0132\022.Protocol.ObjectId\022\021\n\tplayer_id\030"
+  "\002 \001(\004\"v\n\rC_OBJECT_MOVE\022%\n\tobject_id\030\001 \001("
+  "\0132\022.Protocol.ObjectId\022\036\n\003pos\030\002 \001(\0132\021.Pro"
+  "tocol.PosInfo\022\036\n\003rot\030\003 \001(\0132\021.Protocol.Ro"
+  "tInfo\"v\n\rS_OBJECT_MOVE\022%\n\tobject_id\030\001 \001("
+  "\0132\022.Protocol.ObjectId\022\036\n\003pos\030\002 \001(\0132\021.Pro"
+  "tocol.PosInfo\022\036\n\003rot\030\003 \001(\0132\021.Protocol.Ro"
+  "tInfob\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -1706,9 +1730,9 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Protocol_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Protocol_2eproto = {
-    false, false, 4273, descriptor_table_protodef_Protocol_2eproto,
+    false, false, 4333, descriptor_table_protodef_Protocol_2eproto,
     "Protocol.proto",
-    &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 66,
+    &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 67,
     schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
     file_level_metadata_Protocol_2eproto, file_level_enum_descriptors_Protocol_2eproto,
     file_level_service_descriptors_Protocol_2eproto,
@@ -12621,6 +12645,205 @@ void S_PLAYER_ENTER::InternalSwap(S_PLAYER_ENTER* other) {
 
 // ===================================================================
 
+class S_PLAYER_LEAVE::_Internal {
+ public:
+  static const ::Protocol::PlayerGameInfo& player(const S_PLAYER_LEAVE* msg);
+};
+
+const ::Protocol::PlayerGameInfo&
+S_PLAYER_LEAVE::_Internal::player(const S_PLAYER_LEAVE* msg) {
+  return *msg->_impl_.player_;
+}
+void S_PLAYER_LEAVE::clear_player() {
+  if (GetArenaForAllocation() == nullptr && _impl_.player_ != nullptr) {
+    delete _impl_.player_;
+  }
+  _impl_.player_ = nullptr;
+}
+S_PLAYER_LEAVE::S_PLAYER_LEAVE(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.S_PLAYER_LEAVE)
+}
+S_PLAYER_LEAVE::S_PLAYER_LEAVE(const S_PLAYER_LEAVE& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  S_PLAYER_LEAVE* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.player_){nullptr}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_player()) {
+    _this->_impl_.player_ = new ::Protocol::PlayerGameInfo(*from._impl_.player_);
+  }
+  // @@protoc_insertion_point(copy_constructor:Protocol.S_PLAYER_LEAVE)
+}
+
+inline void S_PLAYER_LEAVE::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.player_){nullptr}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+S_PLAYER_LEAVE::~S_PLAYER_LEAVE() {
+  // @@protoc_insertion_point(destructor:Protocol.S_PLAYER_LEAVE)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void S_PLAYER_LEAVE::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  if (this != internal_default_instance()) delete _impl_.player_;
+}
+
+void S_PLAYER_LEAVE::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void S_PLAYER_LEAVE::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.S_PLAYER_LEAVE)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArenaForAllocation() == nullptr && _impl_.player_ != nullptr) {
+    delete _impl_.player_;
+  }
+  _impl_.player_ = nullptr;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* S_PLAYER_LEAVE::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // .Protocol.PlayerGameInfo player = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_player(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* S_PLAYER_LEAVE::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.S_PLAYER_LEAVE)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .Protocol.PlayerGameInfo player = 1;
+  if (this->_internal_has_player()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, _Internal::player(this),
+        _Internal::player(this).GetCachedSize(), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.S_PLAYER_LEAVE)
+  return target;
+}
+
+size_t S_PLAYER_LEAVE::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.S_PLAYER_LEAVE)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .Protocol.PlayerGameInfo player = 1;
+  if (this->_internal_has_player()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.player_);
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S_PLAYER_LEAVE::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    S_PLAYER_LEAVE::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S_PLAYER_LEAVE::GetClassData() const { return &_class_data_; }
+
+
+void S_PLAYER_LEAVE::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<S_PLAYER_LEAVE*>(&to_msg);
+  auto& from = static_cast<const S_PLAYER_LEAVE&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.S_PLAYER_LEAVE)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_has_player()) {
+    _this->_internal_mutable_player()->::Protocol::PlayerGameInfo::MergeFrom(
+        from._internal_player());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void S_PLAYER_LEAVE::CopyFrom(const S_PLAYER_LEAVE& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.S_PLAYER_LEAVE)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool S_PLAYER_LEAVE::IsInitialized() const {
+  return true;
+}
+
+void S_PLAYER_LEAVE::InternalSwap(S_PLAYER_LEAVE* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_.player_, other->_impl_.player_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata S_PLAYER_LEAVE::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[56]);
+}
+
+// ===================================================================
+
 class C_PLAYER_ANIMATION::_Internal {
  public:
 };
@@ -12794,7 +13017,7 @@ void C_PLAYER_ANIMATION::InternalSwap(C_PLAYER_ANIMATION* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata C_PLAYER_ANIMATION::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[56]);
+      file_level_metadata_Protocol_2eproto[57]);
 }
 
 // ===================================================================
@@ -13005,7 +13228,7 @@ void S_PLAYER_ANIMATION::InternalSwap(S_PLAYER_ANIMATION* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata S_PLAYER_ANIMATION::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[57]);
+      file_level_metadata_Protocol_2eproto[58]);
 }
 
 // ===================================================================
@@ -13525,7 +13748,7 @@ void C_PLAYER_STAT_EVENT::InternalSwap(C_PLAYER_STAT_EVENT* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata C_PLAYER_STAT_EVENT::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[58]);
+      file_level_metadata_Protocol_2eproto[59]);
 }
 
 // ===================================================================
@@ -13772,7 +13995,7 @@ void S_PLAYER_STAT::InternalSwap(S_PLAYER_STAT* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata S_PLAYER_STAT::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[59]);
+      file_level_metadata_Protocol_2eproto[60]);
 }
 
 // ===================================================================
@@ -13971,7 +14194,7 @@ void C_OBJECT_PICKUP::InternalSwap(C_OBJECT_PICKUP* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata C_OBJECT_PICKUP::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[60]);
+      file_level_metadata_Protocol_2eproto[61]);
 }
 
 // ===================================================================
@@ -14281,7 +14504,7 @@ void S_OBJECT_PICKUP::InternalSwap(S_OBJECT_PICKUP* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata S_OBJECT_PICKUP::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[61]);
+      file_level_metadata_Protocol_2eproto[62]);
 }
 
 // ===================================================================
@@ -14480,7 +14703,7 @@ void C_OBJECT_DROP::InternalSwap(C_OBJECT_DROP* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata C_OBJECT_DROP::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[62]);
+      file_level_metadata_Protocol_2eproto[63]);
 }
 
 // ===================================================================
@@ -14710,7 +14933,7 @@ void S_OBJECT_DROP::InternalSwap(S_OBJECT_DROP* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata S_OBJECT_DROP::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[63]);
+      file_level_metadata_Protocol_2eproto[64]);
 }
 
 // ===================================================================
@@ -15008,7 +15231,7 @@ void C_OBJECT_MOVE::InternalSwap(C_OBJECT_MOVE* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata C_OBJECT_MOVE::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[64]);
+      file_level_metadata_Protocol_2eproto[65]);
 }
 
 // ===================================================================
@@ -15306,7 +15529,7 @@ void S_OBJECT_MOVE::InternalSwap(S_OBJECT_MOVE* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata S_OBJECT_MOVE::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
-      file_level_metadata_Protocol_2eproto[65]);
+      file_level_metadata_Protocol_2eproto[66]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -15535,6 +15758,10 @@ Arena::CreateMaybeMessage< ::Protocol::S_PLAYER_LIST >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::Protocol::S_PLAYER_ENTER*
 Arena::CreateMaybeMessage< ::Protocol::S_PLAYER_ENTER >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Protocol::S_PLAYER_ENTER >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::S_PLAYER_LEAVE*
+Arena::CreateMaybeMessage< ::Protocol::S_PLAYER_LEAVE >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::S_PLAYER_LEAVE >(arena);
 }
 template<> PROTOBUF_NOINLINE ::Protocol::C_PLAYER_ANIMATION*
 Arena::CreateMaybeMessage< ::Protocol::C_PLAYER_ANIMATION >(Arena* arena) {
