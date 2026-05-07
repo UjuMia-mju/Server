@@ -65,12 +65,21 @@ void Room::LeaveLobby(PlayerRef player)
 			for (auto& p : _players)
 			{
 				if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
+				{
 					targetSessions.push_back(session);
+					session->SetRoom(weak_ptr<Room>()); // 방이 파괴되므로 세션의 방 참조 초기화
+				}
+					
 			}
 		}
 		// 2. 일반 유저가 나가는 경우
 		else
 		{
+			if (auto session = static_pointer_cast<GameSession>(player->ownerSession.lock()))
+			{
+				session->SetRoom(weak_ptr<Room>());
+			}
+				
 			_players.erase(player->playerId);
 			_readyStatus.erase(player->playerId);
 
