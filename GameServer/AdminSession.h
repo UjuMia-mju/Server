@@ -16,6 +16,11 @@ public:
 	{
 		_connected = true;
 		cout << "[Admin] Thread Loop start" << endl;
+
+		// 1. 연결되는 순간 기존에 쌓였던 누적 통계치를 0으로 리셋 (첫 데이터 튐 방지)
+		g_inboundPacketCount.store(0);
+		g_outboundPacketCount.store(0);
+
 		// 목적을 달성하고 바로 끊는 부분(Disconnect) 삭제
 		auto self = static_pointer_cast<AdminSession>(shared_from_this());
 
@@ -67,9 +72,6 @@ public:
 		SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
 		memcpy(sendBuffer->Buffer(), status.c_str(), status.length());
 		sendBuffer->Close(status.length());
-
-		// 검사
-		cout << status << endl;
 
 		Send(sendBuffer);
 	}

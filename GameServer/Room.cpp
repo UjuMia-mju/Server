@@ -67,7 +67,6 @@ void Room::LeaveLobby(PlayerRef player)
 				if (auto session = static_pointer_cast<GameSession>(p.second->ownerSession.lock()))
 				{
 					targetSessions.push_back(session);
-					session->SetRoom(weak_ptr<Room>()); // 방이 파괴되므로 세션의 방 참조 초기화
 				}
 					
 			}
@@ -101,7 +100,11 @@ void Room::LeaveLobby(PlayerRef player)
 	if (sendBuffer)
 	{
 		for (auto& session : targetSessions)
+		{
 			session->Send(sendBuffer);
+			session->SetRoom(weak_ptr<Room>());
+		}
+			
 	}
 
 	// 방이 파괴되었다면 매니저에서 제거
