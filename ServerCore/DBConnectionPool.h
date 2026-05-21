@@ -12,7 +12,7 @@ public:
 
 	DBConnection*	Pop(uint32 timeoutMs = 5000);
 	void			Push(DBConnection* connection);
-
+	void			HandleKeepAlive();
 private:
 	USE_LOCK;
 	SQLHENV					_env = SQL_NULL_HANDLE;

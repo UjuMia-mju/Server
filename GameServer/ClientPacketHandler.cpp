@@ -285,7 +285,7 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 	if (playerInfo == nullptr)
 	{
 		// 인증은 되었지만 플레이어 정보가 없는 경우 (예: DB 오류)
-		cout << "[GACHA LOG] 플레이어 정보가 없습니다. 가챠를 진행할 수 없습니다." << std::endl;
+		cout << "[GACHA LOG] no player INFO" << std::endl;
 		return false;
 	}
 	int32 obtainedSkinId = 0;
@@ -304,7 +304,7 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 	if (isSuccess)
 	{
-		std::cout << "[GACHA LOG] 가챠 성공! 획득한 스킨 ID = " << obtainedSkinId << std::endl;
+		std::cout << "[GACHA LOG] Get Skin = " << obtainedSkinId << std::endl;
 		Protocol::GachaResult* result = resPkt.mutable_result();
 
 		int32 gemAfter = playerInfo->GetGem();
