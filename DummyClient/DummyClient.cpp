@@ -94,62 +94,66 @@ int main()
 
 				cout << "[Step 1] Both players logged in successfully!\n" << endl;
 
-				// 2. Player1 방 생성
-				cout << "[Step 2 - 1] Player1 creating room..." << endl;
-				player1Session->SendCreateRoom();
-				this_thread::sleep_for(2s); // 방 생성 대기
-				cout << "[Step 2 - 2] Room created!\n" << endl;
-
-				// 3. Player1이 Player2 초대
-				cout << "[Step 3] Player1 inviting Player2..." << endl;
-				cout << "Target: " << player2Session->GetPlayerName()
-					<< "#" << player2Session->GetPlayerTag() << endl;
-
-				player1Session->SendInvitePacket(
-					player2Session->GetPlayerName(),
-					player2Session->GetPlayerTag()
-				);
-				this_thread::sleep_for(2s); // 초대 처리 대기
-				cout << "[Step 3] Invitation success!\n" << endl;
-
-				cout << "[Step 4] Both players getting ready..." << endl;
-				player1Session->SendReady(true);
-				this_thread::sleep_for(500ms);
-				player2Session->SendReady(true);
-				this_thread::sleep_for(1s);
-				cout << "[Step 5] Both players are ready!\n" << endl;
-
-				// 6. 방장(Player1)이 게임 시작
-
+				// 뽑기
 				this_thread::sleep_for(2s);
-				cout << "[Step 6] Player1 (room owner) starting game..." << endl;
-				player1Session->SendStartRoom();
-				this_thread::sleep_for(2s); // 게임 시작 대기
-				cout << "[Step 6] Game started!\n" << endl;
+				player1Session->SendGacha();
 
-				// 7. 둘다 같은 스테이지 정보 받는지 확인
-				//cout << "[Step 7] Requesting stage info for both players..." << endl;
-				//player1Session->SendShowStage(1, 1); // Stage 1-1
+				//// 2. Player1 방 생성
+				//cout << "[Step 2 - 1] Player1 creating room..." << endl;
+				//player1Session->SendCreateRoom();
+				//this_thread::sleep_for(2s); // 방 생성 대기
+				//cout << "[Step 2 - 2] Room created!\n" << endl;
+
+				//// 3. Player1이 Player2 초대
+				//cout << "[Step 3] Player1 inviting Player2..." << endl;
+				//cout << "Target: " << player2Session->GetPlayerName()
+				//	<< "#" << player2Session->GetPlayerTag() << endl;
+
+				//player1Session->SendInvitePacket(
+				//	player2Session->GetPlayerName(),
+				//	player2Session->GetPlayerTag()
+				//);
+				//this_thread::sleep_for(2s); // 초대 처리 대기
+				//cout << "[Step 3] Invitation success!\n" << endl;
+
+				//cout << "[Step 4] Both players getting ready..." << endl;
+				//player1Session->SendReady(true);
 				//this_thread::sleep_for(500ms);
-				//player2Session->SendShowStage(1, 1); // Stage 1-1
+				//player2Session->SendReady(true);
+				//this_thread::sleep_for(1s);
+				//cout << "[Step 5] Both players are ready!\n" << endl;
+
+				//// 6. 방장(Player1)이 게임 시작
+
 				//this_thread::sleep_for(2s);
-				//cout << "[Step 7] Stage info received (check above logs)\n" << endl;
+				//cout << "[Step 6] Player1 (room owner) starting game..." << endl;
+				//player1Session->SendStartRoom();
+				//this_thread::sleep_for(2s); // 게임 시작 대기
+				//cout << "[Step 6] Game started!\n" << endl;
+
+				//// 7. 둘다 같은 스테이지 정보 받는지 확인
+				////cout << "[Step 7] Requesting stage info for both players..." << endl;
+				////player1Session->SendShowStage(1, 1); // Stage 1-1
+				////this_thread::sleep_for(500ms);
+				////player2Session->SendShowStage(1, 1); // Stage 1-1
+				////this_thread::sleep_for(2s);
+				////cout << "[Step 7] Stage info received (check above logs)\n" << endl;
 
 
-				//8. 호스트가 선택하는 맵이 게스트한테도 똑같이 보이는지 확인
-				this_thread::sleep_for(2s);
+				////8. 호스트가 선택하는 맵이 게스트한테도 똑같이 보이는지 확인
+				//this_thread::sleep_for(2s);
 
-				player1Session->SendHostStageSelect(1);
+				//player1Session->SendHostStageSelect(1);
 
-				this_thread::sleep_for(2s);
+				//this_thread::sleep_for(2s);
 
-				player1Session->SendHostStageSelect(2);
+				//player1Session->SendHostStageSelect(2);
 
-				this_thread::sleep_for(2s);
-				// 스테이지 클리어 정보
-				player1Session->SendStageClear(1, 3, 3);
+				//this_thread::sleep_for(2s);
+				//// 스테이지 클리어 정보
+				//player1Session->SendStageClear(1, 3, 3);
 
-				cout << "\n========== Test Scenario Complete ==========\n" << endl;
+				//cout << "\n========== Test Scenario Complete ==========\n" << endl;
 			});
 
 		GThreadManager->Join();
@@ -165,6 +169,8 @@ int main()
 	//}
 
 }
+
+// 뽑기 테스트
 
 // =========================================================
 // [스트레스 테스트] 100명의 더미 클라이언트를 생성하여 반복 행동 수행

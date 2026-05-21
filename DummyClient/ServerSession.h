@@ -31,6 +31,7 @@ public:
 	void SendStageData(int32 map_id, int32 chapter, int32 stageIndex);
 	void SendMyClearStageData();
 	void SendGachaPool();
+	void SendGacha();
 	void SendHostStageSelect(int32 map_id);
 	void SendStartStage(int32 map_id);
 	void SendStageEnter();

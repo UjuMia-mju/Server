@@ -140,6 +140,15 @@ void ServerSession::SendGachaPool()
 	Send(sendBuffer);
 }
 
+void ServerSession::SendGacha()
+{
+	Protocol::C_GACHA pkt;
+	pkt.set_pool_id(1); // Example pool ID, adjust as needed
+	pkt.set_pull_count(1); // Example pull count, adjust as needed
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendHostStageSelect(int32 map_id)
 {
 	Protocol::C_HOST_SHOW_STAGE pkt;

@@ -427,6 +427,11 @@ bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt)
 	return true;
 }
 
+bool Handle_S_ROOM_DESTROY(PacketSessionRef& session, Protocol::S_ROOM_DESTROY& pkt)
+{
+	return true;
+}
+
 bool Handle_S_STAGE_INFO(PacketSessionRef& session, Protocol::S_STAGE_INFO& pkt)
 {
 	cout << "\n========== Stage Info ==========" << endl;
