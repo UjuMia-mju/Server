@@ -72,6 +72,11 @@ void Room::LeaveLobby(PlayerRef player)
 
 			_players.clear();
 			_readyStatus.clear();
+
+			if (auto session = static_pointer_cast<GameSession>(player->ownerSession.lock()))
+			{
+				session->SetRoom(weak_ptr<Room>());
+			}
 		}
 		// 2. 일반 유저가 나가는 경우
 		else
