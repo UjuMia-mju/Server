@@ -68,8 +68,10 @@ void Room::LeaveLobby(PlayerRef player)
 				{
 					targetSessions.push_back(session);
 				}
-					
 			}
+
+			_players.clear();
+			_readyStatus.clear();
 		}
 		// 2. 일반 유저가 나가는 경우
 		else
@@ -102,9 +104,12 @@ void Room::LeaveLobby(PlayerRef player)
 		for (auto& session : targetSessions)
 		{
 			session->Send(sendBuffer);
-			session->SetRoom(weak_ptr<Room>());
+
+			if (isDestroyed)
+			{
+				session->SetRoom(weak_ptr<Room>());
+			}
 		}
-			
 	}
 
 	// 방이 파괴되었다면 매니저에서 제거
