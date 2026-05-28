@@ -14,6 +14,11 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 	return true;
 }
 
+bool Handle_S_RELAY_PACKET(PacketSessionRef& session, Protocol::S_RELAY_PACKET& pkt)
+{
+	return true;
+}
+
 bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 {	
 	if (pkt.success() == false)
@@ -48,6 +53,11 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_S_GET_CURRENCY(PacketSessionRef& session, Protocol::S_GET_CURRENCY& pkt)
+{
+	return false;
+}
+
 bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 {
 	if (pkt.success())
@@ -79,7 +89,6 @@ bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 
 bool Handle_S_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::S_GACHA_POOL_LIST& pkt)
 {
-
 	cout << "\n========== Gacha Pools ==========" << endl;
 	
 	if (pkt.pools_size() == 0)
@@ -207,7 +216,14 @@ bool Handle_S_ENTER_ROOM(PacketSessionRef& session, Protocol::S_ENTER_ROOM& pkt)
 
 bool Handle_S_LEAVE_ROOM(PacketSessionRef& session, Protocol::S_LEAVE_ROOM& pkt)
 {
-	return false;
+	if (!pkt.success())
+	{
+		cout << "[Client] Leave room failed: " << endl;
+		return false;
+	}
+
+	cout << "[Client] Successfully left the room" << endl;
+	return true;
 }
 
 bool Handle_S_INVITE_PLAYER(PacketSessionRef& session, Protocol::S_INVITE_PLAYER& pkt)
@@ -280,9 +296,27 @@ bool Handle_S_START_ROOM(PacketSessionRef& session, Protocol::S_START_ROOM& pkt)
 {
 	if (!pkt.success())
 	{
-		cout << "[Client] Start room failed: " << pkt.error_msg() << endl;
+		cout << "[Client] Start room failed123123: " << pkt.error_msg() << endl;
 		return false;
 	}
+
+	// 호스트의 클리어 스테이지 정보 출력
+	cout << "\n========Host Clear Stages===========:" << endl;
+	if (pkt.host_clear_stages_size() > 0)
+	{
+		for (int i = 0; i < pkt.host_clear_stages_size(); i++)
+		{
+			const auto& clearInfo = pkt.host_clear_stages(i);
+			cout << "  - Stage " << clearInfo.map_id()
+				<< " | Stars: " << clearInfo.star()
+				<< " | Clear Time: " << clearInfo.clear_time() << endl;
+		}
+	}
+	else
+	{
+		cout << "  No stages cleared yet." << endl;
+	}
+
 	Protocol::C_ENTER_GAME enterGamePkt;
 	enterGamePkt.set_playerindex(0);
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
@@ -306,9 +340,25 @@ bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt)
 	return true;
 }
 
+bool Handle_S_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::S_HOST_SHOW_STAGE& pkt)
+{
+	cout << "\n========== Host Stage Info ==========" << endl;
+	auto stageInfo = pkt.stage();
+	cout << "Map ID: " << stageInfo.map_id() << "-" << stageInfo.stage_name() << "-" << stageInfo.description() << endl;
+
+	return true;
+}
+
 bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pkt)
 {
-	return false;
+	if (!pkt.success())
+	{
+		cout << "[Client] Failed to start stage: " << endl;
+		return false;
+	}
+
+	cout << "[Client] Stage started successfully!" << endl;
+	return true;
 }
 
 bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_INFO& pkt)
@@ -336,6 +386,48 @@ bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_IN
 }
 
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
+{
+	if (!pkt.success())
+	{
+		cout << "[Client] Enter game failed!" << endl;
+		return false;
+	}
+
+	cout << "\n========== [ENTER GAME] ==========" << endl;
+	cout << "Current Players in Game: " << pkt.players_size() << endl;
+
+	for (int i = 0; i < pkt.players_size(); ++i)
+	{
+		const auto& p = pkt.players(i);
+		cout << "  - [" << p.player_id() << "] " << p.name()
+			<< " | Pos: (" << p.pos().x() << ", " << p.pos().y() << ", " << p.pos().z() << ")" << endl;
+	}
+	cout << "==================================" << endl;
+
+	return true;
+}
+
+bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_READY_TO_START& pkt)
+{
+	int time = pkt.start_delay_seconds();	
+	cout << "[Client] Game is ready to start! time : " << time << " seconds" << endl;
+
+	return true;
+}
+
+bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt)
+{
+	int mapId = pkt.map_id();
+	int star = pkt.star();
+	int clearTime = pkt.clear_time_seconds();
+	cout << "\n========== GAME CLEAR! ==========" << endl;
+	cout << "Congratulations! You cleared the stage " << mapId << " with " << star << " stars!" << endl;
+	cout << "Clear Time: " << clearTime << " seconds" << endl;
+
+	return true;
+}
+
+bool Handle_S_ROOM_DESTROY(PacketSessionRef& session, Protocol::S_ROOM_DESTROY& pkt)
 {
 	return true;
 }

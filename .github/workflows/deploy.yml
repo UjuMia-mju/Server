@@ -1,0 +1,61 @@
+name: Deploy Game Server
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      # 1. Checkout the latest code and binaries from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Stop the existing server process to release file locks
+      - name: Stop Existing Server
+        shell: powershell
+        run: |
+          $processName = "GameServer"
+          $process = Get-Process $processName -ErrorAction SilentlyContinue
+          
+          if ($process) {
+              Write-Host "Found running process: $processName. Stopping..."
+              Stop-Process -Name $processName -Force
+              # Wait to ensure the OS releases the file handle
+              Write-Host "Waiting 5 seconds for file lock to release..."
+              Start-Sleep -Seconds 5
+          } else {
+              Write-Host "No running process found. Proceeding to deployment."
+          }
+
+      # 3. Copy the specific executable to the deployment folder
+      - name: Deploy Executable
+        shell: powershell
+        run: |
+          $sourceFile = "${{ github.workspace }}\Binary\Release\GameServer.exe"
+          $destPath = "C:\Users\Administrator\Desktop\Server"
+          
+          if (!(Test-Path $destPath)) { 
+              New-Item -ItemType Directory -Path $destPath -Force 
+          }
+          
+          Write-Host "Copying executable: $sourceFile -> $destPath"
+          Copy-Item -Path $sourceFile -Destination $destPath -Force
+
+      # 4. Launch the server in a new window
+      - name: Start Server
+        shell: powershell
+        run: |
+          $targetDir = "C:\Users\Administrator\Desktop\Server"
+          $exeName = "GameServer.exe"
+          
+          cd $targetDir
+          Write-Host "Starting $exeName and decoupling from runner..."
+          
+          $env:RUNNER_TRACKING_ID = ""
+          
+          Start-Process -FilePath ".\$exeName" -WorkingDirectory $targetDir -WindowStyle Normal
+          
+          Write-Host "Deployment process finished. Process should remain active."

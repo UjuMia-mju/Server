@@ -22,6 +22,12 @@ RoomRef RoomManager::CreateRoom(uint64 hostPlayerId, const string& hostName, int
 	return room;
 }
 
+void RoomManager::RemoveRoom(uint64 roomId)
+{
+	WRITE_LOCK;
+	_rooms.erase(roomId);
+}
+
 RoomRef RoomManager::FindRoom(uint64 roomId)
 {
 	READ_LOCK;

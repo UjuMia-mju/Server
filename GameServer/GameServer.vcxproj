@@ -180,6 +180,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccountDB.cpp" />
+    <ClCompile Include="AdminSession.cpp" />
     <ClCompile Include="AuthValidator.cpp" />
     <ClCompile Include="DBCacheManager.cpp" />
     <ClCompile Include="Enum.pb.cc">
@@ -221,6 +222,7 @@ xcopy "$(ProjectDir)config.ini" "$(SolutionDir)Binary\Release\" /Y /I</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccountDB.h" />
+    <ClInclude Include="AdminSession.h" />
     <ClInclude Include="AuthValidator.h" />
     <ClInclude Include="DBCacheManager.h" />
     <ClInclude Include="Enum.pb.h" />

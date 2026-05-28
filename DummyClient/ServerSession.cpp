@@ -2,7 +2,6 @@
 #include "ServerSession.h"
 #include "ServerPacketHandler.h"
 
-
 ServerSession::ServerSession(const string& email, const string& password)
 	: _email(email), _password(password)
 {
@@ -99,6 +98,13 @@ void ServerSession::SendInvitePacket(string name, int32 tag)
 	cout << "[Client] Invite packet sent - Target: " << name << "#" << tag << endl;
 }
 
+void ServerSession::SendLeaveRoom()
+{
+	Protocol::C_LEAVE_ROOM pkt;
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendEnterRoom()
 {
 	Protocol::C_ENTER_ROOM pkt;
@@ -123,6 +129,61 @@ void ServerSession::SendMyClearStageData()
 {
 	Protocol::C_GET_CLEAR_INFO pkt;
 
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendGachaPool()
+{
+	Protocol::C_GACHA_POOL_LIST pkt;
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendGacha()
+{
+	Protocol::C_GACHA pkt;
+	pkt.set_pool_id(1); // Example pool ID, adjust as needed
+	pkt.set_pull_count(1); // Example pull count, adjust as needed
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendHostStageSelect(int32 map_id)
+{
+	Protocol::C_HOST_SHOW_STAGE pkt;
+	pkt.set_map_id(map_id);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendStartStage(int32 map_id)
+{
+	Protocol::C_START_STAGE pkt;
+
+	pkt.set_map_id(map_id);
+	pkt.set_chapter(1);
+	pkt.set_stageindex(1);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendStageEnter()
+{
+	Protocol::C_ENTER_GAME pkt;
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
+void ServerSession::SendStageClear(int32 map_id, int32 star, int32 clearTime)
+{
+	Protocol::C_GAME_CLEAR pkt;
+	pkt.set_map_id(map_id);
+	pkt.set_star(star);
+	pkt.set_clear_time_seconds(clearTime);
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);
 }

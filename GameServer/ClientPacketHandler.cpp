@@ -75,84 +75,83 @@ bool Handle_C_GET_DB_DATA(PacketSessionRef& session, Protocol::C_GET_DB_DATA& pk
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 
-	//if (gameSession->GetPlayerInfo() == nullptr)
-	//{
-	//	cout << "PlayerInfo is null. Cannot retrieve DB data." << endl;
-	//	return false;
-	//}
-
 	// DB에서 정보를 보낸다. (가차 리스트, 스킨 리스트, 스테이지 리스트)
 
 	// 스테이지 리스트
 	Protocol::S_STAGE_INFO sStageInfoPkt;
-	auto stageList = StageManager::GetInstance().GetAllStages();
-
-	for (const auto& [stageId, stageInfo] : stageList)
-	{
-		auto stageEntry = sStageInfoPkt.add_stages();
-		stageEntry->set_map_id(stageInfo.stage_id);
-		stageEntry->set_chapter(stageInfo.chapter);
-		stageEntry->set_stage(stageInfo.stage);
-		stageEntry->set_difficulty(stageInfo.difficulty);
-		stageEntry->set_estimated_clear_time(stageInfo.estimated_clearTime);
-		stageEntry->set_isbossstage(stageInfo.isBoss);
-		stageEntry->set_stage_name(stageInfo.mapName);
-		stageEntry->set_description(stageInfo.mapDescription);
-	}
-
+	GStageManager.FillStageListPacket(sStageInfoPkt);
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(sStageInfoPkt);
 	session->Send(sendBuffer);
 
 	// 스킨 폴 리스트
 	Protocol::S_GACHA_POOL_LIST skinPoolList;
-	auto poolList = GGACHA.GetAllGachaPools();
-	for (const auto& [poolId, poolInfo] : poolList)
-	{
-		auto poolEntry = skinPoolList.add_pools();
-		poolEntry->set_pool_id(poolInfo.poolId);
-		poolEntry->set_pool_name(poolInfo.name);
-		poolEntry->set_cost_gem(poolInfo.costGem);
-		poolEntry->set_cost_coin(poolInfo.costCoin);
-		poolEntry->set_max_pull(poolInfo.maxPull);
-		poolEntry->set_is_active(poolInfo.IsActive());
-		poolEntry->set_start_at(poolInfo.startAt);
-		poolEntry->set_end_at(poolInfo.endAt);
-
-		for (const auto& skinId : poolInfo.items)
-		{
-			auto skinMeta = GGACHA.GetSkinMetaData(skinId.skinId);
-			if (skinMeta)
-			{
-				auto itemEntry = poolEntry->add_skins();
-				itemEntry->set_skin_id(skinMeta->skinId);
-				itemEntry->set_skin_name(skinMeta->name);
-				itemEntry->set_skin_des(skinMeta->description);
-				itemEntry->set_rarity(skinMeta->rarity);
-			}
-			else
-			{
-				cout << "Failed to retrieve skin metadata for skin ID: " << skinId.skinId << endl;
-			}
-		}
-	}
-
+	GGACHA.FillGachaPoolListPacket(skinPoolList);
 	auto skinPoolSendBuffer = ClientPacketHandler::MakeSendBuffer(skinPoolList);
 	session->Send(skinPoolSendBuffer);
 
 	// 스킨 리스트
 	Protocol::S_SKIN_LIST skinListPkt;
-	auto skinList = GGACHA.GetAllSkinMetaData();
-	for (const auto& [skinId, skinMeta] : skinList)
-	{
-		auto skinEntry = skinListPkt.add_skins();
-		skinEntry->set_skin_id(skinMeta.skinId);
-		skinEntry->set_skin_name(skinMeta.name);
-		skinEntry->set_skin_des(skinMeta.description);
-		skinEntry->set_rarity(skinMeta.rarity);
-	}
-
+	GGACHA.FillSkinListPacket(skinListPkt);
 	auto skinListSendBuffer = ClientPacketHandler::MakeSendBuffer(skinListPkt);
 	session->Send(skinListSendBuffer);
+
+	return true;
+}
+
+bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_ROOM& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->GetPlayer();
+
+	if (player == nullptr)
+		return false;
+
+	auto room = GetGlobalTestRoom();
+	gameSession->SetRoom(room);
+
+	// 안전을 위해 Room의 락/작업큐 내부에서 한 번에 순차 처리합니다.
+	room->DoAsync([room, player, gameSession, session]()
+		{
+			// 1. 방장이 없으면 방장 권한 부여
+			if (room->GetOwnerId() == 0)
+			{
+				room->SetOwner(player->playerId, player->name, player->tag);
+				cout << "Test Room Owner Set! PlayerId: " << player->playerId << endl;
+			}
+
+			// 2. 방에 플레이어 완전히 입장 (기존 유저들에게 입장 패킷 브로드캐스트 포함)
+			// 테스트 환경에 맞게 EnterLobby 혹은 EnterGame을 선택 호출
+			room->EnterGame(player);
+
+			// 3. 본인 클라이언트에게 방/게임 입장 성공 사실과 방 정보(방장 정보 등)를 전송
+			Protocol::S_ENTER_ROOM enterRoomPkt;
+			room->MakeEnterRoomPacket(gameSession, enterRoomPkt);
+
+			auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
+			session->Send(sendBuffer);
+		});
+
+	cout << "Test Room Join process dispatched!" << endl;
+
+	return true;
+}
+
+bool Handle_C_RELAY_PACKET(PacketSessionRef& session, Protocol::C_RELAY_PACKET& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendCreateRoomError);
+
+	PlayerRef player = gameSession->GetPlayer();
+
+	// 전달할 새로운 봉투(S_RELAY_PACKET) 생성
+	Protocol::S_RELAY_PACKET relayPkt;
+	relayPkt.set_sender_id(player->playerId); // 누가 보냈는지 태그 (클라이언트에서 무시 처리 등에 사용)
+	relayPkt.set_packet_id(pkt.packet_id()); // 패킷 아이디 복사
+	relayPkt.set_payload(pkt.payload());      // 내용물 복사(이동)
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(relayPkt);
+
+	// 방 릴레이 함수 호출 (requireHostAuthority 플래그에 따라 분기)
+	room->RelayPacket(player, sendBuffer, pkt.require_host_authority());
 
 	return true;
 }
@@ -248,6 +247,34 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	return true;
 }
 
+bool Handle_C_GET_CURRENCY(PacketSessionRef& session, Protocol::C_GET_CURRENCY& pkt)
+{
+	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+
+	int32 dbPlayerId = gameSession->GetPlayerInfo()->GetDbUserId();
+	int32 dbCoin = 0;
+	int32 dbGem = 0;
+	Protocol::S_GET_CURRENCY resPkt;
+
+	if (AccountDB::GetUserGoods(dbPlayerId, dbCoin, dbGem))
+	{
+		resPkt.set_success(true);
+		resPkt.set_coin(dbCoin);
+		resPkt.set_gem(dbGem);
+		
+		cout << "Sent currency info - Player ID: " << dbPlayerId << ", Coin: " << dbCoin << ", Gem: " << dbGem << endl;
+	}
+	else
+	{
+		resPkt.set_success(false);
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(resPkt);
+	session->Send(sendBuffer);
+
+	return true;
+}
+
 bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 {
 	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
@@ -258,7 +285,7 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 	if (playerInfo == nullptr)
 	{
 		// 인증은 되었지만 플레이어 정보가 없는 경우 (예: DB 오류)
-		cout << "[GACHA LOG] 플레이어 정보가 없습니다. 가챠를 진행할 수 없습니다." << std::endl;
+		cout << "[GACHA LOG] no player INFO" << std::endl;
 		return false;
 	}
 	int32 obtainedSkinId = 0;
@@ -277,7 +304,7 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 	if (isSuccess)
 	{
-		std::cout << "[GACHA LOG] 가챠 성공! 획득한 스킨 ID = " << obtainedSkinId << std::endl;
+		std::cout << "[GACHA LOG] Get Skin = " << obtainedSkinId << std::endl;
 		Protocol::GachaResult* result = resPkt.mutable_result();
 
 		int32 gemAfter = playerInfo->GetGem();
@@ -324,6 +351,21 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 bool Handle_C_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::C_GACHA_POOL_LIST& pkt)
 {
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+
+	if (gameSession->GetPlayerInfo() == nullptr)
+	{
+		cout << "PlayerInfo is null. Cannot retrieve gacha pool list." << endl;
+		return false;
+	}
+
+	
+	Protocol::S_GACHA_POOL_LIST resPkt;
+	GGACHA.FillGachaPoolListPacket(resPkt);
+	
+	SendBufferRef sendBuffer = ClientPacketHandler::MakeSendBuffer(resPkt);
+	session->Send(sendBuffer);
+
 	return true;
 }
 
@@ -405,6 +447,8 @@ bool Handle_C_CREATE_ROOM(PacketSessionRef& session, Protocol::C_CREATE_ROOM& pk
 	newRoom->DoAsync([session, sendBuffer]() {
 		session->Send(sendBuffer);
 		});
+
+	std::cout << "Create Room Success" << endl;
 	
 	return true;
 }
@@ -485,6 +529,33 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 
 bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
 {
+	auto gameSession = static_pointer_cast<GameSession>(session);
+
+	Protocol::S_LEAVE_ROOM responsePkt;
+	// 방에 속해있는지 확인
+	auto room = gameSession->GetRoom().lock();
+	responsePkt.set_player_id(gameSession->GetPlayer()->playerId);
+
+	if (!room)
+	{
+		responsePkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(responsePkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 방에서 나가기 처리
+	room->DoAsync(&Room::LeaveLobby, gameSession->GetPlayer());
+
+	// 세션의 방 정보 초기화
+	gameSession->SetRoom(weak_ptr<Room>());
+
+	responsePkt.set_success(true);
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(responsePkt);
+	session->Send(sendBuffer);
+
+	cout << "[Room] Player " << gameSession->GetPlayer()->name << " left the room." << endl;
+	cout << "[Room] Current player count: " << room->GetCurrentCount() << endl;
 	return false;
 }
 
@@ -652,32 +723,17 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 	// 게임 시작
 	room->DoAsync(&Room::StartGame);
 
-	std::cout << "Room " << room->GetRoomId() << " game started by "
-		<< gameSession->GetPlayer()->name << endl;
+	std::cout << "Room " << room->GetRoomId() << " game started by " << gameSession->GetPlayer()->name << endl;
 
 	return true;
 }
 
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
-
-	auto room = gameSession->GetRoom().lock();
-
-	if (!room)
-	{
-		std::cout << "Enter game failed: Room not available" << endl;
-		SendEnterGameError(session, "Room not available");
-		return false;
-	}
+	// 방에 있는지 체크
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
 
 	room->DoAsync(&Room::EnterGame, gameSession->GetPlayer());
-
-	Protocol::S_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_success(true);
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-	session->Send(sendBuffer);
-
 	return true;
 }
 
@@ -687,9 +743,8 @@ bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 
 	// 테스트 코드 부분
 	auto room = GetGlobalTestRoom();
-	gameSession->GetRoom() = room;
+	gameSession->SetRoom(room);
 
-	//
 	if (!room)
 	{
 		std::cout << "Enter game failed: Room not available" << endl;
@@ -699,10 +754,38 @@ bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 
 	room->DoAsync(&Room::EnterGame, gameSession->GetPlayer());
 
-	Protocol::S_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_success(true);
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-	session->Send(sendBuffer);
+	return true;
+}
+
+bool Handle_C_GAME_CLEAR(PacketSessionRef& session, Protocol::C_GAME_CLEAR& pkt)
+{
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 2. 방장(Host) 권한 체크: 방장만 클리어 패킷을 보낼 수 있어야 함
+	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
+	{
+		std::cout << "[Game Clear Failed] Only room owner can send clear packet." << endl;
+		Protocol::S_GAME_CLEAR errorPkt;
+		errorPkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	int32 map_id = pkt.map_id();
+	int32 star = pkt.star();
+	int32 clear_time = pkt.clear_time_seconds();
+
+	// 3. StageManager에서 스테이지 클리어 정보 업데이트
+	bool updateSuccess = GStageManager.UpdateStageClearInfo(gameSession->GetPlayer()->playerId, map_id, star, clear_time);
+	Protocol::S_GAME_CLEAR clearPkt;
+	clearPkt.set_success(updateSuccess);
+	clearPkt.set_map_id(map_id); // 클라이언트에서 클리어 된 맵을 식별하기 위해 맵 ID도 내려줍니다
+	clearPkt.set_star(star);
+	clearPkt.set_clear_time_seconds(clear_time);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(clearPkt);
+	room->Broadcast(sendBuffer); // 방 전체 참가자들에게 결과 전송
 
 	return true;
 }
@@ -745,9 +828,72 @@ bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt)
 	return true;
 }
 
+bool Handle_C_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::C_HOST_SHOW_STAGE& pkt)
+{
+	// 호스트가 뭘 선택하고 있는지 보여줌
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 자신이 방장인지 확인
+	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
+	{
+		std::cout << "Show stage failed: Only room owner" << endl;
+		SendStartRoomError(session, "Only room owner can show stage");
+		return false;
+	}
+
+	int32 map_id = pkt.map_id();
+	
+	Protocol::S_HOST_SHOW_STAGE showStagePkt;
+	showStagePkt.set_success(true);
+
+	Protocol::StageInfo* stageInfoPkt = showStagePkt.mutable_stage();
+	GStageManager.ChangeStageInfoToProtocol(GStageManager.GetStageInfoById(map_id), *stageInfoPkt);
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(showStagePkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
+}
+
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt)
 {
-	return false;
+	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// 자신이 방장인지 확인
+	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
+	{
+		std::cout << "Start stage failed: Only room owner" << endl;
+		SendStartRoomError(session, "Only room owner can start stage");
+		return false;
+	}
+
+	Protocol::S_START_STAGE startStagePkt;
+
+	int32 map_id = pkt.map_id();
+	int32 chapter = pkt.chapter();
+	int32 stage = pkt.stageindex();
+
+	// 3. StageManager에서 스테이지 데이터 가져오기
+	auto stageData = GStageManager.GetStageInfo(map_id, chapter, stage);
+	if (stageData == nullopt)
+	{
+		std::cout << "Start stage failed: Stage cache miss" << endl;
+		startStagePkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startStagePkt);
+		session->Send(sendBuffer);
+		return false;
+	}
+
+	// 4. 성공 패킷 구성 및 스테이지 정보 직렬화 (기존 헬퍼 사용)
+	startStagePkt.set_success(true);
+	Protocol::StageInfo* stageInfoPkt = startStagePkt.mutable_stage();
+	GStageManager.ChangeStageInfoToProtocol(stageData.value(), *stageInfoPkt);
+
+	// 5. 방에 있는 "모든" 유저에게 스테이지 시작 브로드캐스트
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(startStagePkt);
+	room->DoAsync(&Room::Broadcast, sendBuffer);
+
+	std::cout << "Room " << room->GetRoomId() << " started Map ID: " << map_id << endl;
+
+	return true;
 }
 
 bool Handle_C_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::C_GET_CLEAR_INFO& pkt)

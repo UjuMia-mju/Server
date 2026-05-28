@@ -14,6 +14,10 @@
 #include "DBBind.h"
 #include "TypeCast.h"
 #include "DBCacheManager.h"
+#include "AdminSession.h"
+
+std::atomic<int64> g_inboundPacketCount(0);
+std::atomic<int64> g_outboundPacketCount(0);
 
 enum
 {
@@ -38,7 +42,7 @@ void DoWorkerJob(ServerServiceRef& service)
 int main()
 {
 	::SetConsoleOutputCP(CP_UTF8);
-	cout << "Game Server Start!" << endl;
+	cout << "Game Server Start! - git action CI/CD - ip change" << endl;
 
 	// Config 파일 로드
 	WCHAR exePath[MAX_PATH];
@@ -87,6 +91,31 @@ int main()
 	);
 
 	ASSERT_CRASH(service->Start());
+
+	// --- WPF 툴 전용 서비스 (9000번 포트) ---
+	ServerServiceRef adminService = MakeShared<ServerService>(
+		NetAddress(serverIP, 9000),
+		service->GetIocpCore(),        // 기존 IOCP Core 재사용 가능
+		MakeShared<AdminSession>,      // 관리자 전용 세션 사용
+		10
+	);
+
+	ASSERT_CRASH(adminService->Start());
+
+	//DB Keep-Alive 전용 스레드 추가
+	GThreadManager->Launch([]()
+		{
+			while (true)
+			{
+				// 30분마다 실행
+				this_thread::sleep_for(std::chrono::minutes(30));
+
+				if (GDBConnectionPool)
+				{
+					GDBConnectionPool->HandleKeepAlive();
+				}
+			}
+		});
 
 	for (int32 i = 0; i < workerThreads; i++)
 	{

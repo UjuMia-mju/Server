@@ -6,11 +6,16 @@
 *.sln.docstates
 
 # Build
+Binary/
 bin/
 obj/
 Debug/
 Release/
 x64/
+
+!Binary/
+!Binary/Release/
+!Binary/Release/GameServer.exe
 
 # C++
 *.obj
@@ -27,5 +32,5 @@ x64/
 Libraries/Libs/**/*.lib
 
 # Config files with passwords
-GameServer/config.ini
-DummyClient/config.ini
+*.ini
+*.config
