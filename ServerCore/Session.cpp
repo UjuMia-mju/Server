@@ -9,6 +9,7 @@
 
 Session::Session() : _recvBuffer(BUFFER_SIZE)
 {
+	_connected.store(false); // 초기값은 false
 	_socket = SocketUtils::CreateSocket();
 }
 
@@ -55,8 +56,8 @@ void Session::Disconnect(const WCHAR* cause)
 		return;
 	}
 
-	wcout << L"Disconnected: " << cause << endl;
-
+	//wcout << L"Disconnected: " << cause << endl;
+	cout << "Session Disconnected" << endl;
 	RegisterDisConnect();
 }
 
@@ -110,6 +111,7 @@ bool Session::RegisterConnect()
 	}
 
 	_connectEvent.Init();
+	_connectEvent.eventType = EventType::Connect;
 	_connectEvent.owner = shared_from_this(); // ADD_REF
 
 	DWORD numOfBytes = 0;
@@ -130,7 +132,9 @@ bool Session::RegisterConnect()
 
 bool Session::RegisterDisConnect()
 {
+	cout << "123123123" << endl;
 	_disConnectEvent.Init();
+	_disConnectEvent.eventType = EventType::DisConnect;
 	_disConnectEvent.owner = shared_from_this(); // ADD_REF
 
 	if (false == SocketUtils::DisconnectEx(_socket, &_disConnectEvent, TF_REUSE_SOCKET, 0))
@@ -138,8 +142,10 @@ bool Session::RegisterDisConnect()
 		int32 errorCode = ::WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			HandleError(errorCode);
+			//HandleError(errorCode);
 			_disConnectEvent.owner = nullptr; // RELEASE_REF
+
+			ProcessDisConnect();
 			return false;
 		}
 	}
@@ -156,6 +162,7 @@ void Session::RegisterRecv()
 	}
 
 	_recvEvent.Init();
+	_recvEvent.eventType = EventType::Recv;
 	_recvEvent.owner = shared_from_this(); // ADD_REF
 
 	WSABUF wsaBuf;
@@ -184,6 +191,7 @@ void Session::RegisterSend()
 	}
 
 	_sendEvent.Init();
+	_sendEvent.eventType = EventType::Send;
 	_sendEvent.owner = shared_from_this(); // ADD_REF
 
 	// 보낼 데이터를 sendEvent에 등록하기
@@ -247,7 +255,7 @@ void Session::ProcessConnect()
 void Session::ProcessDisConnect()
 {
 	_disConnectEvent.owner = nullptr; // 일단 릴리즈를 함.
-
+	cout << "123123123" << endl;
 	OnDisconnected();
 	GetService()->ReleaseSession(GetSessionRef());
 }

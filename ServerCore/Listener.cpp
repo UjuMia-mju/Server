@@ -131,6 +131,12 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 		return;
 	}
 
+	if (_serverService->GetIocpCore()->Register(session) == false)
+	{
+		RegisterAccept(acceptEvent);
+		return;
+	}
+
 	cout << "[Listener] Accept New Connection : " << endl;
 
 	session->SetNetAdress(NetAddress(sockAddress));

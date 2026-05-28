@@ -38,9 +38,10 @@ uint64 InviteManager::CreateInvite(uint64 roomId, const string& roomName,
 	}
 
 	// 이미 방에 있는지 체크
-	if (targetSession->GetRoom().lock())
+	auto currentRoom = targetSession->GetRoom().lock();
+	if (currentRoom && currentRoom->IsPlaying())
 	{
-		std::cout << "[InviteManager] Target player already in a room" << endl;
+		std::cout << "[InviteManager] Target player is currently playing a game" << endl;
 		return 0;
 	}
 
@@ -102,6 +103,13 @@ bool InviteManager::AcceptInvite(uint64 inviteId, GameSessionRef accepter)
 		std::cout << "[InviteManager] Room is full" << endl;
 		_invites.erase(it);
 		return false;
+	}
+
+
+	// 이미 다른 방에 있는 경우에는, 기존 방을 나간다.
+	if (auto oldRoom = accepter->GetRoom().lock())
+	{
+		oldRoom->DoAsync(&Room::LeaveLobby, accepter->GetPlayer());
 	}
 
 	// 방에 입장

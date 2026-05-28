@@ -37,7 +37,7 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 	}
 	else
 	{
-		int32 errorCode = ::WSAGetLastError(); // 경우에 따라 에러가 에러가 아닐 수 있음. (타임아웃이면 정상 처리)
+		int32 errorCode = ::GetLastError(); // 경우에 따라 에러가 에러가 아닐 수 있음. (타임아웃이면 정상 처리)
 		switch (errorCode)
 		{
 		case WAIT_TIMEOUT:
@@ -46,8 +46,16 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 		}
 		default:
 			//ASSERT_CRASH(false);
-			IocpObjectRef iocpObject = iocpEvent->owner;
-			iocpObject->Dispatch(iocpEvent, numOfBytes);
+			if (iocpEvent != nullptr)
+			{
+				IocpObjectRef iocpObject = iocpEvent->owner;
+				iocpObject->Dispatch(iocpEvent, 0);
+				cout << "GetQueuedCompletionStatus failed with error: " << errorCode << " but iocpEvent is not null. Dispatching event." << endl;
+			}
+			else
+			{
+				cout << "GetQueuedCompletionStatus failed with error: " << errorCode << endl;
+			}
 			break;
 		}
 	}
