@@ -12,14 +12,18 @@ void GameSession::OnConnected()
 void GameSession::OnDisconnected()
 {
 	PlayerRef player = _player;
+	RoomRef room = _room.lock();
 	cout << "GameSession::OnDisconnected Call Player Leave Room" << endl;
-	GSessionManager.Remove(static_pointer_cast<GameSession>(shared_from_this()));
-	if (auto roomRef = _room.lock())
+	
+	if (room && player)
 	{
-		roomRef->DoAsync(&Room::LeaveLobby, player);
+		room->DoAsync(&Room::LeaveLobby, player);
 	}
 
+	GSessionManager.Remove(static_pointer_cast<GameSession>(shared_from_this()));
+
 	_player = nullptr;
+	_room.reset();
 }
 
 void GameSession::OnRecvPacket(BYTE* buffer, int32 len)
