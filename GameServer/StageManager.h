@@ -4,7 +4,7 @@
 
 struct StageInfo
 {
-	int map_id;
+	int stage_id;
 	int chapter;
 	int stage;
 
@@ -34,18 +34,31 @@ public:
 		return instance;
 	}
 
-	optional<StageInfo> GetStageInfo(int mapId, int chapter, int stage);
+	optional<StageInfo> GetStageInfo(int mapId, int chapter, int stage) const
+	{
+		auto it = _stageCache.find(mapId);
+		if (it != _stageCache.end())
+		{
+			if (it->second.chapter == chapter && it->second.stage == stage)
+			{
+				return it->second;
+			}
+			else
+			{
+				cout << "error: stage cahche miss" << endl;
+				return nullopt;
+			}
+		}
+		return nullopt;
+	}
+
 	unordered_map<int32_t, StageInfo> GetAllStages() const
 	{
 		return _stageCache;
 	}
 
 	bool GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>& clears);
-	void FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const;
-	StageInfo GetStageInfoById(int stageId) const;
-	void ChangeProtocolToStageInfo(const Protocol::StageInfo& proto, OUT StageInfo& stageInfo) const;
-	void ChangeStageInfoToProtocol(const StageInfo& stageInfo, OUT Protocol::StageInfo& proto) const;
-	bool UpdateStageClearInfo(int32 userId, int mapId, int star, int clearTime);
+
 private:
 	unordered_map<int32_t, StageInfo> _stageCache;
 };

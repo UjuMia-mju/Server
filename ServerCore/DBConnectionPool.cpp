@@ -107,24 +107,3 @@ void DBConnectionPool::Push(DBConnection* connection)
 	WRITE_LOCK;
 	_connections.push_back(connection);
 }
-
-void DBConnectionPool::HandleKeepAlive()
-{
-	WRITE_LOCK;
-
-	if (!_initialized) return;
-
-	cout << "[DB] Sending Keep-Alive to " << _connections.size() << " idle connections..." << endl;
-
-	for (DBConnection* connection : _connections)
-	{
-		// 쿼리를 하나 보내서 MySQL 측의 idle 타이머를 리셋.
-		if (connection->Ping() == false)
-		{
-			cout << "[DB] Keep-Alive Failed for a connection." << endl;
-		}
-
-		// 대기 중인 쿼리 결과를 정리 (Unbind)
-		connection->Unbind();
-	}
-}

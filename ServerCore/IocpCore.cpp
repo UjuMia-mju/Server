@@ -28,10 +28,8 @@ bool IocpCore::Dispatch(uint32 timeoutMs)
 	ULONG_PTR key = 0;
 	IocpEvent* iocpEvent = nullptr;
 
-	//커널 완료 큐로부터 비동기 작업 결과를 획득
 	if (::GetQueuedCompletionStatus(_iocpHandle, OUT &numOfBytes, OUT &key, OUT reinterpret_cast<LPOVERLAPPED*>(&iocpEvent), timeoutMs))
 	{
-		//이벤트를 소유한 객체(Session 등)를 찾아 실행 권한 위임
 		IocpObjectRef iocpObject = iocpEvent->owner;
 		iocpObject->Dispatch(iocpEvent, numOfBytes);
 	}

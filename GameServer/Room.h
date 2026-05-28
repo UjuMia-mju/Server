@@ -17,18 +17,15 @@ public:
 	void MakeEnterRoomPacket(GameSessionRef gameSession, Protocol::S_ENTER_ROOM& pkt) const;
 	
 	// ========== 게임 시작 후, 스테이지 진행 관련 ==========
-	// 테스트용
-	void SetOwner(uint64 ownerId, const string& ownerName, int32 ownerTag);
+
 
 	// ========== 게임 플레이 관련(실제 이동하는 씬) ==========
 	void EnterGame(PlayerRef player);       // 게임 입장 (위치 동기화)
+	void LeaveGame(PlayerRef player);       // 게임 퇴장
 
 	// ========== 브로드케스트(공통) ==========
 	void Broadcast(SendBufferRef sendBuffer);
 	void BroadcastExcept(SendBufferRef sendBuffer, uint64 excludePlayerId);
-
-	// ========== relay 관련 ==========
-	void RelayPacket(PlayerRef sender, SendBufferRef sendBuffer, bool requireHostAuthority);
 
 	// Getter
 	uint64 GetRoomId() const { return _roomId; }
@@ -53,8 +50,7 @@ private:
 	bool _isPlaying = false;
 
 	unordered_map<uint64, PlayerRef> _players;
-	unordered_map<uint64, bool> _readyStatus; // 방 준비 상태
-	unordered_set<uint64> _loadedPlayers; // 게임 입장 상태 (게임 씬에서 사용)
+	unordered_map<uint64, bool> _readyStatus;
 };
 
 RoomRef GetGlobalTestRoom();

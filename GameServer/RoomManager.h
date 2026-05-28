@@ -17,14 +17,7 @@ public:
 
 	uint64 GenerateRoomId();
 	RoomRef CreateRoom(uint64 hostPlayerId, const string& hostName, int32 hostTag);
-	void RemoveRoom(uint64 roomId);
 	RoomRef FindRoom(uint64 roomId);
-
-	int RoomCount()
-	{
-		READ_LOCK;
-		return static_cast<int>(_rooms.size());
-	}
 
 private:
 	USE_LOCK;

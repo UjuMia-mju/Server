@@ -111,11 +111,6 @@ void DBConnection::Unbind()
 	::SQLFreeStmt(_statement, SQL_CLOSE);
 }
 
-bool DBConnection::Ping()
-{
-	return Execute(L"SELECT 1;");
-}
-
 bool DBConnection::BindParam(int32 paramIndex, bool* value, SQLLEN* index)
 {
 	return BindParam(paramIndex, SQL_C_TINYINT, SQL_TINYINT, size32(bool), value, index);

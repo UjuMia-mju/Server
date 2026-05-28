@@ -46,6 +46,7 @@ public:
 
 	void			Push(MemoryHeader* ptr);
 	MemoryHeader* Pop();
+
 private:
 	SLIST_HEADER	_header;
 	int32			_allocSize = 0;

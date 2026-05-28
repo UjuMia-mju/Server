@@ -178,35 +178,3 @@ bool AccountDB::GetUserProfileInfo(int32 dbUserId, OUT int32& outCoin, OUT int32
 
 	return true;
 }
-
-bool AccountDB::GetUserGoods(int32 dbUserId, OUT int32& outCoin, OUT int32& outGem)
-{
-	// 초기화
-	outCoin = 0;
-	outGem = 0;
-
-	DBConnectionGuard conn(GDBConnectionPool);
-	if (!conn)
-	{
-		return false;
-	}
-
-	// 1. 유저의 재화 가져오기 (테이블: user_goods 또는 users)
-	DBBind<1, 2> dbGoodsBind(conn, L"SELECT coin, gem FROM user_goods WHERE user_id = ?");
-	dbGoodsBind.BindParam(0, dbUserId);
-
-	dbGoodsBind.BindCol(0, outCoin);
-	dbGoodsBind.BindCol(1, outGem);
-
-	if (dbGoodsBind.Execute())
-	{
-		dbGoodsBind.Fetch();
-	}
-	else
-	{
-		// 쿼리 자체가 실패한 경우
-		return false;
-	}
-
-	return true;
-}

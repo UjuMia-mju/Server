@@ -15,5 +15,4 @@ public:
 	static bool ValidateAccount(const string& email, const string& password);
 	static bool GetPlayerInfo(const string& email, const std::string& password, OUT int32& playerId, OUT string& playerName, OUT int32& playerTag);
 	static bool GetUserProfileInfo(int32 dbUserId, OUT int32& outCoin, OUT int32& outGem, OUT vector<OwnedSkinInfo>& outOwnedSkins);
-	static bool GetUserGoods(int32 dbUserId, OUT int32& outCoin, OUT int32& outGem);
 };

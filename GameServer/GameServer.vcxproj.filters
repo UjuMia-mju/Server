@@ -75,9 +75,6 @@
     <ClCompile Include="StageManager.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
-    <ClCompile Include="AdminSession.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -136,9 +133,6 @@
     </ClInclude>
     <ClInclude Include="StageManager.h">
       <Filter>GameContents</Filter>
-    </ClInclude>
-    <ClInclude Include="AdminSession.h">
-      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

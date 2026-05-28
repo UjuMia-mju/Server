@@ -44,11 +44,6 @@ public:
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
-
-		{ % -if output == 'ClientPacketHandler'% }
-		g_inboundPacketCount.fetch_add(1);
-		{ % -endif% }
-
 		return GPacketHandler[header->id](session, buffer, len);
 	}
 {%- for pkt in parser.send_pkt %}
@@ -80,10 +75,7 @@ private:
 		header->id = pktId;
 
 		ASSERT_CRASH(pkt.SerializeToArray(&header[1], dataSize));
-		
-		{ % -if output == 'ClientPacketHandler'% }
-		g_outboundPacketCount.fetch_add(1);
-		{ % -endif% }
+
 		sendBuffer->Close(packetSize);
 
 		return sendBuffer;
