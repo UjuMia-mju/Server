@@ -363,6 +363,13 @@ int32 PacketSession::OnRecv(BYTE* buffer, int32 len)
 		// 한번 까보기
 		PacketHeader header = *(reinterpret_cast<PacketHeader*>(&buffer[processLen]));
 
+		// [중요] 헤더의 size가 sizeof(PacketHeader)보다 작으면 비정상 패킷입니다.
+		if (header.size < sizeof(PacketHeader) || header.size > 0xFFFF /* 최대 패킷 크기 설정 */)
+		{
+			// 비정상 패킷으로 간주하고 처리를 중단하거나 세션을 끊어야 함
+			return -1; // -1을 반환하면 Session::ProcessRecv에서 세션을 Close하도록 유도
+		}
+
 		// 헤더에 기록된 패킷 크기를 파싱해야 한다.
 		if (dataSize < header.size)
 		{
