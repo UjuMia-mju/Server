@@ -29,6 +29,15 @@ void GameSession::OnDisconnected()
 void GameSession::OnRecvPacket(BYTE* buffer, int32 len)
 {
 	PacketSessionRef session = GetPacketSessionRef();
+
+	// [보안] 1. 최소한 헤더보다는 커야 함
+	if (len < sizeof(PacketHeader) || session == nullptr)
+	{
+		// 이 경우 비정상적인 접근이므로 연결을 끊는 것이 안전합니다.
+		Disconnect(L"Invalid Packet Length");
+		return;
+	}
+
 	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
 	// 나중에 헤더의 id의 대역폭을 보고 아 이거는 게임 서버, 이거는 로비 서버 등등을 처리
 	ClientPacketHandler::HandlePacket(session, buffer, len);
