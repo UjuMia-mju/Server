@@ -265,9 +265,9 @@ bool GachaManager::PerformDBTransaction(int32 userId, int32 skinId, int32 costCo
 		// SELECT 결과를 꺼내옵니다.
 		if (dbBind.Fetch())
 		{
-			std::cout << "[DB_SP LOG] sp_ExecuteGacha result = " << result << std::endl;
 			if (result == 0)
 			{
+				std::cout << "[DB_SP LOG] sp_ExecuteGacha Success! Skin ID: " << skinId << std::endl;
 				return true; // 드디어 완벽한 성공!
 			}
 		}
