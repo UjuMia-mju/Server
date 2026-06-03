@@ -48,6 +48,7 @@ namespace
 
 #define CHECK_AUTH_LOGIN(session, ErrorSender) \
     GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session); \
+	if (gameSession == nullptr) return false; \
     PacketResult authResult = AuthValidator::ValidateAuth(gameSession, AuthLevel::LOGGED_IN); \
     if (!authResult.IsSuccess()) { \
         ErrorSender(session, authResult.GetMessage()); \
@@ -277,6 +278,7 @@ bool Handle_C_GET_CURRENCY(PacketSessionRef& session, Protocol::C_GET_CURRENCY& 
 
 bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 {
+	cout << "[GACHA LOG] Received C_GACHA - Pool ID: " << pkt.pool_id() << std::endl;
 	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
 	
 	PlayerInfoRef playerInfo = gameSession->GetPlayerInfo();
@@ -529,7 +531,7 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 
 bool Handle_C_LEAVE_ROOM(PacketSessionRef& session, Protocol::C_LEAVE_ROOM& pkt)
 {
-	auto gameSession = static_pointer_cast<GameSession>(session);
+	CHECK_AUTH_LOGIN(session, SendCreateRoomError);
 
 	Protocol::S_LEAVE_ROOM responsePkt;
 	// 방에 속해있는지 확인
