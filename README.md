@@ -1,5 +1,36 @@
 # 우주픽스 서버 프로젝트
 
+## 🎬 Gameplay Video
+
+<a href="https://www.youtube.com/watch?v=Z0QKo3amG5g">
+  <img src="https://img.youtube.com/vi/Z0QKo3amG5g/hqdefault.jpg" alt="유튜브 영상 썸네일" width="600">
+</a>
+
+## 🖼️ Screenshots / Gallery
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/ea4018a2-40e8-4749-89bf-ae67dcf46d13" width="500" height="300" style="object-fit: cover;" alt="이미지 1"><br>
+      <sub><b>시작 화면</b></sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/fc5e575f-325b-4202-b9f0-052a47ca3c52" width="500" height="300" style="object-fit: cover;" alt="이미지 2"><br>
+      <sub><b>스테이지 선택 화면</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/1e756228-4f4a-4a27-911f-f111cd0ac5b0" width="500" height="300" style="object-fit: cover;" alt="이미지 1"><br>
+      <sub><b>인게임 화면</b></sub>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/28d5df6e-848b-463d-8abb-5e3b6d8aba39" width="500" height="300" style="object-fit: cover;" alt="이미지 2"><br>
+      <sub><b>클리어 화면</b></sub>
+    </td>
+  </tr>
+</table>
+
 ## 1. 프로젝트 소개
 
 이 프로젝트는 협동형 우주선 수리 게임인 "우주픽스"의 서버 백엔드입니다.
@@ -54,16 +85,12 @@
 
 ### 아키텍처 다이어그램
 
-아키텍처 이미지 첨부 위치:
+<img width="1441" height="844" alt="image" src="https://github.com/user-attachments/assets/0d2fcd32-26b5-4e6a-835f-48a1e68d08f4" />
 
-- docs/architecture/architecture.png
-- docs/architecture/README.md
+### WPF 모니터링 도구
 
-아키텍처가 추가되면 아래 위치에 연결해 주세요.
+<img width="817" height="515" alt="image" src="https://github.com/user-attachments/assets/ab3e5d9f-834a-47e5-973d-14aeb2d1856b" />
 
-![Architecture Placeholder](docs/architecture/architecture.png)
-
-> 이 부분은 실제 구조도 이미지를 넣는 자리입니다. 현재는 첨부 전이므로 placeholder로 유지합니다.
 
 ---
 
