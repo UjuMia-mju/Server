@@ -1,0 +1,3 @@
+C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir
+C:/Users/Admin/Desktop/Server/build/CMakeFiles/edit_cache.dir
+C:/Users/Admin/Desktop/Server/build/CMakeFiles/rebuild_cache.dir

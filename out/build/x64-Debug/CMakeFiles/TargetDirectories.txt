@@ -1,0 +1,3 @@
+C:/Users/Admin/Desktop/우주픽스/Server/out/build/x64-Debug/CMakeFiles/gameserver.dir
+C:/Users/Admin/Desktop/우주픽스/Server/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Admin/Desktop/우주픽스/Server/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
