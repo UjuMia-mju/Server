@@ -1,0 +1,350 @@
+[
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\DummyClient\\DummyClient.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\DummyClient\\DummyClient.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/DummyClient/DummyClient.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/DummyClient/DummyClient.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\DummyClient\\ServerPacketHandler.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\DummyClient\\ServerPacketHandler.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/DummyClient/ServerPacketHandler.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/DummyClient/ServerPacketHandler.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\DummyClient\\ServerSession.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\DummyClient\\ServerSession.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/DummyClient/ServerSession.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/DummyClient/ServerSession.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\DummyClient\\pch.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\DummyClient\\pch.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/DummyClient/pch.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/DummyClient/pch.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\AccountDB.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\AccountDB.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/AccountDB.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/AccountDB.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\AccountManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\AccountManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/AccountManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/AccountManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\AdminSession.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\AdminSession.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/AdminSession.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/AdminSession.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\AuthValidator.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\AuthValidator.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/AuthValidator.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/AuthValidator.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\ClientPacketHandler.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\ClientPacketHandler.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/ClientPacketHandler.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/ClientPacketHandler.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\DBCacheManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\DBCacheManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/DBCacheManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/DBCacheManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\GachaManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\GachaManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/GachaManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/GachaManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\GameServer.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\GameServer.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/GameServer.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/GameServer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\GameSession.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\GameSession.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/GameSession.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/GameSession.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\GameSessionManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\GameSessionManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/GameSessionManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/GameSessionManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\InviteManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\InviteManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/InviteManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/InviteManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\Itemmanager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\Itemmanager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/Itemmanager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/Itemmanager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\Job.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\Job.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/Job.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/Job.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\PacketResult.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\PacketResult.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/PacketResult.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/PacketResult.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\Player.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\Player.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/Player.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/Player.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\PlayerManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\PlayerManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/PlayerManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/PlayerManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\Room.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\Room.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/Room.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/Room.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\RoomManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\RoomManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/RoomManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/RoomManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\StageManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\StageManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/StageManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/StageManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\item.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\item.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/item.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/item.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\GameServer\\pch.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\GameServer\\pch.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/GameServer/pch.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/GameServer/pch.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Allocator.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Allocator.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Allocator.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Allocator.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\BufferReader.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\BufferReader.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/BufferReader.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/BufferReader.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\BufferWriter.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\BufferWriter.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/BufferWriter.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/BufferWriter.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\ConfigManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\ConfigManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/ConfigManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/ConfigManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\CoreGlobal.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\CoreGlobal.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/CoreGlobal.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/CoreGlobal.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\CorePch.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\CorePch.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/CorePch.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/CorePch.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\CoreTLS.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\CoreTLS.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/CoreTLS.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/CoreTLS.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\DBBind.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\DBBind.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/DBBind.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/DBBind.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\DBConnection.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\DBConnection.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/DBConnection.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/DBConnection.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\DBConnectionPool.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\DBConnectionPool.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/DBConnectionPool.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/DBConnectionPool.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\DeadLockProfiler.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\DeadLockProfiler.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/DeadLockProfiler.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/DeadLockProfiler.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\GlobalQueue.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\GlobalQueue.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/GlobalQueue.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/GlobalQueue.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\IocpCore.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\IocpCore.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/IocpCore.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/IocpCore.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\IocpEvent.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\IocpEvent.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/IocpEvent.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/IocpEvent.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Job.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Job.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Job.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Job.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\JobQueue.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\JobQueue.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/JobQueue.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/JobQueue.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\JobTimer.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\JobTimer.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/JobTimer.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/JobTimer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Listener.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Listener.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Listener.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Listener.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Lock.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Lock.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Lock.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Lock.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\LockQueue.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\LockQueue.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/LockQueue.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/LockQueue.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Memory.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Memory.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Memory.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Memory.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\MemoryPool.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\MemoryPool.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/MemoryPool.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/MemoryPool.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\NetAdress.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\NetAdress.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/NetAdress.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/NetAdress.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\RecvBuffer.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\RecvBuffer.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/RecvBuffer.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/RecvBuffer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\SendBuffer.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\SendBuffer.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/SendBuffer.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/SendBuffer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\ServerPacketHandler.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\ServerPacketHandler.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/ServerPacketHandler.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/ServerPacketHandler.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Service.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Service.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Service.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Service.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\Session.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\Session.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/Session.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/Session.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\SocketUtils.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\SocketUtils.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/SocketUtils.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/SocketUtils.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\ThreadManager.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\ThreadManager.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/ThreadManager.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/ThreadManager.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\ServerCore\\pch.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\ServerCore\\pch.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/ServerCore/pch.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/ServerCore/pch.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\CMakeFiles\\4.2.1\\CompilerIdCXX\\CMakeCXXCompilerId.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\build\\CMakeFiles\\4.2.1\\CompilerIdCXX\\CMakeCXXCompilerId.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/4.2.1/CompilerIdCXX/CMakeCXXCompilerId.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/CMakeFiles/4.2.1/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj"
+},
+{
+  "directory": "C:/Users/Admin/Desktop/Server/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Users/Admin/Desktop/Server/include -IC:/Users/Admin/Desktop/Server/. -IC:/Users/Admin/Desktop/Server/src -O3 -DNDEBUG -std=c++17 -Wall -Wextra -O3 -DNDEBUG -march=native -flto -o CMakeFiles\\gameserver.dir\\out\\build\\x64-Debug\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CMakeCXXCompilerId.cpp.obj -c C:\\Users\\Admin\\Desktop\\Server\\out\\build\\x64-Debug\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CMakeCXXCompilerId.cpp",
+  "file": "C:/Users/Admin/Desktop/Server/out/build/x64-Debug/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CMakeCXXCompilerId.cpp",
+  "output": "C:/Users/Admin/Desktop/Server/build/CMakeFiles/gameserver.dir/out/build/x64-Debug/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CMakeCXXCompilerId.cpp.obj"
+}
+]

@@ -7,83 +7,121 @@
 #include "GameSessionManager.h"
 #include "RoomManager.h"
 
+// --------------------------------------------------
+// 1. 패킷 구조체 정의 (TCP 경계 처리 및 직렬화용)
+// --------------------------------------------------
+#pragma pack(push, 1)
+struct PacketHeader
+{
+    uint16 size;
+    uint16 id; // 예: PKT_S2C_ADMIN_SERVER_STATUS = 0x9001
+};
+
+struct PKT_S2C_AdminServerStatus
+{
+    PacketHeader header;
+    int32  userCount;
+    uint64 memUsageMB;
+    int32  roomCount;
+    int64  inPPS;
+    int64  outPPS;
+};
+#pragma pack(pop)
+
 class AdminSession : public PacketSession
 {
 private:
-	atomic<bool> _connected = false;
+    atomic<bool> _authenticated = false;
+    uint64 _timerId = 0; // 등록된 타이머 ID 관리를 통한 취소 처리
+
 public:
-	virtual void OnConnected() override
-	{
-		_connected = true;
-		cout << "[Admin] Thread Loop start" << endl;
+    virtual void OnConnected() override
+    {
+        cout << "[Admin] Connected from client." << endl;
+        // 접속 초기화: 통계치 리셋
+        g_inboundPacketCount.store(0);
+        g_outboundPacketCount.store(0);
+        // 리포팅을 시작하는 타이머 등록
+        ScheduleNextStatusUpdate();
+    }
 
-		// 1. 연결되는 순간 기존에 쌓였던 누적 통계치를 0으로 리셋 (첫 데이터 튐 방지)
-		g_inboundPacketCount.store(0);
-		g_outboundPacketCount.store(0);
+    virtual void OnDisconnected() override
+    {
+        cout << "[Admin] Disconnected. Canceling status updates." << endl;
+        _authenticated = false;
 
-		// 목적을 달성하고 바로 끊는 부분(Disconnect) 삭제
-		auto self = static_pointer_cast<AdminSession>(shared_from_this());
+        // 세션 종료 시 남아있는 타이머 예약 취소
+        if (_timerId != 0)
+        {
+            _timerId = 0;
+        }
+    }
 
-		std::thread([self]() {
-			// 클라이언트와 연결이 유지되는 동안 무한 루프
-			while (self->_connected)
-			{
-				self->SendServerStatus();
-				// 1초 대기
-				std::this_thread::sleep_for(1s);
-			}
-			cout << "[Admin] Thread Loop Ended." << endl;
-			}).detach(); // 메인 스레드와 분리되어 백그라운드에서 실행
-	}
+    virtual void OnRecvPacket(BYTE* buffer, int32 len) override
+    {
+        // 관리자 인증 처리 패킷 구현 (예: PKT_C2S_ADMIN_AUTH)
+    }
 
-	virtual void OnDisconnected() override
-	{
-		// 끊어지면 타이머 루프도 종료되도록 플래그 변경
-		cout << "[Admin] Disconnected. Stopping status updates." << endl;
-		_connected = false;
-	}
+    // --------------------------------------------------
+    // 2. 타이머 기반 주기적 갱신 (JobTimer 이용)
+    // --------------------------------------------------
+    void ScheduleNextStatusUpdate()
+    {
+        if (IsConnected() == false)
+            return;
 
-	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
-	{
-		// 패킷 처리 로직 작성
-	}
+        auto self = static_pointer_cast<AdminSession>(shared_from_this());
 
-	// 기존 OnConnected에 있던 전송 로직을 별도 함수로 분리
-	void SendServerStatus()
-	{
-		// 1초마다 호출되는 구간
-		int32 userCount = GSessionManager.GetSessionCount();
-		uint64 memUsage = GetMemoryUsage();
-		int roomCount = GetRoomCount();
+        // 1초 뒤에 SendServerStatus를 실행하도록 JobTimer에 예약
+        // (프로젝트의 JobTimer 구현 방식에 맞춰 호출)
+        _timerId = GJobTimer->Reserve(1000, [self]() {
+            self->SendServerStatus();
+            self->ScheduleNextStatusUpdate(); // 다음 1초 예약 (Self-rearming timer)
+            });
+    }
 
-		// exchange(0)를 통해 현재까지 쌓인 값을 가져오고 0으로 리셋!
-		// 1초마다 실행되므로 완벽한 PPS(Packet Per Second)가 됩니다.
-		int64 inPPS = g_inboundPacketCount.exchange(0);
-		int64 outPPS = g_outboundPacketCount.exchange(0);
+    void SendServerStatus()
+    {
+        if (IsConnected() == false)
+            return;
 
-		// 정보를 하나의 문자열로 조합 (마지막에 \n 같은 구분자를 넣어주면 클라이언트에서 끊어 읽기 편합니다)
-		string status = to_string(userCount) +
-			"|" + to_string(memUsage) +
-			"|" + to_string(roomCount) +
-			"|" + to_string(inPPS) +
-			"|" + to_string(outPPS);
+        // 메트릭 수집
+        int32 userCount = GSessionManager.GetSessionCount();
+        uint64 memUsage = GetMemoryUsage();
+        int32 roomCount = GetRoomCount();
+        int64 inPPS = g_inboundPacketCount.exchange(0);
+        int64 outPPS = g_outboundPacketCount.exchange(0);
 
-		// 데이터 전송
-		SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-		memcpy(sendBuffer->Buffer(), status.c_str(), status.length());
-		sendBuffer->Close(status.length());
+        // 구조체 패킷 조립
+        PKT_S2C_AdminServerStatus pkt;
+        pkt.header.size = sizeof(PKT_S2C_AdminServerStatus);
+        pkt.header.id = 0x9001; // PKT_S2C_ADMIN_SERVER_STATUS
+        pkt.userCount = userCount;
+        pkt.memUsageMB = memUsage;
+        pkt.roomCount = roomCount;
+        pkt.inPPS = inPPS;
+        pkt.outPPS = outPPS;
 
-		Send(sendBuffer);
-	}
+        // 버퍼 복사 및 송신
+        SendBufferRef sendBuffer = GSendBufferManager->Open(sizeof(pkt));
+        ::memcpy(sendBuffer->Buffer(), &pkt, sizeof(pkt));
+        sendBuffer->Close(sizeof(pkt));
 
-	uint64 GetMemoryUsage() {
-		PROCESS_MEMORY_COUNTERS_EX pmc;
-		GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
-		return pmc.PrivateUsage / 1024 / 1024; // MB 단위 변환
-	}
+        Send(sendBuffer);
+    }
 
-	int GetRoomCount() {
-		return RoomManager::Instance().RoomCount();
-	}
+    uint64 GetMemoryUsage()
+    {
+        PROCESS_MEMORY_COUNTERS_EX pmc;
+        if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
+        {
+            return pmc.PrivateUsage / (1024 * 1024); // MB 단위
+        }
+        return 0;
+    }
+
+    int GetRoomCount()
+    {
+        return RoomManager::Instance().RoomCount();
+    }
 };
-
