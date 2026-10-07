@@ -131,11 +131,8 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 		return;
 	}
 
-	if (_serverService->GetIocpCore()->Register(session) == false)
-	{
-		RegisterAccept(acceptEvent);
-		return;
-	}
+	// 세션은 Service::CreateSession()에서 이미 IOCP에 등록됨.
+	// 여기서 다시 등록하면 실패해서 accept한 연결이 바로 끊긴다.
 
 	cout << "[Listener] Accept New Connection : " << endl;
 

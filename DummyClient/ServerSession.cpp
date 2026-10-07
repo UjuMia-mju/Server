@@ -1,9 +1,12 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ServerSession.h"
 #include "ServerPacketHandler.h"
 
-ServerSession::ServerSession(const string& email, const string& password)
-	: _email(email), _password(password)
+atomic<int64> GRecvPacketCount = 0;
+atomic<int32> GInviteAcceptDelayMs = 1000;
+
+ServerSession::ServerSession(const string& email, const string& password, bool autoLogin)
+	: _email(email), _password(password), _autoLogin(autoLogin)
 {
 }
 
@@ -14,13 +17,18 @@ ServerSession::~ServerSession()
 
 void ServerSession::OnConnected()
 {
+	if (_autoLogin == false)
+		return;
+
 	this_thread::sleep_for(200ms);
 
-	SendLoginPacket(_email, _password);
+	SendLogin();
 }
 
 void ServerSession::OnRecvPacket(BYTE* buffer, int32 len)
 {
+	GRecvPacketCount.fetch_add(1);
+
 	PacketSessionRef session = GetPacketSessionRef();
 	ServerPacketHandler::HandlePacket(session, buffer, len);
 }
@@ -58,6 +66,21 @@ int32 ServerSession::GetPlayerTag() const
 	return _playerTag;
 }
 
+void ServerSession::SetRoomId(uint64 roomId)
+{
+	_roomId = roomId;
+}
+
+uint64 ServerSession::GetRoomId() const
+{
+	return _roomId;
+}
+
+bool ServerSession::IsInRoom() const
+{
+	return _roomId != 0;
+}
+
 void ServerSession::SendGetDbDataPacket()
 {
 	Protocol::C_GET_DB_DATA pkt;
@@ -75,6 +98,11 @@ void ServerSession::SendLoginPacket(string id, string psw)
 	Send(sendBuffer);
 
 	cout << "[Client] Login packet sent - Email: " << id << endl;
+}
+
+void ServerSession::SendLogin()
+{
+	SendLoginPacket(_email, _password);
 }
 
 void ServerSession::SendCreateRoom()

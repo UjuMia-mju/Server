@@ -511,7 +511,7 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 	}
 
 	// 방에 입장
-	gameSession->GetRoom() = targetRoom;
+	gameSession->SetRoom(targetRoom);
 	targetRoom->DoAsync(&Room::EnterLobby, gameSession->GetPlayer());
 
 	// 성공 응답 패킷 구성

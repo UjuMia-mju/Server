@@ -33,6 +33,18 @@
     <ClCompile Include="ServerSession.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="BasicTest.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="InviteFlowTest.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomStressTest.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="StressTest.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerPacketHandler.h">
@@ -51,6 +63,18 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="ServerSession.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicTest.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="InviteFlowTest.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomStressTest.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="StressTest.h">
       <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>

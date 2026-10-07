@@ -191,7 +191,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="BasicTest.cpp" />
+    <ClCompile Include="InviteFlowTest.cpp" />
+    <ClCompile Include="RoomStressTest.cpp" />
     <ClCompile Include="ServerSession.cpp" />
+    <ClCompile Include="StressTest.cpp" />
     <ClCompile Include="Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -203,8 +207,12 @@
     <ClInclude Include="Enum.pb.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Protocol.pb.h" />
+    <ClInclude Include="BasicTest.h" />
+    <ClInclude Include="InviteFlowTest.h" />
+    <ClInclude Include="RoomStressTest.h" />
     <ClInclude Include="ServerPacketHandler.h" />
     <ClInclude Include="ServerSession.h" />
+    <ClInclude Include="StressTest.h" />
     <ClInclude Include="Struct.pb.h" />
   </ItemGroup>
   <ItemGroup>

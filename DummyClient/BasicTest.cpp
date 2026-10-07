@@ -1,0 +1,139 @@
+﻿#include "pch.h"
+#include "BasicTest.h"
+#include "Service.h"
+#include "ThreadManager.h"
+#include "ServerSession.h"
+
+// =========================================================
+// [2인 시나리오 테스트] player3, player5 두 명이 로그인 후 시나리오 진행
+// =========================================================
+void BasicTest::Run()
+{
+	shared_ptr<ServerSession> player1Session;
+	shared_ptr<ServerSession> player2Session;
+
+	ClientServiceRef service1 = MakeShared<ClientService>(
+		NetAddress(L"127.0.0.1", 7777), MakeShared<IocpCore>(),
+		[&]() {
+			player1Session = MakeShared<ServerSession>("player3@test.com", "1234");
+			return player1Session;
+		}, 1);
+
+	ClientServiceRef service2 = MakeShared<ClientService>(
+		NetAddress(L"127.0.0.1", 7777), MakeShared<IocpCore>(),
+		[&]() {
+			player2Session = MakeShared<ServerSession>("player5@test.com", "1234");
+			return player2Session;
+		}, 1);
+
+	ASSERT_CRASH(service1->Start());
+	this_thread::sleep_for(300ms);
+	ASSERT_CRASH(service2->Start());
+	this_thread::sleep_for(300ms);
+
+	// 각 서비스별 워커 스레드
+	for (int32 i = 0; i < 2; i++)
+	{
+		GThreadManager->Launch([=]()
+			{
+				while (true)
+				{
+					service1->GetIocpCore()->Dispatch();
+				}
+			});
+	}
+
+	for (int32 i = 0; i < 2; i++)
+	{
+		GThreadManager->Launch([=]()
+			{
+				while (true)
+				{
+					service2->GetIocpCore()->Dispatch();
+				}
+			});
+	}
+
+	GThreadManager->Launch([&]()
+		{
+			cout << "\n========== Test Scenario Start ==========\n" << endl;
+
+			// 0. 데이터 받아오기
+			player1Session->SendGetDbDataPacket();
+
+			// 1. 로그인 대기
+			cout << "[Step 1] Waiting for login..." << endl;
+			while (!player1Session || !player2Session ||
+				!player1Session->IsLoginCompleted() ||
+				!player2Session->IsLoginCompleted())
+			{
+				this_thread::sleep_for(100ms);
+			}
+
+			cout << "[Step 1] Both players logged in successfully!\n" << endl;
+
+			// 뽑기
+			//this_thread::sleep_for(2s);
+			//player1Session->SendGacha();
+
+			//// 2. Player1 방 생성
+			//cout << "[Step 2 - 1] Player1 creating room..." << endl;
+			//player1Session->SendCreateRoom();
+			//this_thread::sleep_for(2s); // 방 생성 대기
+			//cout << "[Step 2 - 2] Room created!\n" << endl;
+
+			//// 3. Player1이 Player2 초대
+			//cout << "[Step 3] Player1 inviting Player2..." << endl;
+			//cout << "Target: " << player2Session->GetPlayerName()
+			//	<< "#" << player2Session->GetPlayerTag() << endl;
+
+			//player1Session->SendInvitePacket(
+			//	player2Session->GetPlayerName(),
+			//	player2Session->GetPlayerTag()
+			//);
+			//this_thread::sleep_for(2s); // 초대 처리 대기
+			//cout << "[Step 3] Invitation success!\n" << endl;
+
+			//cout << "[Step 4] Both players getting ready..." << endl;
+			//player1Session->SendReady(true);
+			//this_thread::sleep_for(500ms);
+			//player2Session->SendReady(true);
+			//this_thread::sleep_for(1s);
+			//cout << "[Step 5] Both players are ready!\n" << endl;
+
+			//// 6. 방장(Player1)이 게임 시작
+
+			//this_thread::sleep_for(2s);
+			//cout << "[Step 6] Player1 (room owner) starting game..." << endl;
+			//player1Session->SendStartRoom();
+			//this_thread::sleep_for(2s); // 게임 시작 대기
+			//cout << "[Step 6] Game started!\n" << endl;
+
+			//// 7. 둘다 같은 스테이지 정보 받는지 확인
+			////cout << "[Step 7] Requesting stage info for both players..." << endl;
+			////player1Session->SendShowStage(1, 1); // Stage 1-1
+			////this_thread::sleep_for(500ms);
+			////player2Session->SendShowStage(1, 1); // Stage 1-1
+			////this_thread::sleep_for(2s);
+			////cout << "[Step 7] Stage info received (check above logs)\n" << endl;
+
+
+			////8. 호스트가 선택하는 맵이 게스트한테도 똑같이 보이는지 확인
+			//this_thread::sleep_for(2s);
+
+			//player1Session->SendHostStageSelect(1);
+
+			//this_thread::sleep_for(2s);
+
+			//player1Session->SendHostStageSelect(2);
+
+			//this_thread::sleep_for(2s);
+			//// 스테이지 클리어 정보
+			//player1Session->SendStageClear(1, 3, 3);
+
+			//cout << "\n========== Test Scenario Complete ==========\n" << endl;
+		});
+
+	GThreadManager->Join();
+}
+// =========================================================
