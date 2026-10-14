@@ -405,18 +405,6 @@ WorkerThreads=5
 
 ## 14. 첨부 자료 위치
 
-아래 폴더에 이후 게임 아키텍처 이미지, 영상, 스크린샷을 넣으면 됩니다.
-
-- docs/architecture/
-- docs/media/
-
-예시:
-
-- docs/architecture/architecture.png
-- docs/media/gameplay_1.png
-- docs/media/gameplay_2.png
-- docs/media/trailer.mp4
-
 ---
 
 ## 15. 요약
