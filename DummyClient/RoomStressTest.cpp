@@ -3,9 +3,8 @@
 #include "StressTest.h"
 #include "ServerSession.h"
 #include "ServerPacketHandler.h"
-#include <algorithm>
-#include <iomanip>
-#include <sstream>
+#include "RelayStats.h"
+#include "PacketStats.h"
 
 // =========================================================
 // 테스트 설정 (여기 값만 바꿔서 실행)
@@ -20,64 +19,11 @@ static const int32 ROOM_SIZE = 4;
 static const uint32 RELAY_PACKET_ID = 1;
 static const auto ROOM_TIMEOUT = 10s;
 
-// 지연시간 수집 (IOCP 워커 스레드에서 기록, 메인 스레드에서 1초마다 가져감)
-static mutex GLatencyLock;
-static vector<int64> GLatencyUs;
-static atomic<int64> GRelayRecvCount = 0;
-
 static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payloadSize, int32 durationSec, bool verbose);
 
 void RoomStressTest::Run()
 {
 	RunRoomStressTest(CLIENT_COUNT, SEND_INTERVAL_MS, PAYLOAD_SIZE, DURATION_SEC, VERBOSE);
-}
-
-static int64 NowUs()
-{
-	return chrono::duration_cast<chrono::microseconds>(chrono::steady_clock::now().time_since_epoch()).count();
-}
-
-void RoomStressTest::OnRelayReceived(const string& payload)
-{
-	if (payload.size() < sizeof(int64))
-		return;
-
-	// 같은 프로세스에서 보내고 받기 때문에 steady_clock 기준 시각을 그대로 비교 가능
-	int64 sentUs = 0;
-	::memcpy(&sentUs, payload.data(), sizeof(int64));
-	int64 latencyUs = NowUs() - sentUs;
-
-	GRelayRecvCount.fetch_add(1);
-
-	lock_guard<mutex> guard(GLatencyLock);
-	GLatencyUs.push_back(latencyUs);
-}
-
-static vector<int64> TakeLatencySamples()
-{
-	vector<int64> samples;
-	lock_guard<mutex> guard(GLatencyLock);
-	samples.swap(GLatencyUs);
-	return samples;
-}
-
-// "p50 0.42ms / p99 1.80ms / max 3.10ms"
-static string FormatLatency(vector<int64>& samples)
-{
-	if (samples.empty())
-		return "no samples";
-
-	sort(samples.begin(), samples.end());
-	auto percentile = [&](int32 p) -> double
-		{
-			size_t index = min(samples.size() - 1, samples.size() * p / 100);
-			return samples[index] / 1000.0;
-		};
-
-	ostringstream ss;
-	ss << fixed << setprecision(2)
-		<< "p50 " << percentile(50) << "ms / p99 " << percentile(99) << "ms / max " << samples.back() / 1000.0 << "ms";
-	return ss.str();
 }
 
 // countFn() == target이 되거나 timeout까지 대기, 마지막 count 반환
@@ -241,8 +187,7 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 
 	// 서버에서 EnterLobby가 DoAsync로 처리되므로 방 멤버 등록이 끝나도록 잠깐 대기
 	this_thread::sleep_for(500ms);
-	GRelayRecvCount.store(0);
-	TakeLatencySamples();
+	RelayStats::Reset();
 
 	// 4. 릴레이 패킷 반복 전송
 	out << "[RoomStress] Relay start (C_RELAY_PACKET -> other " << (ROOM_SIZE - 1) << " members)" << endl;
@@ -256,6 +201,7 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 
 	auto testStart = chrono::steady_clock::now();
 	auto lastReport = testStart;
+	PacketStats::TakeRate();	// 이전 단계에서 보낸 개수는 버림
 	auto nextTick = testStart;
 
 	while (true)
@@ -265,8 +211,7 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 		for (auto& session : active)
 		{
 			// payload 앞 8byte = 보낸 시각(us)
-			int64 now = NowUs();
-			::memcpy(&payload[0], &now, sizeof(int64));
+			RelayStats::StampSendTime(payload);
 
 			Protocol::C_RELAY_PACKET pkt;
 			pkt.set_packet_id(RELAY_PACKET_ID);
@@ -283,12 +228,14 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 		// 1초마다 통계 출력
 		if (now - lastReport >= 1s)
 		{
-			int64 recv = GRelayRecvCount.load();
+			int64 recv = RelayStats::RecvCount();
 			int64 elapsed = chrono::duration_cast<chrono::seconds>(now - testStart).count();
-			vector<int64> samples = TakeLatencySamples();
+			vector<int64> samples = RelayStats::TakeSamples();
 
 			out << "  [" << elapsed << "s] Sent " << sentThisSec << " pkt/s, Recv " << (recv - lastRecv)
-				<< " pkt/s | Latency " << FormatLatency(samples) << endl;
+				<< " pkt/s | Latency " << RelayStats::FormatLatency(samples) << endl;
+
+			out << "        " << PacketStats::TakeRate() << endl;
 
 			allLatency.insert(allLatency.end(), samples.begin(), samples.end());
 			sentThisSec = 0;
@@ -305,16 +252,17 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 	// 마지막 응답이 도착할 시간을 조금 준다
 	this_thread::sleep_for(2s);
 
-	vector<int64> rest = TakeLatencySamples();
+	vector<int64> rest = RelayStats::TakeSamples();
 	allLatency.insert(allLatency.end(), rest.begin(), rest.end());
-	int64 totalRecv = GRelayRecvCount.load();
+	int64 totalRecv = RelayStats::RecvCount();
 
 	out << "\n========== ROOM RELAY STRESS TEST END ==========" << endl;
 	out << "  Rooms: " << fullRooms << " full / " << roomCount << ", sending clients: " << active.size() << endl;
 	out << "  Total sent: " << totalSent << " / Total recv: " << totalRecv << " (expected " << expectedRecv << ")" << endl;
-	out << "  Latency (all): " << FormatLatency(allLatency) << endl;
+	out << "  Latency (all): " << RelayStats::FormatLatency(allLatency) << endl;
 	if (totalRecv < expectedRecv)
 		out << "  * Received " << (expectedRecv - totalRecv) << " fewer relay packets than expected." << endl;
+	PacketStats::Report(out);
 	out.flush();
 
 	// IOCP 워커 스레드가 무한 루프라 프로세스를 바로 종료

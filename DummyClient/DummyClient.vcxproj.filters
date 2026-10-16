@@ -39,6 +39,18 @@
     <ClCompile Include="InviteFlowTest.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="GameFlowTest.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="RelayStats.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketStats.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPhase.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
     <ClCompile Include="RoomStressTest.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -69,6 +81,18 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="InviteFlowTest.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFlowTest.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="RelayStats.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketStats.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPhase.h">
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="RoomStressTest.h">

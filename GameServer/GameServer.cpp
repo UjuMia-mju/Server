@@ -15,6 +15,7 @@
 #include "TypeCast.h"
 #include "DBCacheManager.h"
 #include "AdminSession.h"
+#include "LockStats.h"
 
 std::atomic<int64> g_inboundPacketCount(0);
 std::atomic<int64> g_outboundPacketCount(0);
@@ -116,6 +117,35 @@ int main()
 				}
 			}
 		});
+
+#if USE_LOCK_STATS
+	// 락 호출 통계 ([Lock] 태그): 1초마다 클래스별 READ/WRITE 호출 수, 10초마다 누적
+	//   끄려면 ServerCore/LockStats.h의 USE_LOCK_STATS를 0으로
+	GThreadManager->Launch([]()
+		{
+			const int32 TOTAL_EVERY_SEC = 10;
+			int32 tick = 0;
+			bool printedSinceTotal = false;
+			while (true)
+			{
+				this_thread::sleep_for(1s);
+
+				string line = LockStats::TakeRateLine(1);
+				if (line.empty() == false)
+				{
+					cout << line << endl;
+					printedSinceTotal = true;
+				}
+
+				// 일이 있었던 구간에만 누적 출력 (idle일 때 로그가 쌓이지 않게)
+				if (++tick % TOTAL_EVERY_SEC == 0 && printedSinceTotal)
+				{
+					cout << LockStats::TotalLine() << endl;
+					printedSinceTotal = false;
+				}
+			}
+		});
+#endif
 
 	for (int32 i = 0; i < workerThreads; i++)
 	{

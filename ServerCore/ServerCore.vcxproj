@@ -177,6 +177,7 @@
     <ClInclude Include="JobQueue.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="Lock.h" />
+    <ClInclude Include="LockStats.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="NetAdress.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="JobQueue.cpp" />
     <ClCompile Include="Listener.cpp" />
     <ClCompile Include="Lock.cpp" />
+    <ClCompile Include="LockStats.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="NetAdress.cpp" />

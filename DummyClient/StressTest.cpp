@@ -4,6 +4,7 @@
 #include "ThreadManager.h"
 #include "ServerSession.h"
 #include "ServerPacketHandler.h"
+#include "PacketStats.h"
 
 // =========================================================
 // 테스트 설정 (여기 값만 바꿔서 실행)
@@ -176,6 +177,7 @@ static void RunStressTest(int32 clientCount, int32 intervalMs, int32 durationSec
 
 	auto testStart = chrono::steady_clock::now();
 	auto lastReport = testStart;
+	PacketStats::TakeRate();	// 이전 단계에서 보낸 개수는 버림
 	auto nextTick = testStart;
 
 	while (true)
@@ -202,6 +204,8 @@ static void RunStressTest(int32 clientCount, int32 intervalMs, int32 durationSec
 			out << "  [" << elapsed << "s] Sent " << sentThisSec << " pkt/s, Recv " << (recv - lastRecv)
 				<< " pkt/s (Total sent " << totalSent << " / recv " << recv << ")" << endl;
 
+			out << "        " << PacketStats::TakeRate() << endl;
+
 			sentThisSec = 0;
 			lastRecv = recv;
 			lastReport = now;
@@ -222,6 +226,7 @@ static void RunStressTest(int32 clientCount, int32 intervalMs, int32 durationSec
 	out << "  Total sent: " << totalSent << " / Total recv: " << totalRecv << endl;
 	if (totalRecv < totalSent)
 		out << "  * Received " << (totalSent - totalRecv) << " fewer packets than sent. Check if the server is falling behind or some packets have no response." << endl;
+	PacketStats::Report(out);
 	out.flush();
 
 	// IOCP 워커 스레드가 무한 루프라 프로세스를 바로 종료
