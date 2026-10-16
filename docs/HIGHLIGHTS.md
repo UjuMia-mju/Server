@@ -13,7 +13,7 @@
 | 구분 | 범위 | 비고 |
 | --- | --- | --- |
 | **강의 기반 (원리 학습 후 구현)** | `ServerCore/` — IOCP 코어, 세션, 송수신 버퍼, RW SpinLock, 메모리 풀, 잡 큐·잡 타이머, DB 커넥션 풀 / `Tools/PacketGenerator` | 아래 2-④처럼 **비정상 경로를 직접 보강**한 지점이 있습니다 |
-| **직접 설계·구현** | `GameServer/` 전체 — 계정·방·초대 세션, Relay, 요청별 상태 검증, 관리자 채널, 뽑기·스테이지·DB 캐시 / `DummyClient/` 부하 테스트 | 아래 2-①②③⑤⑥ |
+| **직접 설계·구현** | `GameServer/` 전체 — 계정·방·초대 세션, Relay, 요청별 상태 검증, 관리자 채널, 뽑기·스테이지·DB 캐시 / `DummyClient/` 부하 테스트 | 2-①②③⑥, 2-⑤의 측정 도구와 판단 |
 
 ---
 
@@ -61,8 +61,8 @@
 
 | 볼 곳 | 확인 포인트 |
 | --- | --- |
-| [`Lock::WriteLock`](../ServerCore/Lock.cpp#L7-L54) | 같은 스레드의 쓰기 재진입 허용, 타임아웃 시 즉시 크래시로 데드락 위치 확인 |
-| [`Session::ProcessSend`](../ServerCore/Session.cpp#L294-L317) | 재진입이 실제로 필요한 경로 (`WRITE_LOCK` 안에서 `RegisterSend`가 같은 락을 다시 잡음) |
+| [`Lock::WriteLock`](../ServerCore/Lock.cpp#L7-L54) (강의 기반) | 같은 스레드의 쓰기 재진입 허용, 타임아웃 시 즉시 크래시로 데드락 위치 확인 |
+| [`Session::ProcessSend`](../ServerCore/Session.cpp#L294-L317) (강의 기반) | 재진입이 실제로 필요한 경로 (`WRITE_LOCK` 안에서 `RegisterSend`가 같은 락을 다시 잡음) |
 
 **측정 방법 — 더미 클라이언트와 두 가지 통계**
 
