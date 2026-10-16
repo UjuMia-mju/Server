@@ -11,12 +11,6 @@
 // 1. 패킷 구조체 정의 (TCP 경계 처리 및 직렬화용)
 // --------------------------------------------------
 #pragma pack(push, 1)
-struct PacketHeader
-{
-    uint16 size;
-    uint16 id; // 예: PKT_S2C_ADMIN_SERVER_STATUS = 0x9001
-};
-
 struct PKT_S2C_AdminServerStatus
 {
     PacketHeader header;
@@ -32,6 +26,7 @@ class AdminSession : public PacketSession
 {
 private:
     atomic<bool> _authenticated = false;
+    JobQueueRef _timerQueue = MakeShared<JobQueue>();
     uint64 _timerId = 0; // 등록된 타이머 ID 관리를 통한 취소 처리
 
 public:
@@ -74,7 +69,11 @@ public:
 
         // 1초 뒤에 SendServerStatus를 실행하도록 JobTimer에 예약
         // (프로젝트의 JobTimer 구현 방식에 맞춰 호출)
-        _timerId = GJobTimer->Reserve(1000, [self]() {
+        weak_ptr<AdminSession> weakSelf = self;
+        _timerQueue->DoTimer(1000, [weakSelf]() {
+            shared_ptr<AdminSession> self = weakSelf.lock();
+            if (self == nullptr)
+                return;
             self->SendServerStatus();
             self->ScheduleNextStatusUpdate(); // 다음 1초 예약 (Self-rearming timer)
             });

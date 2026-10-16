@@ -12,11 +12,12 @@ uint64 RoomManager::GenerateRoomId()
 
 RoomRef RoomManager::CreateRoom(uint64 hostPlayerId, const string& hostName, int32 hostTag)
 {
-	uint64 newRoomId = GenerateRoomId();
 	string roomName = hostName + "'s Room";
+	
+	WRITE_LOCK;
+	uint64 newRoomId = GenerateRoomId();
 	RoomRef room = MakeShared<Room>(newRoomId, roomName, hostPlayerId, hostName, hostTag);
 
-	WRITE_LOCK;
 	_rooms[newRoomId] = room;
 
 	return room;

@@ -48,6 +48,9 @@
     <ClInclude Include="Lock.h">
       <Filter>Thread</Filter>
     </ClInclude>
+    <ClInclude Include="LockStats.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
     <ClInclude Include="DeadLockProfiler.h">
       <Filter>Thread</Filter>
     </ClInclude>
@@ -147,6 +150,9 @@
       <Filter>Thread</Filter>
     </ClCompile>
     <ClCompile Include="Lock.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="LockStats.cpp">
       <Filter>Thread</Filter>
     </ClCompile>
     <ClCompile Include="DeadLockProfiler.cpp">

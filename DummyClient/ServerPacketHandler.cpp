@@ -2,6 +2,7 @@
 #include "ServerPacketHandler.h"
 #include "BufferReader.h"
 #include "ServerSession.h"
+#include "RelayStats.h"
 
 PacketHandleFunc GPacketHandler[UINT16_MAX];
 static int room_id = 0;
@@ -16,6 +17,7 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 
 bool Handle_S_RELAY_PACKET(PacketSessionRef& session, Protocol::S_RELAY_PACKET& pkt)
 {
+	RelayStats::OnReceived(pkt.payload());
 	return true;
 }
 
@@ -63,25 +65,25 @@ bool Handle_S_GACHA(PacketSessionRef& session, Protocol::S_GACHA& pkt)
 	if (pkt.success())
 	{
 		cout << "\n============================================\n";
-		cout << u8"[가챠 대성공] 결과를 확인하세요!\n";
+		cout << "[Gacha Success] Check the results!\n";
 
 		const auto& result = pkt.result();
-		cout << u8"소모한 젬: " << result.gems_spent() << u8" / 남은 젬: " << result.remaining_gems() << "\n\n";
+		cout << "Gems spent: " << result.gems_spent() << " / Gems left: " << result.remaining_gems() << "\n\n";
 
 		// 얻은 스킨 리스트 출력
 		for (int i = 0; i < result.obtained_skins_size(); ++i)
 		{
 			const auto& skin = result.obtained_skins(i);
-			cout << u8"  [당첨] 스킨 ID: " << skin.skin_id() << "\n";
-			cout << u8"      이름: " << skin.skin_name() << "\n";
-			cout << u8"      설명: " << skin.skin_des() << "\n";
-			cout << u8"      등급: " << skin.rarity() << "\n";
+			cout << "  [Obtained] Skin ID: " << skin.skin_id() << "\n";
+			cout << "      Name: " << skin.skin_name() << "\n";
+			cout << "      Desc: " << skin.skin_des() << "\n";
+			cout << "      Rarity: " << skin.rarity() << "\n";
 		}
 		cout << "============================================\n";
 	}
 	else
 	{
-		cout << "\nu8[가챠 실패] " << pkt.error_msg() << "\n";
+		cout << "\n[Gacha Failed] " << pkt.error_msg() << "\n";
 	}
 
 	return true;
@@ -172,6 +174,7 @@ bool Handle_S_CREATE_ROOM(PacketSessionRef& session, Protocol::S_CREATE_ROOM& pk
 	}
 
 	cout << "[Client] Room created - ID: " << pkt.room().room_id() << endl;
+	static_pointer_cast<ServerSession>(session)->SetRoomId(pkt.room().room_id());
 	return true;
 }
 
@@ -210,6 +213,7 @@ bool Handle_S_ENTER_ROOM(PacketSessionRef& session, Protocol::S_ENTER_ROOM& pkt)
 
 	// room_id 저장 (게임 시작 시 사용)
 	room_id = pkt.room().room_id();
+	static_pointer_cast<ServerSession>(session)->SetRoomId(pkt.room().room_id());
 
 	return true;
 }
@@ -247,7 +251,8 @@ bool Handle_S_INVITE_NOTIFICATION(PacketSessionRef& session, Protocol::S_INVITE_
 	cout << "========================================\n" << endl;
 
 	// 자동 수락
-	this_thread::sleep_for(1s);
+	if (GInviteAcceptDelayMs > 0)
+		this_thread::sleep_for(chrono::milliseconds(GInviteAcceptDelayMs.load()));
 
 	Protocol::C_INVITE_RESPONSE responsePkt;
 	responsePkt.set_invite_id(pkt.invite_id());
@@ -255,7 +260,7 @@ bool Handle_S_INVITE_NOTIFICATION(PacketSessionRef& session, Protocol::S_INVITE_
 	room_id = pkt.room_id(); // 나중에 게임 입장할 때 사용
 
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(responsePkt);
-	session->Send(sendBuffer);
+	static_pointer_cast<ServerSession>(session)->Send(sendBuffer);
 
 	cout << "[Client] Accepted invitation" << endl;
 	return true;
@@ -287,6 +292,8 @@ bool Handle_S_ROOM_MEMBER_LEAVE(PacketSessionRef& session, Protocol::S_ROOM_MEMB
 
 bool Handle_S_READY(PacketSessionRef& session, Protocol::S_READY& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->OnReadyChanged(pkt.player_id(), pkt.is_ready());
+
 	cout << "[Room] Player " << pkt.player_id()
 		<< (pkt.is_ready() ? " is ready" : " cancelled ready") << endl;
 	return true;
@@ -317,11 +324,9 @@ bool Handle_S_START_ROOM(PacketSessionRef& session, Protocol::S_START_ROOM& pkt)
 		cout << "  No stages cleared yet." << endl;
 	}
 
-	Protocol::C_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_playerindex(0);
-	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
-	session->Send(sendBuffer);
-	cout << "[Client] ========== GAME STARTED! ==========" << endl;
+	// 스테이지 선택 화면으로 진입. C_ENTER_GAME은 S_START_STAGE를 받은 뒤에 보냄
+	static_pointer_cast<ServerSession>(session)->SetRoomStarted();
+	cout << "[Client] ========== ROOM STARTED (stage select) ==========" << endl;
 	return true;
 }
 
@@ -337,6 +342,7 @@ bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt)
 	auto stageInfo = pkt.stage();
 	cout << "Map ID: " << stageInfo.map_id() << "-" << stageInfo.stage_name() << "-" << stageInfo.description() << endl;
 
+	static_pointer_cast<ServerSession>(session)->OnShowStageReceived();
 	return true;
 }
 
@@ -346,6 +352,7 @@ bool Handle_S_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::S_HOST_SHOW_S
 	auto stageInfo = pkt.stage();
 	cout << "Map ID: " << stageInfo.map_id() << "-" << stageInfo.stage_name() << "-" << stageInfo.description() << endl;
 
+	static_pointer_cast<ServerSession>(session)->SetHostStage(stageInfo.map_id());
 	return true;
 }
 
@@ -358,6 +365,9 @@ bool Handle_S_START_STAGE(PacketSessionRef& session, Protocol::S_START_STAGE& pk
 	}
 
 	cout << "[Client] Stage started successfully!" << endl;
+
+	// 스테이지 시작 -> 게임 씬 로드 -> 게임 입장
+	static_pointer_cast<ServerSession>(session)->SendStageEnter();
 	return true;
 }
 
@@ -409,6 +419,8 @@ bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 
 bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_READY_TO_START& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetGameReady();
+
 	int time = pkt.start_delay_seconds();	
 	cout << "[Client] Game is ready to start! time : " << time << " seconds" << endl;
 
@@ -429,6 +441,7 @@ bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt)
 
 bool Handle_S_ROOM_DESTROY(PacketSessionRef& session, Protocol::S_ROOM_DESTROY& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRoomId(0);
 	return true;
 }
 
@@ -436,13 +449,17 @@ bool Handle_S_STAGE_INFO(PacketSessionRef& session, Protocol::S_STAGE_INFO& pkt)
 {
 	cout << "\n========== Stage Info ==========" << endl;
 	auto stageInfo = pkt.stages();
+	vector<StageKey> stages;
 	for (int i = 0; i < stageInfo.size(); i++)
 	{
 		const auto& stage = stageInfo[i];
 		cout << "Stage " << stage.map_id() << "-"
 			<< stage.stage_name() << ": " << stage.description() << endl;
+
+		stages.push_back(StageKey{ stage.map_id(), stage.chapter(), stage.stage() });
 	}
 
+	static_pointer_cast<ServerSession>(session)->SetStageList(move(stages));
 	return true;
 }
 

@@ -1,9 +1,13 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ServerSession.h"
 #include "ServerPacketHandler.h"
+#include "PacketStats.h"
 
-ServerSession::ServerSession(const string& email, const string& password)
-	: _email(email), _password(password)
+atomic<int64> GRecvPacketCount = 0;
+atomic<int32> GInviteAcceptDelayMs = 1000;
+
+ServerSession::ServerSession(const string& email, const string& password, bool autoLogin)
+	: _email(email), _password(password), _autoLogin(autoLogin)
 {
 }
 
@@ -14,13 +18,18 @@ ServerSession::~ServerSession()
 
 void ServerSession::OnConnected()
 {
+	if (_autoLogin == false)
+		return;
+
 	this_thread::sleep_for(200ms);
 
-	SendLoginPacket(_email, _password);
+	SendLogin();
 }
 
 void ServerSession::OnRecvPacket(BYTE* buffer, int32 len)
 {
+	GRecvPacketCount.fetch_add(1);
+
 	PacketSessionRef session = GetPacketSessionRef();
 	ServerPacketHandler::HandlePacket(session, buffer, len);
 }
@@ -28,6 +37,12 @@ void ServerSession::OnRecvPacket(BYTE* buffer, int32 len)
 void ServerSession::OnSend(int32 len)
 {
 	// Optional: Add logging if needed
+}
+
+void ServerSession::Send(SendBufferRef sendBuffer)
+{
+	PacketStats::OnSend(sendBuffer);
+	PacketSession::Send(sendBuffer);
 }
 
 void ServerSession::OnDisconnected()
@@ -58,6 +73,96 @@ int32 ServerSession::GetPlayerTag() const
 	return _playerTag;
 }
 
+void ServerSession::SetRoomId(uint64 roomId)
+{
+	_roomId = roomId;
+}
+
+uint64 ServerSession::GetRoomId() const
+{
+	return _roomId;
+}
+
+bool ServerSession::IsInRoom() const
+{
+	return _roomId != 0;
+}
+
+void ServerSession::OnReadyChanged(uint64 playerId, bool isReady)
+{
+	lock_guard<mutex> guard(_readyLock);
+	if (isReady)
+		_readyPlayers.insert(playerId);
+	else
+		_readyPlayers.erase(playerId);
+}
+
+int32 ServerSession::GetReadyCount()
+{
+	lock_guard<mutex> guard(_readyLock);
+	return static_cast<int32>(_readyPlayers.size());
+}
+
+void ServerSession::SetGameReady()
+{
+	_isGameReady = true;
+}
+
+bool ServerSession::IsGameReady() const
+{
+	return _isGameReady;
+}
+
+void ServerSession::SetRoomStarted()
+{
+	_isRoomStarted = true;
+}
+
+bool ServerSession::IsRoomStarted() const
+{
+	return _isRoomStarted;
+}
+
+void ServerSession::SetStageList(vector<StageKey> stages)
+{
+	{
+		lock_guard<mutex> guard(_stageLock);
+		_stageList = move(stages);
+	}
+	_hasStageList = true;
+}
+
+vector<StageKey> ServerSession::GetStageList()
+{
+	lock_guard<mutex> guard(_stageLock);
+	return _stageList;
+}
+
+bool ServerSession::HasStageList() const
+{
+	return _hasStageList;
+}
+
+void ServerSession::OnShowStageReceived()
+{
+	_showStageCount.fetch_add(1);
+}
+
+int32 ServerSession::GetShowStageCount() const
+{
+	return _showStageCount;
+}
+
+void ServerSession::SetHostStage(int32 mapId)
+{
+	_hostStage = mapId;
+}
+
+int32 ServerSession::GetHostStage() const
+{
+	return _hostStage;
+}
+
 void ServerSession::SendGetDbDataPacket()
 {
 	Protocol::C_GET_DB_DATA pkt;
@@ -75,6 +180,11 @@ void ServerSession::SendLoginPacket(string id, string psw)
 	Send(sendBuffer);
 
 	cout << "[Client] Login packet sent - Email: " << id << endl;
+}
+
+void ServerSession::SendLogin()
+{
+	SendLoginPacket(_email, _password);
 }
 
 void ServerSession::SendCreateRoom()
@@ -158,13 +268,14 @@ void ServerSession::SendHostStageSelect(int32 map_id)
 	Send(sendBuffer);
 }
 
-void ServerSession::SendStartStage(int32 map_id)
+void ServerSession::SendStartStage(int32 map_id, int32 chapter, int32 stageIndex)
 {
 	Protocol::C_START_STAGE pkt;
 
+	// 서버가 map_id + chapter + stage가 모두 맞아야 캐시 hit로 처리하므로 셋 다 보냄
 	pkt.set_map_id(map_id);
-	pkt.set_chapter(1);
-	pkt.set_stageindex(1);
+	pkt.set_chapter(chapter);
+	pkt.set_stageindex(stageIndex);
 
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);

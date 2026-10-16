@@ -2,11 +2,15 @@
 #include "Lock.h"
 #include "CoreTLS.h"
 #include "DeadLockProfiler.h"
+#include "LockStats.h"
 
 void Lock::WriteLock(const char* name)
 {
 #if _DEBUG
 	GDeadLockProfiler->PushLock(name);
+#endif
+#if USE_LOCK_STATS
+	LockStats::OnLock(name, true);
 #endif
 
 	// 동일한 스레드가 소유하고 있다면 무조건 성공
@@ -71,6 +75,9 @@ void Lock::ReadLock(const char* name)
 {
 #if _DEBUG
 	GDeadLockProfiler->PushLock(name);
+#endif
+#if USE_LOCK_STATS
+	LockStats::OnLock(name, false);
 #endif
 
 	// 동일한 스레드가 쓰기 잠금을 소유하고 있다면 무조건 성공.
