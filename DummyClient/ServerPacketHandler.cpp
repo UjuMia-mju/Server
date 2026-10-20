@@ -23,7 +23,9 @@ bool Handle_S_RELAY_PACKET(PacketSessionRef& session, Protocol::S_RELAY_PACKET& 
 }
 
 bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
-{	
+{
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_LOGIN, pkt.success());
+
 	if (pkt.success() == false)
 	{
 		return true;
@@ -448,6 +450,8 @@ bool Handle_S_GAME_READY_TO_START(PacketSessionRef& session, Protocol::S_GAME_RE
 
 bool Handle_S_GAME_CLEAR(PacketSessionRef& session, Protocol::S_GAME_CLEAR& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_GAME_CLEAR, pkt.success());
+
 	int mapId = pkt.map_id();
 	int star = pkt.star();
 	int clearTime = pkt.clear_time_seconds();

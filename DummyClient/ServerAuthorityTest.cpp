@@ -442,6 +442,143 @@ static ScenarioResult RunRelayRoute(const vector<Client>& clients, ostream& out)
 }
 
 // =========================================================
+// [relogin] 이미 로그인한 세션이 C_LOGIN을 다시 보냄 (작업 5)
+//   통과 조건: S_LOGIN(실패) + 기존 로그인 상태가 그대로라 방 생성이 됨
+// =========================================================
+static ScenarioResult RunRelogin(const vector<Client>& clients, ostream& out)
+{
+	ScenarioResult result;
+	result.name = "relogin";
+
+	ClearRecv(clients);
+	for (auto& client : clients)
+		client->SendLogin();
+
+	if (WaitUntil([&]() { return all_of(clients.begin(), clients.end(), [](const Client& c) { return RecvCount(c, PKT_S_LOGIN) > 0; }); }) == false)
+	{
+		result.timedOut = true;
+		out << "  [relogin] timeout: S_LOGIN" << endl;
+		return result;
+	}
+
+	// 기존 플레이어 상태가 살아 있으면 로그인이 필요한 방 생성이 성공해야 함
+	bool created = CreateRooms(clients);
+
+	for (auto& client : clients)
+	{
+		RecvRecord login = client->GetRecv(PKT_S_LOGIN);
+
+		result.total++;
+		if (login.success == false && client->IsInRoom())
+		{
+			result.passed++;
+			continue;
+		}
+
+		result.Fail(client->GetPlayerName() + ": second login success=" + to_string(login.success) + ", still logged in=" + to_string(client->IsInRoom()));
+	}
+
+	if (created == false || CloseRooms(clients, clients) == false)
+	{
+		result.timedOut = true;
+		out << "  [relogin] timeout: create / close room" << endl;
+	}
+
+	return result;
+}
+
+// =========================================================
+// [clear] 방장이 범위를 벗어난 C_GAME_CLEAR를 보냄 (작업 5)
+//   방장 혼자인 방에서 케이스마다 보내고, 전부 S_GAME_CLEAR(실패)여야 함
+//   (정상 값은 DB에 기록되므로 보내지 않음)
+// =========================================================
+static ScenarioResult RunInvalidClear(const vector<Client>& hosts, ostream& out)
+{
+	ScenarioResult result;
+	result.name = "clear";
+
+	auto timeout = [&](const string& step) {
+		result.timedOut = true;
+		out << "  [clear] timeout: " << step << endl;
+		return result;
+		};
+
+	// 실제로 있는 맵 ID를 하나 받아둠
+	ClearRecv(hosts);
+	hosts[0]->SendGetDbDataPacket();
+	if (WaitUntil([&]() { return hosts[0]->HasStageList(); }) == false || hosts[0]->GetStageList().empty())
+		return timeout("stage list");
+
+	int32 validMap = hosts[0]->GetStageList()[0].mapId;
+
+	if (CreateRooms(hosts) == false)
+		return timeout("create room");
+
+	struct ClearCase
+	{
+		string name;
+		bool afterStart;
+		int32 mapId;
+		int32 star;
+		int32 clearTime;
+	};
+	const vector<ClearCase> cases =
+	{
+		{ "before start", false, validMap, 3, 100 },
+		{ "unknown map",  true,  -1,       3, 100 },
+		{ "star 4",       true,  validMap, 4, 100 },
+		{ "star -1",      true,  validMap, -1, 100 },
+		{ "time 0",       true,  validMap, 3, 0 },
+		{ "time -5",      true,  validMap, 3, -5 },
+	};
+
+	bool started = false;
+	for (auto& clearCase : cases)
+	{
+		if (clearCase.afterStart && started == false)
+		{
+			for (auto& host : hosts)
+				host->SendReady(true);
+			if (WaitUntil([&]() { return all_of(hosts.begin(), hosts.end(), [](const Client& c) { return RecvCount(c, PKT_S_READY) > 0; }); }) == false)
+				return timeout("ready");
+
+			for (auto& host : hosts)
+				host->SendStartRoom();
+			if (WaitUntil([&]() { return all_of(hosts.begin(), hosts.end(), [](const Client& c) { return RecvCount(c, PKT_S_START_ROOM) > 0; }); }) == false)
+				return timeout("start room");
+
+			started = true;
+		}
+
+		ClearRecv(hosts);
+		for (auto& host : hosts)
+			host->SendStageClear(clearCase.mapId, clearCase.star, clearCase.clearTime);
+
+		if (WaitUntil([&]() { return all_of(hosts.begin(), hosts.end(), [](const Client& c) { return RecvCount(c, PKT_S_GAME_CLEAR) > 0; }); }) == false)
+			return timeout(clearCase.name);
+
+		for (auto& host : hosts)
+		{
+			result.total++;
+			if (host->GetRecv(PKT_S_GAME_CLEAR).success == false)
+			{
+				result.passed++;
+				continue;
+			}
+			result.Fail(clearCase.name + ": accepted for " + host->GetPlayerName());
+		}
+	}
+
+	if (CloseRooms(hosts, hosts) == false)
+	{
+		result.timedOut = true;
+		out << "  [clear] timeout: close room" << endl;
+	}
+
+	return result;
+}
+
+// =========================================================
 // [invite] 초대를 받은 뒤 방장이 게임 시작 -> 수락 (작업 1)
 //   그룹 3명: [0] A = 초대하는 방장 (혼자 있는 방 RA)
 //             [1] C = 초대받는 사람 (자기 방 RC의 방장)
@@ -599,6 +736,10 @@ int32 ServerAuthorityTest::Run(const vector<string>& scenarios)
 		results.push_back(RunStartReadyRace(clients, out));
 	if (wants("relay"))
 		results.push_back(RunRelayRoute(clients, out));
+	if (wants("relogin"))
+		results.push_back(RunRelogin(vector<Client>(clients.begin(), clients.begin() + min<size_t>(4, clients.size())), out));
+	if (wants("clear"))
+		results.push_back(RunInvalidClear(vector<Client>(clients.begin(), clients.begin() + min<size_t>(4, clients.size())), out));
 
 	Report(results, out);
 

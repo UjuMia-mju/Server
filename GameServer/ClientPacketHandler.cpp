@@ -61,6 +61,23 @@ namespace
 		session->Send(sendBuffer);
 	}
 
+	// 로그용 이메일 마스킹: @ 앞부분은 앞 2글자만 남긴다 (player12@test.com -> pl******@test.com)
+	string MaskEmail(const string& email)
+	{
+		size_t at = email.find('@');
+		size_t localLen = (at == string::npos) ? email.size() : at;
+		size_t keep = min<size_t>(2, localLen);
+		return email.substr(0, keep) + string(localLen - keep, '*') + email.substr(localLen);
+	}
+
+	void SendGameClearError(PacketSessionRef& session)
+	{
+		Protocol::S_GAME_CLEAR errorPkt;
+		errorPkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+	}
+
 	// 응답 패킷이 따로 없는 패킷(이동, 애니메이션, 정적 데이터 조회 등)은 인증 실패 시 응답 없이 무시한다
 	// (실패 로그는 AuthValidator가 남김)
 	void IgnoreAuthError(PacketSessionRef& session, const std::string& errorMsg)
@@ -191,10 +208,22 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 
+	// 이미 로그인한 세션의 재로그인은 거절 (기존 플레이어/방 상태를 정리하지 않고 덮어쓰게 되므로)
+	if (gameSession->GetPlayer() != nullptr)
+	{
+		cout << "Login rejected: already logged in - Player: " << gameSession->GetPlayer()->name << endl;
+
+		Protocol::S_LOGIN failPkt;
+		failPkt.set_success(false);
+		session->Send(ClientPacketHandler::MakeSendBuffer(failPkt));
+		return false;
+	}
+
 	string email = pkt.userid();
 	string password = pkt.psw();
 
-	cout << "Received Login - Email: " << email << ", Password: " << password << endl;
+	// 비밀번호는 로그에 남기지 않는다
+	cout << "Received Login - Email: " << MaskEmail(email) << endl;
 
 	Protocol::S_LOGIN sLoginPkt;
 
@@ -260,14 +289,14 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 		else
 		{
 			sLoginPkt.set_success(false);
-			std::cout << "Failed to retrieve player info for email: " << email << endl;
+			std::cout << "Failed to retrieve player info for email: " << MaskEmail(email) << endl;
 		}
 	}
 	else
 	{
 		// Fail to Login
 		sLoginPkt.set_success(false);
-		std::cout << "Failed to validate account for email: " << email << endl;
+		std::cout << "Failed to validate account for email: " << MaskEmail(email) << endl;
 	}
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(sLoginPkt);
@@ -766,16 +795,33 @@ bool Handle_C_GAME_CLEAR(PacketSessionRef& session, Protocol::C_GAME_CLEAR& pkt)
 	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
 	{
 		std::cout << "[Game Clear Failed] Only room owner can send clear packet." << endl;
-		Protocol::S_GAME_CLEAR errorPkt;
-		errorPkt.set_success(false);
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
-		session->Send(sendBuffer);
+		SendGameClearError(session);
 		return false;
 	}
 
 	int32 map_id = pkt.map_id();
 	int32 star = pkt.star();
 	int32 clear_time = pkt.clear_time_seconds();
+
+	// 클라이언트가 보낸 값을 그대로 저장하지 않고 범위를 확인한다
+	const int32 MAX_CLEAR_STAR = 3;
+	string invalidReason;
+	if (room->IsPlaying() == false)
+		invalidReason = "game not started";
+	else if (GStageManager.HasStage(map_id) == false)
+		invalidReason = "unknown map";
+	else if (star < 0 || star > MAX_CLEAR_STAR)
+		invalidReason = "star out of range";
+	else if (clear_time <= 0)
+		invalidReason = "clear time must be positive";
+
+	if (invalidReason.empty() == false)
+	{
+		std::cout << "[Game Clear Failed] " << invalidReason << " - map: " << map_id << ", star: " << star
+			<< ", clear time: " << clear_time << ", player: " << gameSession->GetPlayer()->name << endl;
+		SendGameClearError(session);
+		return false;
+	}
 
 	// 3. StageManager에서 스테이지 클리어 정보 업데이트
 	bool updateSuccess = GStageManager.UpdateStageClearInfo(gameSession->GetPlayer()->playerId, map_id, star, clear_time);

@@ -59,10 +59,12 @@ private:
 	static const int32 MAX_ROOM_CAPACITY = 4;
 	uint64 _roomId = 0;
 	string _roomName;
-	uint64 _ownerId = 0;
+	// _ownerId, _isPlaying는 핸들러(큐 밖)에서도 빠른 실패/방장 확인용으로 읽으므로 atomic
+	// (값을 바꾸는 쪽은 락 안, 최종 판정은 작업 큐 안에서 한다)
+	atomic<uint64> _ownerId = 0;
 	string _ownerName;
 	int32 _ownerTag;
-	bool _isPlaying = false;
+	atomic<bool> _isPlaying = false;
 	bool _isDestroyed = false; // 방장 퇴장으로 파괴됨 (큐에 남아 있던 입장 요청을 거절하기 위함)
 
 	unordered_map<uint64, PlayerRef> _players;

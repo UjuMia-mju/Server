@@ -43,6 +43,7 @@ public:
 	bool GetMyStageClearInfo(int32 userId, OUT xvector<StageClearInfo>& clears);
 	void FillStageListPacket(Protocol::S_STAGE_INFO& pkt) const;
 	StageInfo GetStageInfoById(int stageId) const;
+	bool HasStage(int mapId) const { return _stageCache.find(mapId) != _stageCache.end(); }
 	void ChangeProtocolToStageInfo(const Protocol::StageInfo& proto, OUT StageInfo& stageInfo) const;
 	void ChangeStageInfoToProtocol(const StageInfo& stageInfo, OUT Protocol::StageInfo& proto) const;
 	bool UpdateStageClearInfo(int32 userId, int mapId, int star, int clearTime);
