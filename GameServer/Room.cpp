@@ -410,44 +410,46 @@ void Room::EnterGame(PlayerRef player)
 	}
 }
 
+// 전달 경로는 보낸 사람 기준으로 서버가 정한다. (클라이언트 플래그로 경로를 넓힐 수 없음)
+//   - 방장이 아닌 사람 -> 플래그와 상관없이 방장에게만 (Peer -> Host)
+//   - 방장 + requireHostAuthority = true  -> 본인 포함 방 전체
+//   - 방장 + requireHostAuthority = false -> 본인 제외 방 전체 (Host -> Peer)
 void Room::RelayPacket(PlayerRef sender, SendBufferRef sendBuffer, bool requireHostAuthority)
 {
-	// Host 에게만 전송한다. (Peer -> Host)
-	if (requireHostAuthority)
+	bool isHost = false;
+	GameSessionRef hostSession = nullptr;
+
+	// 1. 방장 여부와 방장 세션을 같은 락 안에서 확인 (락 최소화)
 	{
-		if (sender->playerId != _ownerId)
+		READ_LOCK;
+		isHost = (sender->playerId == _ownerId);
+		if (isHost == false)
 		{
-			GameSessionRef hostSession = nullptr;
-
-			// 1. 필요한 호스트 세션만 빠르게 훔친다 (락 최소화)
+			auto it = _players.find(_ownerId);
+			if (it != _players.end())
 			{
-				READ_LOCK;
-				auto it = _players.find(_ownerId);
-				if (it != _players.end())
-				{
-					hostSession = static_pointer_cast<GameSession>(it->second->ownerSession.lock());
-				}
-			} // 락 해제
-
-			// 2. 락 밖에서 전송
-			if (hostSession != nullptr)
-			{
-				hostSession->Send(sendBuffer);
-			}
-			else
-			{
-				cout << "Host player not found in room " << _roomId << endl;
+				hostSession = static_pointer_cast<GameSession>(it->second->ownerSession.lock());
 			}
 		}
-		else
-		{
+	} // 락 해제
+
+	// 2. 락 밖에서 전송
+	if (isHost)
+	{
+		if (requireHostAuthority)
 			Broadcast(sendBuffer);
-		}
+		else
+			BroadcastExcept(sendBuffer, sender->playerId);
+		return;
 	}
-	// Host가 전체에게 전송한다. (Host -> Peer)
+
+	if (hostSession != nullptr)
+	{
+		hostSession->Send(sendBuffer);
+	}
 	else
 	{
-		BroadcastExcept(sendBuffer, sender->playerId);
+		cout << "Host player not found in room " << _roomId << endl;
 	}
 }
 

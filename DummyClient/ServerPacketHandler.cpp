@@ -17,6 +17,7 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 
 bool Handle_S_RELAY_PACKET(PacketSessionRef& session, Protocol::S_RELAY_PACKET& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_RELAY_PACKET, true, "", static_cast<int64>(pkt.sender_id()));
 	RelayStats::OnReceived(pkt.payload());
 	return true;
 }

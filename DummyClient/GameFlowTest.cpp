@@ -239,7 +239,8 @@ static RelayResult RunRelay(const vector<Group>& rooms, int32 minPerSec, int32 m
 	struct Sender
 	{
 		Client client;
-		int64 receivers = 0;	// 한 번 보내면 받는 사람 수 (방 인원 - 1)
+		bool isHost = false;	// 실제 클라이언트처럼 방장은 나머지 전원에게(false), 멤버는 방장에게만(true) 보냄
+		int64 receivers = 0;	// 한 번 보내면 받는 사람 수 (방장: 방 인원 - 1, 멤버: 1)
 		int32 perSec = 0;		// 이번 1초 동안의 초당 전송 수
 		int64 nextUs = 0;		// 다음 전송 시각
 	};
@@ -262,7 +263,8 @@ static RelayResult RunRelay(const vector<Group>& rooms, int32 minPerSec, int32 m
 		{
 			Sender sender;
 			sender.client = member;
-			sender.receivers = static_cast<int64>(room.members.size()) - 1;
+			sender.isHost = member == room.Host();
+			sender.receivers = sender.isHost ? static_cast<int64>(room.members.size()) - 1 : 1;
 			sender.perSec = rateDist(rng);
 			sender.nextUs = startUs + uniform_int_distribution<int64>(0, 1'000'000 / sender.perSec)(rng);
 			senders.push_back(sender);
@@ -294,7 +296,7 @@ static RelayResult RunRelay(const vector<Group>& rooms, int32 minPerSec, int32 m
 
 				Protocol::C_RELAY_PACKET pkt;
 				pkt.set_packet_id(RELAY_PACKET_ID);
-				pkt.set_require_host_authority(false); // 보낸 사람 제외 방 전체에게
+				pkt.set_require_host_authority(sender.isHost == false); // 방장: 보낸 사람 제외 방 전체 / 멤버: 방장에게만
 				pkt.set_payload(payload);
 				sender.client->Send(ServerPacketHandler::MakeSendBuffer(pkt));
 

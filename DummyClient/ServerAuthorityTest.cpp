@@ -2,7 +2,9 @@
 #include "ServerAuthorityTest.h"
 #include "TestPhase.h"
 #include "ServerPacketHandler.h"
+#include "RelayStats.h"
 #include <algorithm>
+#include <array>
 
 using namespace TestPhase;
 
@@ -277,6 +279,109 @@ static ScenarioResult RunStartReadyRace(const vector<Client>& clients, ostream& 
 }
 
 // =========================================================
+// [relay] 보낸 사람과 require_host_authority 조합별 전달 대상 (작업 3)
+//   그룹 4명: [0] 방장, [1] 보내는 멤버, [2][3] 멤버
+//   케이스마다 한 번씩 보내고, 각자 받은 S_RELAY_PACKET 수가 기대값과 정확히 같은지 확인
+// =========================================================
+static ScenarioResult RunRelayRoute(const vector<Client>& clients, ostream& out)
+{
+	ScenarioResult result;
+	result.name = "relay";
+
+	struct RelayCase
+	{
+		string name;
+		int32 senderIndex;
+		bool requireHostAuthority;
+		array<int32, 4> expected;	// [0] 방장 ~ [3] 멤버가 받아야 하는 수
+	};
+	const vector<RelayCase> cases =
+	{
+		{ "member/false", 1, false, { 1, 0, 0, 0 } },	// 멤버는 플래그와 상관없이 방장에게만
+		{ "member/true",  1, true,  { 1, 0, 0, 0 } },
+		{ "host/false",   0, false, { 0, 1, 1, 1 } },	// 방장: 본인 제외 전체
+		{ "host/true",    0, true,  { 1, 1, 1, 1 } },	// 방장: 본인 포함 전체
+	};
+
+	auto groups = MakeGroups(clients, 4);
+	auto hosts = Hosts(groups);
+	auto everyone = AllMembers(groups);
+	ClearRecv(everyone);
+
+	if (CreateRooms(hosts) == false)
+	{
+		result.timedOut = true;
+		out << "  [relay] timeout: create room" << endl;
+		return result;
+	}
+
+	vector<pair<Client, uint64>> entries;
+	for (auto& group : groups)
+		for (auto& guest : group.Guests())
+			entries.push_back({ guest, group.Host()->GetRoomId() });
+
+	if (EnterRooms(entries) == false)
+	{
+		result.timedOut = true;
+		out << "  [relay] timeout: enter room" << endl;
+		return result;
+	}
+
+	string payload(sizeof(int64), 'x');
+	for (auto& relayCase : cases)
+	{
+		ClearRecv(everyone);
+
+		for (auto& group : groups)
+		{
+			RelayStats::StampSendTime(payload);
+
+			Protocol::C_RELAY_PACKET pkt;
+			pkt.set_packet_id(1);
+			pkt.set_require_host_authority(relayCase.requireHostAuthority);
+			pkt.set_payload(payload);
+			group.members[relayCase.senderIndex]->Send(ServerPacketHandler::MakeSendBuffer(pkt));
+		}
+
+		// 받아야 하는 사람이 다 받을 때까지 기다린 뒤, 받으면 안 되는 사람에게 늦게 도착하는 것도 잡도록 조금 더 대기
+		WaitUntil([&]() {
+			return all_of(groups.begin(), groups.end(), [&](const Group& g) {
+				for (int32 i = 0; i < 4; i++)
+					if (RecvCount(g.members[i], PKT_S_RELAY_PACKET) < relayCase.expected[i])
+						return false;
+				return true;
+				});
+			}, 3s);
+		this_thread::sleep_for(300ms);
+
+		for (auto& group : groups)
+		{
+			array<int32, 4> got = {};
+			for (int32 i = 0; i < 4; i++)
+				got[i] = RecvCount(group.members[i], PKT_S_RELAY_PACKET);
+
+			result.total++;
+			if (got == relayCase.expected)
+			{
+				result.passed++;
+				continue;
+			}
+
+			result.Fail(relayCase.name + " room " + to_string(group.Host()->GetRoomId()) + ": recv [host, sender/member, member, member] = ["
+				+ to_string(got[0]) + ", " + to_string(got[1]) + ", " + to_string(got[2]) + ", " + to_string(got[3]) + "]");
+		}
+	}
+
+	if (CloseRooms(hosts, everyone) == false)
+	{
+		result.timedOut = true;
+		out << "  [relay] timeout: close room" << endl;
+	}
+
+	return result;
+}
+
+// =========================================================
 // [invite] 초대를 받은 뒤 방장이 게임 시작 -> 수락 (작업 1)
 //   그룹 3명: [0] A = 초대하는 방장 (혼자 있는 방 RA)
 //             [1] C = 초대받는 사람 (자기 방 RC의 방장)
@@ -428,6 +533,8 @@ int32 ServerAuthorityTest::Run(const vector<string>& scenarios)
 		results.push_back(RunInviteWhilePlaying(clients, out));
 	if (wants("start"))
 		results.push_back(RunStartReadyRace(clients, out));
+	if (wants("relay"))
+		results.push_back(RunRelayRoute(clients, out));
 
 	Report(results, out);
 

@@ -12,7 +12,7 @@
 //      HostShow   : 호스트가 하나 골라 C_HOST_SHOW_STAGE -> 방 전원이 받으면 완료
 //   7. StageStart : 호스트 C_START_STAGE -> S_START_STAGE -> (자동) C_ENTER_GAME
 //                   -> 방 전원이 S_GAME_READY_TO_START 받으면 완료
-//   8. Relay      : 게임 시작한 전원이 초당 10~20회(1초마다 다시 뽑음, 간격 ±50%) C_RELAY_PACKET -> 같은 방 나머지에게 전달, 지연 측정
+//   8. Relay      : 게임 시작한 전원이 초당 10~20회(1초마다 다시 뽑음, 간격 ±50%) C_RELAY_PACKET (방장 -> 나머지 전원, 멤버 -> 방장), 지연 측정
 // =========================================================
 namespace GameFlowTest
 {

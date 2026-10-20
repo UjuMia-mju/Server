@@ -151,7 +151,7 @@ bool Handle_C_RELAY_PACKET(PacketSessionRef& session, Protocol::C_RELAY_PACKET& 
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(relayPkt);
 
-	// 방 릴레이 함수 호출 (requireHostAuthority 플래그에 따라 분기)
+	// 방 릴레이 함수 호출 (경로는 보낸 사람이 방장인지로 서버가 정함. 플래그는 방장이 보낼 때만 사용)
 	room->RelayPacket(player, sendBuffer, pkt.require_host_authority());
 
 	return true;

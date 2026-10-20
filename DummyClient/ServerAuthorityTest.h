@@ -6,6 +6,7 @@
 //   - enter  : 3인 방에 2명이 동시에 C_ENTER_ROOM -> 정확히 1명만 성공, 1명은 "Room is full" (작업 1)
 //   - invite : 초대를 받은 뒤 방장이 게임 시작 -> 수락 실패, 원래 있던 방에 그대로 남음 (작업 1)
 //   - start  : 방장 C_START_ROOM과 멤버 C_READY(false)를 동시에 -> 준비 안 된 사람이 있는 채로 시작되면 안 됨 (작업 2)
+//   - relay  : 멤버가 보낸 릴레이는 플래그와 상관없이 방장에게만, 방장은 플래그대로 전달 (작업 3)
 //   설정(인원/반복 횟수)은 ServerAuthorityTest.cpp 맨 위 상수에서 변경
 // =========================================================
 namespace ServerAuthorityTest

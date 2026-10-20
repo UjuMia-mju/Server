@@ -150,9 +150,10 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 		}, elapsedMs);
 	out << "[RoomStress] Members entered " << entered << " / " << expectedMembers << " (" << elapsedMs << "ms)" << endl;
 
-	// 실제로 방에 들어간 세션만 릴레이 전송
-	// 방 인원이 n명이면 한 번 보낼 때마다 n-1명이 받으므로 tick당 기대 수신 = n * (n-1)
+	// 실제로 방에 들어간 세션만 릴레이 전송 (실제 클라이언트처럼 방장은 나머지 전원에게, 멤버는 방장에게만)
+	// 방 인원이 n명이면 tick당 기대 수신 = 방장 1회 x (n-1)명 + 멤버 (n-1)회 x 방장 1명 = 2 * (n-1)
 	vector<shared_ptr<ServerSession>> active;
+	set<shared_ptr<ServerSession>> owners;
 	int64 expectedRecvPerTick = 0;
 	int32 fullRooms = 0;
 	for (auto& group : groups)
@@ -162,6 +163,7 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 
 		int64 inRoom = 1;
 		active.push_back(group.owner);
+		owners.insert(group.owner);
 		for (auto& member : group.members)
 		{
 			if (member->IsInRoom())
@@ -171,7 +173,7 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 			}
 		}
 
-		expectedRecvPerTick += inRoom * (inRoom - 1);
+		expectedRecvPerTick += 2 * (inRoom - 1);
 		if (inRoom == ROOM_SIZE)
 			fullRooms++;
 	}
@@ -190,7 +192,7 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 	RelayStats::Reset();
 
 	// 4. 릴레이 패킷 반복 전송
-	out << "[RoomStress] Relay start (C_RELAY_PACKET -> other " << (ROOM_SIZE - 1) << " members)" << endl;
+	out << "[RoomStress] Relay start (C_RELAY_PACKET: owner -> other " << (ROOM_SIZE - 1) << " members, member -> owner)" << endl;
 
 	string payload(payloadSize, 'x');
 	vector<int64> allLatency;
@@ -215,7 +217,8 @@ static void RunRoomStressTest(int32 clientCount, int32 intervalMs, int32 payload
 
 			Protocol::C_RELAY_PACKET pkt;
 			pkt.set_packet_id(RELAY_PACKET_ID);
-			pkt.set_require_host_authority(false); // 보낸 사람 제외 방 전체에게
+			// 방장: false = 보낸 사람 제외 방 전체에게 / 멤버: true = 방장에게만 (서버는 멤버가 false를 보내도 방장에게만 전달)
+			pkt.set_require_host_authority(owners.count(session) == 0);
 			pkt.set_payload(payload);
 			session->Send(ServerPacketHandler::MakeSendBuffer(pkt));
 		}
