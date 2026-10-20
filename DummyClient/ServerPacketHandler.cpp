@@ -348,6 +348,8 @@ bool Handle_S_START_ROOM(PacketSessionRef& session, Protocol::S_START_ROOM& pkt)
 
 bool Handle_S_SHOW_STAGE(PacketSessionRef& session, Protocol::S_SHOW_STAGE& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_SHOW_STAGE, pkt.success());
+
 	if (!pkt.success())
 	{
 		cout << "[Client] Failed to show stage: " << endl;

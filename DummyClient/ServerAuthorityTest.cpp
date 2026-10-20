@@ -90,6 +90,66 @@ static void ClearRecv(const vector<Client>& clients)
 }
 
 // =========================================================
+// [unauth] 로그인하지 않은 클라이언트가 로그인/방이 필요한 패킷을 보냄 (작업 4)
+//   예전에는 C_PLAYER_ANIMATION, C_GET_CURRENCY, C_TEST_ENTER_GAME에서 널 역참조로 서버가 죽었음
+//   통과 조건: 응답 패킷이 있는 것은 실패 응답, 나머지는 무시 + 그 뒤에 같은 클라이언트가 정상 로그인 (서버 생존)
+// =========================================================
+static ScenarioResult RunUnauthenticated(const vector<Client>& clients, ostream& out)
+{
+	ScenarioResult result;
+	result.name = "unauth";
+
+	ClearRecv(clients);
+	for (auto& client : clients)
+	{
+		{ Protocol::C_PLAYER_ANIMATION pkt; pkt.set_state(1); client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_GET_CURRENCY pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_TEST_ENTER_GAME pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_TEST_ENTER_ROOM pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_MOVE pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_PLAYER_STAT_EVENT pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_SHOW_STAGE pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_GET_DB_DATA pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+		{ Protocol::C_GACHA_POOL_LIST pkt; client->Send(ServerPacketHandler::MakeSendBuffer(pkt)); }
+	}
+
+	// 실패 응답이 오는 두 패킷의 응답을 기다린 뒤, 나머지 응답이 늦게 오는 것도 잡도록 조금 더 대기
+	WaitUntil([&]() { return all_of(clients.begin(), clients.end(), [](const Client& c) {
+		return RecvCount(c, PKT_S_GET_CURRENCY) > 0 && RecvCount(c, PKT_S_SHOW_STAGE) > 0; }); }, 3s);
+	this_thread::sleep_for(500ms);
+
+	// 서버가 살아 있으면 같은 클라이언트가 그대로 로그인할 수 있어야 함
+	for (auto& client : clients)
+		client->SendLogin();
+	WaitUntil([&]() { return all_of(clients.begin(), clients.end(), [](const Client& c) { return c->IsLoginCompleted(); }); });
+
+	for (auto& client : clients)
+	{
+		RecvRecord currency = client->GetRecv(PKT_S_GET_CURRENCY);
+		RecvRecord showStage = client->GetRecv(PKT_S_SHOW_STAGE);
+		// 로그인/방이 필요한 패킷이 처리됐다면 받았을 응답들 (받으면 안 됨)
+		int32 leaked = RecvCount(client, PKT_S_ENTER_GAME) + RecvCount(client, PKT_S_ENTER_ROOM)
+			+ RecvCount(client, PKT_S_STAGE_INFO) + RecvCount(client, PKT_S_GACHA_POOL_LIST) + RecvCount(client, PKT_S_SKIN_LIST);
+
+		bool currencyRejected = currency.count > 0 && currency.success == false;
+		bool showStageRejected = showStage.count > 0 && showStage.success == false;
+
+		result.total++;
+		if (currencyRejected && showStageRejected && leaked == 0 && client->IsLoginCompleted())
+		{
+			result.passed++;
+			continue;
+		}
+
+		result.Fail(client->GetPlayerName() + ": currency rejected=" + to_string(currencyRejected)
+			+ ", show stage rejected=" + to_string(showStageRejected) + ", unexpected responses=" + to_string(leaked)
+			+ ", login after=" + to_string(client->IsLoginCompleted()));
+	}
+
+	return result;
+}
+
+// =========================================================
 // [enter] 3인 방의 남은 1자리에 2명이 동시에 입장 (작업 1)
 //   그룹 5명: [0] 방장, [1][2] 먼저 입장, [3][4] 동시에 입장
 // =========================================================
@@ -525,7 +585,11 @@ int32 ServerAuthorityTest::Run(const vector<string>& scenarios)
 	auto clients = CreateClients(CLIENT_COUNT, out);
 	vector<ScenarioResult> results;
 
-	RunPhase("Login", clients, [](const Client& c) { c->SendLogin(); }, [](const Client& c) { return c->IsLoginCompleted(); }, out);
+	// 로그인 전에 해야 하므로 가장 먼저 (앞의 4명만 사용, 이 4명은 시나리오 안에서 로그인까지 함)
+	if (wants("unauth"))
+		results.push_back(RunUnauthenticated(vector<Client>(clients.begin(), clients.begin() + min<size_t>(4, clients.size())), out));
+
+	RunPhase("Login", clients, [](const Client& c) { if (c->IsLoginCompleted() == false) c->SendLogin(); }, [](const Client& c) { return c->IsLoginCompleted(); }, out);
 
 	if (wants("enter"))
 		results.push_back(RunEnterRace(clients, out));

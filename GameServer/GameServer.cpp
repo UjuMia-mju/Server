@@ -78,6 +78,12 @@ int main()
 	DBCacheManager::GetInstance().WaitAll();
 
 	ClientPacketHandler::Init();
+#ifndef ENABLE_TEST_PACKETS
+	// 테스트용 패킷은 정식 빌드에서 받지 않는다 -> Handle_INVALID로 처리
+	// (ClientPacketHandler.h는 빌드할 때마다 GenPackets로 다시 생성되므로 등록 해제는 여기서 한다)
+	GPacketHandler[PKT_C_TEST_ENTER_ROOM] = Handle_INVALID;
+	GPacketHandler[PKT_C_TEST_ENTER_GAME] = Handle_INVALID;
+#endif
 
 	// Config에서 서버 설정 가져오기
 	std::wstring serverIP = GConfigManager->GetServerIP();

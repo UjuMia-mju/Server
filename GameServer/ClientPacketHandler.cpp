@@ -44,6 +44,28 @@ namespace
 		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
 		session->Send(sendBuffer);
 	}
+
+	void SendGetCurrencyError(PacketSessionRef& session, const std::string& errorMsg)
+	{
+		Protocol::S_GET_CURRENCY errorPkt;
+		errorPkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+	}
+
+	void SendShowStageError(PacketSessionRef& session, const std::string& errorMsg)
+	{
+		Protocol::S_SHOW_STAGE errorPkt;
+		errorPkt.set_success(false);
+		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
+		session->Send(sendBuffer);
+	}
+
+	// 응답 패킷이 따로 없는 패킷(이동, 애니메이션, 정적 데이터 조회 등)은 인증 실패 시 응답 없이 무시한다
+	// (실패 로그는 AuthValidator가 남김)
+	void IgnoreAuthError(PacketSessionRef& session, const std::string& errorMsg)
+	{
+	}
 }
 
 #define CHECK_AUTH_LOGIN(session, ErrorSender) \
@@ -68,13 +90,14 @@ namespace
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 {
 	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
-	// TODO : Log
+	cout << "Invalid packet received - ID: " << header->id << ", Size: " << header->size << endl;
 	return false;
 }
 
 bool Handle_C_GET_DB_DATA(PacketSessionRef& session, Protocol::C_GET_DB_DATA& pkt)
 {
-	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	// 클라이언트는 로그인 성공 후(S_LOGIN)에만 요청하므로 로그인 필요
+	CHECK_AUTH_LOGIN(session, IgnoreAuthError);
 
 	// DB에서 정보를 보낸다. (가차 리스트, 스킨 리스트, 스테이지 리스트)
 
@@ -99,13 +122,14 @@ bool Handle_C_GET_DB_DATA(PacketSessionRef& session, Protocol::C_GET_DB_DATA& pk
 	return true;
 }
 
+// 테스트용 패킷(C_TEST_ENTER_ROOM, C_TEST_ENTER_GAME)은 ENABLE_TEST_PACKETS를 정의한 빌드에서만 동작한다.
+// 정식 빌드에서는 GameServer.cpp에서 Handle_INVALID로 등록을 바꾸고, 여기에는 빈 정의만 남긴다
+// (ClientPacketHandler.h는 빌드할 때마다 생성되며 Init에서 두 핸들러를 참조하므로 정의는 필요함)
+#ifdef ENABLE_TEST_PACKETS
 bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_ROOM& pkt)
 {
-	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	CHECK_AUTH_LOGIN(session, SendEnterGameError);
 	PlayerRef player = gameSession->GetPlayer();
-
-	if (player == nullptr)
-		return false;
 
 	auto room = GetGlobalTestRoom();
 	gameSession->SetRoom(room);
@@ -136,6 +160,12 @@ bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 
 	return true;
 }
+#else
+bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_ROOM& pkt)
+{
+	return false;
+}
+#endif
 
 bool Handle_C_RELAY_PACKET(PacketSessionRef& session, Protocol::C_RELAY_PACKET& pkt)
 {
@@ -250,9 +280,17 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 
 bool Handle_C_GET_CURRENCY(PacketSessionRef& session, Protocol::C_GET_CURRENCY& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+	CHECK_AUTH_LOGIN(session, SendGetCurrencyError);
 
-	int32 dbPlayerId = gameSession->GetPlayerInfo()->GetDbUserId();
+	PlayerInfoRef playerInfo = gameSession->GetPlayerInfo();
+	if (playerInfo == nullptr)
+	{
+		cout << "Get currency failed: no player info" << endl;
+		SendGetCurrencyError(session, "No player info");
+		return false;
+	}
+
+	int32 dbPlayerId = playerInfo->GetDbUserId();
 	int32 dbCoin = 0;
 	int32 dbGem = 0;
 	Protocol::S_GET_CURRENCY resPkt;
@@ -353,7 +391,8 @@ bool Handle_C_GACHA(PacketSessionRef& session, Protocol::C_GACHA& pkt)
 
 bool Handle_C_GACHA_POOL_LIST(PacketSessionRef& session, Protocol::C_GACHA_POOL_LIST& pkt)
 {
-	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	// 클라이언트는 가챠 화면(로그인 후)에서 C_GET_CURRENCY와 함께 요청하므로 로그인 필요
+	CHECK_AUTH_LOGIN(session, IgnoreAuthError);
 
 	if (gameSession->GetPlayerInfo() == nullptr)
 	{
@@ -692,9 +731,10 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 	return true;
 }
 
+#ifdef ENABLE_TEST_PACKETS
 bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_GAME& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+	CHECK_AUTH_LOGIN(session, SendEnterGameError);
 
 	// 테스트 코드 부분
 	auto room = GetGlobalTestRoom();
@@ -711,6 +751,12 @@ bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 
 	return true;
 }
+#else
+bool Handle_C_TEST_ENTER_GAME(PacketSessionRef& session, Protocol::C_TEST_ENTER_GAME& pkt)
+{
+	return false;
+}
+#endif
 
 bool Handle_C_GAME_CLEAR(PacketSessionRef& session, Protocol::C_GAME_CLEAR& pkt)
 {
@@ -747,7 +793,7 @@ bool Handle_C_GAME_CLEAR(PacketSessionRef& session, Protocol::C_GAME_CLEAR& pkt)
 
 bool Handle_C_SHOW_STAGE(PacketSessionRef& session, Protocol::C_SHOW_STAGE& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+	CHECK_AUTH_LOGIN(session, SendShowStageError);
 
 	Protocol::S_SHOW_STAGE showStagePkt;
 	showStagePkt.set_success(true);
@@ -806,6 +852,8 @@ bool Handle_C_HOST_SHOW_STAGE(PacketSessionRef& session, Protocol::C_HOST_SHOW_S
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(showStagePkt);
 	room->DoAsync(&Room::Broadcast, sendBuffer);
+
+	return true;
 }
 
 bool Handle_C_START_STAGE(PacketSessionRef& session, Protocol::C_START_STAGE& pkt)
@@ -907,14 +955,8 @@ bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 
 bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
-
-	// 플레이어가 로그인되어 있는지 확인
-	if (gameSession->GetPlayer() == nullptr)
-	{
-		std::cout << "Move packet from non-logged in player!" << endl;
-		return false;
-	}
+	// 방에 있는 플레이어만 위치를 갱신하고 같은 방에 전달한다
+	CHECK_AUTH_ROOM(session, OUT room, IgnoreAuthError);
 
 	// 플레이어 위치 업데이트 (메모리)
 	gameSession->GetPlayer()->posX = pkt.pos().x();
@@ -944,22 +986,15 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(movePkt);
 
 	// 같은 방의 모든 플레이어에게 전송
-	auto roomPtr = gameSession->GetRoom().lock();
-	if (roomPtr != nullptr)
-	{
-		roomPtr->DoAsync(&Room::Broadcast, sendBuffer);
-	}
-	else
-	{
-		std::cout << "Room not found for player: " << gameSession->GetPlayer()->name << endl;
-	}
+	room->DoAsync(&Room::Broadcast, sendBuffer);
 
 	return true;
 }
 
 bool Handle_C_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::C_PLAYER_ANIMATION& pkt)
 {
-	GameSessionRef gameSession = std::static_pointer_cast<GameSession>(session);
+	// 애니메이션은 방 안에서만 의미가 있음
+	CHECK_AUTH_ROOM(session, OUT room, IgnoreAuthError);
 
 	gameSession->GetPlayer()->animState = pkt.state();
 	Protocol::S_PLAYER_ANIMATION animationPkt;
@@ -967,12 +1002,7 @@ bool Handle_C_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::C_PLAYER_ANI
 	animationPkt.set_state(pkt.state());
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(animationPkt);
-	auto roomPtr = gameSession->GetRoom().lock();
-
-	if (roomPtr != nullptr)
-	{
-		roomPtr->DoAsync(&Room::Broadcast, sendBuffer);
-	}
+	room->DoAsync(&Room::Broadcast, sendBuffer);
 
 	return true;
 }
@@ -980,6 +1010,9 @@ bool Handle_C_PLAYER_ANIMATION(PacketSessionRef& session, Protocol::C_PLAYER_ANI
 bool Handle_C_PLAYER_STAT_EVENT(PacketSessionRef& session, Protocol::C_PLAYER_STAT_EVENT& pkt)
 {
 	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
+
+	// TODO: 스탯 이벤트 처리 미구현 (현재 클라이언트는 C_RELAY_PACKET으로 방장에게 보냄)
+	return true;
 }
 
 bool Handle_C_OBJECT_PICKUP(PacketSessionRef& session, Protocol::C_OBJECT_PICKUP& pkt)
