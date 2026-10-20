@@ -57,6 +57,9 @@
     <ClCompile Include="StressTest.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="ServerAuthorityTest.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerPacketHandler.h">
@@ -99,6 +102,9 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="StressTest.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerAuthorityTest.h">
       <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>

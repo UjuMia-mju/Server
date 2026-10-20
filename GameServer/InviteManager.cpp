@@ -77,50 +77,40 @@ uint64 InviteManager::CreateInvite(uint64 roomId, const string& roomName,
 	return inviteId;
 }
 
+// true = 방 작업 큐에 입장 요청을 넘김 (입장 성공/실패 응답은 Room::TryEnterLobby가 보냄)
+// false = 초대나 방이 없어서 바로 실패 (응답은 호출한 쪽이 보냄)
 bool InviteManager::AcceptInvite(uint64 inviteId, GameSessionRef accepter)
 {
-	WRITE_LOCK;
+	RoomRef room;
+	uint64 roomId = 0;
 
-	auto it = _invites.find(inviteId);
-	if (it == _invites.end())
 	{
-		std::cout << "[InviteManager] Invite not found: " << inviteId << endl;
-		return false;
-	}
+		WRITE_LOCK;
 
-	// 방 찾기
-	auto room = RoomManager::Instance().FindRoom(it->second->roomId);
-	if (!room)
-	{
-		std::cout << "[InviteManager] Room not found: " << it->second->roomId << endl;
+		auto it = _invites.find(inviteId);
+		if (it == _invites.end())
+		{
+			std::cout << "[InviteManager] Invite not found: " << inviteId << endl;
+			return false;
+		}
+
+		roomId = it->second->roomId;
 		_invites.erase(it);
-		return false;
+
+		// 방 찾기
+		room = RoomManager::Instance().FindRoom(roomId);
+		if (!room)
+		{
+			std::cout << "[InviteManager] Room not found: " << roomId << endl;
+			return false;
+		}
 	}
 
-	// 방이 가득 찼는지 체크
-	if (room->GetCurrentCount() >= room->GetMaxCount())
-	{
-		std::cout << "[InviteManager] Room is full" << endl;
-		_invites.erase(it);
-		return false;
-	}
+	// 정원/진행 상태 검사와 입장, 기존 방 퇴장(입장 성공 시에만)은 방 작업 큐 안에서 처리한다
+	room->DoAsync(&Room::TryEnterLobby, accepter->GetPlayer(), accepter, EnterSource::Invite);
 
-
-	// 이미 다른 방에 있는 경우에는, 기존 방을 나간다.
-	if (auto oldRoom = accepter->GetRoom().lock())
-	{
-		oldRoom->DoAsync(&Room::LeaveLobby, accepter->GetPlayer());
-	}
-
-	// 방에 입장
-	accepter->SetRoom(room);
-	room->DoAsync(&Room::EnterLobby, accepter->GetPlayer());
-
-	// 초대 정보 삭제
 	std::cout << "[InviteManager] Player " << accepter->GetPlayer()->name
-		<< " accepted invite " << inviteId << " and joined room " << it->second->roomId << endl;
-
-	_invites.erase(it);
+		<< " accepted invite " << inviteId << " for room " << roomId << endl;
 
 	return true;
 }

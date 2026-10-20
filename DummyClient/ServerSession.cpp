@@ -5,6 +5,7 @@
 
 atomic<int64> GRecvPacketCount = 0;
 atomic<int32> GInviteAcceptDelayMs = 1000;
+atomic<bool> GInviteAutoAccept = true;
 
 ServerSession::ServerSession(const string& email, const string& password, bool autoLogin)
 	: _email(email), _password(password), _autoLogin(autoLogin)
@@ -32,6 +33,13 @@ void ServerSession::OnRecvPacket(BYTE* buffer, int32 len)
 
 	PacketSessionRef session = GetPacketSessionRef();
 	ServerPacketHandler::HandlePacket(session, buffer, len);
+
+	// 핸들러가 결과(SetRecvResult)를 남긴 뒤에 count를 올린다
+	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+	lock_guard<mutex> guard(_recvLock);
+	RecvRecord& record = _recvRecords[header->id];
+	record.count++;
+	record.lastSeq = ++_recvSeq;
 }
 
 void ServerSession::OnSend(int32 len)
@@ -71,6 +79,11 @@ const string& ServerSession::GetPlayerName() const
 int32 ServerSession::GetPlayerTag() const
 {
 	return _playerTag;
+}
+
+int32 ServerSession::GetPlayerId() const
+{
+	return _playerId;
 }
 
 void ServerSession::SetRoomId(uint64 roomId)
@@ -163,6 +176,28 @@ int32 ServerSession::GetHostStage() const
 	return _hostStage;
 }
 
+void ServerSession::SetRecvResult(uint16 pktId, bool success, const string& errorMsg, int64 value)
+{
+	lock_guard<mutex> guard(_recvLock);
+	RecvRecord& record = _recvRecords[pktId];
+	record.success = success;
+	record.errorMsg = errorMsg;
+	record.value = value;
+}
+
+RecvRecord ServerSession::GetRecv(uint16 pktId)
+{
+	lock_guard<mutex> guard(_recvLock);
+	auto it = _recvRecords.find(pktId);
+	return it == _recvRecords.end() ? RecvRecord() : it->second;
+}
+
+void ServerSession::ClearRecv()
+{
+	lock_guard<mutex> guard(_recvLock);
+	_recvRecords.clear();
+}
+
 void ServerSession::SendGetDbDataPacket()
 {
 	Protocol::C_GET_DB_DATA pkt;
@@ -208,6 +243,15 @@ void ServerSession::SendInvitePacket(string name, int32 tag)
 	cout << "[Client] Invite packet sent - Target: " << name << "#" << tag << endl;
 }
 
+void ServerSession::SendInviteResponse(uint64 inviteId, bool accept)
+{
+	Protocol::C_INVITE_RESPONSE pkt;
+	pkt.set_invite_id(inviteId);
+	pkt.set_accept(accept);
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
+}
+
 void ServerSession::SendLeaveRoom()
 {
 	Protocol::C_LEAVE_ROOM pkt;
@@ -221,6 +265,14 @@ void ServerSession::SendEnterRoom()
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);
 	cout << "[Client] Show members packet sent" << endl;
+}
+
+void ServerSession::SendEnterRoom(uint64 roomId)
+{
+	Protocol::C_ENTER_ROOM pkt;
+	pkt.set_room_id(roomId);
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	Send(sendBuffer);
 }
 
 void ServerSession::SendStageData(int32 map_id, int32 chapter, int32 stageIndex)

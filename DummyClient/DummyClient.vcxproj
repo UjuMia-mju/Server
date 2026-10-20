@@ -200,6 +200,7 @@
     <ClCompile Include="RoomStressTest.cpp" />
     <ClCompile Include="ServerSession.cpp" />
     <ClCompile Include="StressTest.cpp" />
+    <ClCompile Include="ServerAuthorityTest.cpp" />
     <ClCompile Include="Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -221,6 +222,7 @@
     <ClInclude Include="ServerPacketHandler.h" />
     <ClInclude Include="ServerSession.h" />
     <ClInclude Include="StressTest.h" />
+    <ClInclude Include="ServerAuthorityTest.h" />
     <ClInclude Include="Struct.pb.h" />
   </ItemGroup>
   <ItemGroup>

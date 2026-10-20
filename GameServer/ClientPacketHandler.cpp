@@ -126,7 +126,7 @@ bool Handle_C_TEST_ENTER_ROOM(PacketSessionRef& session, Protocol::C_TEST_ENTER_
 
 			// 3. 본인 클라이언트에게 방/게임 입장 성공 사실과 방 정보(방장 정보 등)를 전송
 			Protocol::S_ENTER_ROOM enterRoomPkt;
-			room->MakeEnterRoomPacket(gameSession, enterRoomPkt);
+			room->MakeEnterRoomPacket(enterRoomPkt);
 
 			auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
 			session->Send(sendBuffer);
@@ -484,47 +484,12 @@ bool Handle_C_ENTER_ROOM(PacketSessionRef& session, Protocol::C_ENTER_ROOM& pkt)
 		session->Send(sendBuffer);
 		return false;
 	}
-	// 방이 꽉 찼는지 체크
-	if (targetRoom->GetCurrentCount() >= targetRoom->GetMaxCount())
-	{
-		std::cout << "Enter room failed: Room is full" << endl;
 
-		Protocol::S_ENTER_ROOM errorPkt;
-		errorPkt.set_success(false);
-		errorPkt.set_error_msg("Room is full");
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
-		session->Send(sendBuffer);
-		return false;
-	}
-
-	// 게임이 이미 시작되었는지 체크
-	if (targetRoom->IsPlaying())
-	{
-		std::cout << "Enter room failed: Game already started" << endl;
-
-		Protocol::S_ENTER_ROOM errorPkt;
-		errorPkt.set_success(false);
-		errorPkt.set_error_msg("Game already started");
-		auto sendBuffer = ClientPacketHandler::MakeSendBuffer(errorPkt);
-		session->Send(sendBuffer);
-		return false;
-	}
-
-	// 방에 입장
-	gameSession->SetRoom(targetRoom);
-	targetRoom->DoAsync(&Room::EnterLobby, gameSession->GetPlayer());
-
-	// 성공 응답 패킷 구성
-	Protocol::S_ENTER_ROOM enterRoomPkt;
-	targetRoom->MakeEnterRoomPacket(gameSession, enterRoomPkt);
-
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
-	targetRoom->DoAsync([session, sendBuffer]() {
-		session->Send(sendBuffer);
-		});
+	// 정원/진행 상태 검사, 입장, 응답(S_ENTER_ROOM)은 방 작업 큐 안에서 한 번에 처리한다
+	targetRoom->DoAsync(&Room::TryEnterLobby, gameSession->GetPlayer(), gameSession, EnterSource::Normal);
 
 	std::cout << "Player " << gameSession->GetPlayer()->name
-		<< " entered room " << roomId << endl;
+		<< " requested to enter room " << roomId << endl;
 
 	return true;
 }
@@ -653,26 +618,13 @@ bool Handle_C_INVITE_RESPONSE(PacketSessionRef& session, Protocol::C_INVITE_RESP
 
 	if (accept)
 	{
-		// 초대 수락
-		bool success = InviteManager::Instance().AcceptInvite(inviteId, gameSession);
-		responsePkt.set_success(success);
+		// 초대 수락: 입장 결과는 방 작업 큐(Room::TryEnterLobby)에서 정해지므로
+		// 응답(S_ENTER_ROOM + S_INVITE_RESPONSE)도 거기서 보낸다
+		if (InviteManager::Instance().AcceptInvite(inviteId, gameSession))
+			return true;
 
-		if (!success)
-		{
-			responsePkt.set_error_msg("Failed to join room (invite expired or room full)");
-		}
-		else
-		{
-			// 추가: 방 입장 성공 시 방 정보 전송
-			auto room = gameSession->GetRoom().lock();
-			if (room)
-			{
-				Protocol::S_ENTER_ROOM enterRoomPkt;
-				room->MakeEnterRoomPacket(gameSession, enterRoomPkt);
-				auto enterRoomBuffer = ClientPacketHandler::MakeSendBuffer(enterRoomPkt);
-				session->Send(enterRoomBuffer);
-			}
-		}
+		responsePkt.set_success(false);
+		responsePkt.set_error_msg("Failed to join room (invite expired or room full)");
 	}
 	else
 	{

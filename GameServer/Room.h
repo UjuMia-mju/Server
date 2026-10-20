@@ -2,6 +2,13 @@
 #include "JobQueue.h"
 #include "Protocol.pb.h"
 
+// 방 입장 경로 (경로마다 클라이언트에게 보내는 응답 패킷이 다름)
+enum class EnterSource
+{
+	Normal,		// C_ENTER_ROOM   -> S_ENTER_ROOM
+	Invite,		// 초대 수락       -> S_ENTER_ROOM + S_INVITE_RESPONSE
+};
+
 class Room : public JobQueue
 {
 public:
@@ -9,12 +16,13 @@ public:
 	~Room();
 
 	// ========== 대기실 관련 ==========
-	void EnterLobby(PlayerRef player);      // 방 입장 (대기실)
+	void EnterLobby(PlayerRef player);      // 방 입장 (대기실, 방 생성 시 방장 입장)
+	void TryEnterLobby(PlayerRef player, GameSessionRef session, EnterSource source); // 입장 검사 + 입장 (작업 큐 안에서 실행)
 	void LeaveLobby(PlayerRef player);      // 방 퇴장
 	void SetReady(uint64 playerId, bool isReady);  // 준비 상태
 	bool CanStartGame();
 	void StartGame();                       // 게임 시작
-	void MakeEnterRoomPacket(GameSessionRef gameSession, Protocol::S_ENTER_ROOM& pkt) const;
+	void MakeEnterRoomPacket(Protocol::S_ENTER_ROOM& pkt);
 	
 	// ========== 게임 시작 후, 스테이지 진행 관련 ==========
 	// 테스트용
@@ -35,12 +43,16 @@ public:
 	string GetRoomName() const { return _roomName; }
 	uint64 GetOwnerId() const { return _ownerId; }
 	bool IsPlaying() const { return _isPlaying; }
-	int32 GetCurrentCount() const { return static_cast<int32>(_players.size()); }
+	int32 GetCurrentCount() { READ_LOCK; return static_cast<int32>(_players.size()); } // 로그용. 이 값으로 입장 여부를 정하지 않는다
 	int32 GetMaxCount() const { return MAX_ROOM_CAPACITY; }
 	string GetOwnerName() const { return _ownerName; }
 	int32 GetOwnerTag() const { return _ownerTag; }
 
-	vector<pair<PlayerRef, bool>> GetMembersWithReadyStatus() const;
+	vector<pair<PlayerRef, bool>> GetMembersWithReadyStatus();
+private:
+	void BroadcastMemberEnter(PlayerRef player);
+	void SendEnterRoomFail(GameSessionRef session, EnterSource source, const string& errorMsg);
+
 private:
 	USE_LOCK;
 
@@ -51,6 +63,7 @@ private:
 	string _ownerName;
 	int32 _ownerTag;
 	bool _isPlaying = false;
+	bool _isDestroyed = false; // 방장 퇴장으로 파괴됨 (큐에 남아 있던 입장 요청을 거절하기 위함)
 
 	unordered_map<uint64, PlayerRef> _players;
 	unordered_map<uint64, bool> _readyStatus; // 방 준비 상태

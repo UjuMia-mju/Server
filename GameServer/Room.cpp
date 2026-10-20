@@ -26,6 +26,88 @@ void Room::EnterLobby(PlayerRef player)
 		_readyStatus[player->playerId] = false;
 	}
 
+	BroadcastMemberEnter(player);
+}
+
+// 정원/진행 상태 검사와 입장을 방 작업 큐 안에서 한 번에 처리한다.
+// 핸들러(워커 스레드)에서 검사하고 큐에서 입장하면, 그 사이에 다른 입장이 끼어들어 정원을 넘길 수 있다.
+void Room::TryEnterLobby(PlayerRef player, GameSessionRef session, EnterSource source)
+{
+	RoomRef currentRoom = session->GetRoom().lock();
+	string errorMsg;
+
+	if (source == EnterSource::Normal && currentRoom)
+	{
+		errorMsg = "Already in a room";
+	}
+	else if (currentRoom.get() == this)
+	{
+		errorMsg = "Already in this room";
+	}
+	else
+	{
+		WRITE_LOCK;
+		if (_isDestroyed)
+			errorMsg = "Room not found";
+		else if (_isPlaying)
+			errorMsg = "Game already started";
+		else if (_players.size() >= MAX_ROOM_CAPACITY)
+			errorMsg = "Room is full";
+		else
+		{
+			_players[player->playerId] = player;
+			_readyStatus[player->playerId] = false;
+		}
+	}
+
+	if (errorMsg.empty() == false)
+	{
+		std::cout << "Enter room failed: " << errorMsg << " - Room " << _roomId << ", Player " << player->name << endl;
+		SendEnterRoomFail(session, source, errorMsg);
+		return;
+	}
+
+	// 입장이 반영된 뒤에 세션에 방을 연결한다
+	session->SetRoom(static_pointer_cast<Room>(shared_from_this()));
+
+	// 초대 수락: 새 방 입장이 성공한 뒤에 기존 방을 나간다 (실패하면 기존 방에 그대로 남음)
+	if (currentRoom)
+		currentRoom->DoAsync(&Room::LeaveLobby, player);
+
+	// 입장이 반영된 상태로 응답을 만든다
+	Protocol::S_ENTER_ROOM enterRoomPkt;
+	MakeEnterRoomPacket(enterRoomPkt);
+	session->Send(ClientPacketHandler::MakeSendBuffer(enterRoomPkt));
+
+	if (source == EnterSource::Invite)
+	{
+		Protocol::S_INVITE_RESPONSE responsePkt;
+		responsePkt.set_success(true);
+		session->Send(ClientPacketHandler::MakeSendBuffer(responsePkt));
+	}
+
+	BroadcastMemberEnter(player);
+}
+
+void Room::SendEnterRoomFail(GameSessionRef session, EnterSource source, const string& errorMsg)
+{
+	if (source == EnterSource::Invite)
+	{
+		Protocol::S_INVITE_RESPONSE responsePkt;
+		responsePkt.set_success(false);
+		responsePkt.set_error_msg("Failed to join room (" + errorMsg + ")");
+		session->Send(ClientPacketHandler::MakeSendBuffer(responsePkt));
+		return;
+	}
+
+	Protocol::S_ENTER_ROOM errorPkt;
+	errorPkt.set_success(false);
+	errorPkt.set_error_msg(errorMsg);
+	session->Send(ClientPacketHandler::MakeSendBuffer(errorPkt));
+}
+
+void Room::BroadcastMemberEnter(PlayerRef player)
+{
 	// 방 멤버 입장 알림
 	Protocol::S_ROOM_MEMBER_ENTER enterPkt;
 	auto member = enterPkt.mutable_member();
@@ -49,6 +131,13 @@ void Room::LeaveLobby(PlayerRef player)
 	SendBufferRef sendBuffer = nullptr;
 	bool isDestroyed = false;
 
+	// 초대 수락으로 이미 다른 방에 연결된 세션은 끊지 않는다 (이 방에 연결된 경우에만 해제)
+	auto detachSession = [this](const GameSessionRef& session)
+	{
+		if (session->GetRoom().lock().get() == this)
+			session->SetRoom(weak_ptr<Room>());
+	};
+
 	{
 		WRITE_LOCK;
 
@@ -56,6 +145,7 @@ void Room::LeaveLobby(PlayerRef player)
 		if (_ownerId == player->playerId)
 		{
 			isDestroyed = true;
+			_isDestroyed = true;
 
 			Protocol::S_ROOM_DESTROY destroyPkt;
 			destroyPkt.set_room_id(_roomId);
@@ -75,7 +165,7 @@ void Room::LeaveLobby(PlayerRef player)
 
 			if (auto session = static_pointer_cast<GameSession>(player->ownerSession.lock()))
 			{
-				session->SetRoom(weak_ptr<Room>());
+				detachSession(session);
 			}
 		}
 		// 2. 일반 유저가 나가는 경우
@@ -83,9 +173,9 @@ void Room::LeaveLobby(PlayerRef player)
 		{
 			if (auto session = static_pointer_cast<GameSession>(player->ownerSession.lock()))
 			{
-				session->SetRoom(weak_ptr<Room>());
+				detachSession(session);
 			}
-				
+
 			_players.erase(player->playerId);
 			_readyStatus.erase(player->playerId);
 
@@ -112,7 +202,7 @@ void Room::LeaveLobby(PlayerRef player)
 
 			if (isDestroyed)
 			{
-				session->SetRoom(weak_ptr<Room>());
+				detachSession(session);
 			}
 		}
 	}
@@ -194,49 +284,36 @@ void Room::StartGame()
 	Broadcast(sendBuffer);
 }
 
-void Room::MakeEnterRoomPacket(GameSessionRef gameSession, Protocol::S_ENTER_ROOM& pkt) const
+// 입장이 반영된 뒤(작업 큐 안)에서 호출해야 멤버 목록에 본인이 포함된다
+void Room::MakeEnterRoomPacket(Protocol::S_ENTER_ROOM& pkt)
 {
+	READ_LOCK;
 	pkt.set_success(true);
 
 	// 방 정보
 	Protocol::RoomInfo* roomInfo = pkt.mutable_room();
-	roomInfo->set_room_id(GetRoomId());
-	roomInfo->set_room_name(GetRoomName());
-	roomInfo->set_current_count(GetCurrentCount());
-	roomInfo->set_max_count(GetMaxCount());
-	roomInfo->set_is_playing(IsPlaying());
+	roomInfo->set_room_id(_roomId);
+	roomInfo->set_room_name(_roomName);
+	roomInfo->set_current_count(static_cast<int32>(_players.size()));
+	roomInfo->set_max_count(MAX_ROOM_CAPACITY);
+	roomInfo->set_is_playing(_isPlaying);
 
 	// 방장 정보
 	Protocol::Player* host = roomInfo->mutable_host();
-	host->set_id(GetOwnerId());
-	host->set_name(GetOwnerName());
-	host->set_tag(GetOwnerTag());
+	host->set_id(_ownerId);
+	host->set_name(_ownerName);
+	host->set_tag(_ownerTag);
 
 	// 멤버 리스트
 	auto members = GetMembersWithReadyStatus();
-	bool hasSelf = false;
 	for (const auto& [player, isReady] : members)
 	{
-		if (player->playerId == gameSession->GetPlayer()->playerId)
-		{
-			hasSelf = true;
-		}
-			
 		Protocol::RoomMemberInfo* memberInfo = pkt.add_members();
 		Protocol::Player* playerInfo = memberInfo->mutable_player();
 		playerInfo->set_id(player->playerId);
 		playerInfo->set_name(player->name);
 		playerInfo->set_tag(player->tag);
 		memberInfo->set_is_ready(isReady);
-	}
-	if (!hasSelf)
-	{
-		Protocol::RoomMemberInfo* memberInfo = pkt.add_members();
-		Protocol::Player* playerInfo = memberInfo->mutable_player();
-		playerInfo->set_id(gameSession->GetPlayer()->playerId);
-		playerInfo->set_name(gameSession->GetPlayer()->name);
-		playerInfo->set_tag(gameSession->GetPlayer()->tag);
-		memberInfo->set_is_ready(false);
 	}
 }
 
@@ -350,8 +427,9 @@ void Room::RelayPacket(PlayerRef sender, SendBufferRef sendBuffer, bool requireH
 	}
 }
 
-vector<pair<PlayerRef, bool>> Room::GetMembersWithReadyStatus() const
+vector<pair<PlayerRef, bool>> Room::GetMembersWithReadyStatus()
 {
+	READ_LOCK;
 	vector<pair<PlayerRef, bool>> members;
 	members.reserve(_players.size());
 

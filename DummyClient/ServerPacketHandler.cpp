@@ -57,6 +57,7 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 
 bool Handle_S_GET_CURRENCY(PacketSessionRef& session, Protocol::S_GET_CURRENCY& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_GET_CURRENCY, pkt.success());
 	return false;
 }
 
@@ -167,6 +168,8 @@ bool Handle_S_MY_SKINS(PacketSessionRef& session, Protocol::S_MY_SKINS& pkt)
 
 bool Handle_S_CREATE_ROOM(PacketSessionRef& session, Protocol::S_CREATE_ROOM& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_CREATE_ROOM, pkt.success(), pkt.error_msg());
+
 	if (!pkt.success())
 	{
 		cout << "[Client] Create room failed: " << pkt.error_msg() << endl;
@@ -185,6 +188,8 @@ bool Handle_S_ROOM_LIST(PacketSessionRef& session, Protocol::S_ROOM_LIST& pkt)
 
 bool Handle_S_ENTER_ROOM(PacketSessionRef& session, Protocol::S_ENTER_ROOM& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_ENTER_ROOM, pkt.success(), pkt.error_msg(), pkt.members_size());
+
 	if (!pkt.success())
 	{
 		cout << "[Client] Enter room failed: " << pkt.error_msg() << endl;
@@ -250,6 +255,10 @@ bool Handle_S_INVITE_NOTIFICATION(PacketSessionRef& session, Protocol::S_INVITE_
 	cout << "Invite ID: " << pkt.invite_id() << endl;
 	cout << "========================================\n" << endl;
 
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_INVITE_NOTIFICATION, true, "", static_cast<int64>(pkt.invite_id()));
+	if (GInviteAutoAccept == false)
+		return true;
+
 	// 자동 수락
 	if (GInviteAcceptDelayMs > 0)
 		this_thread::sleep_for(chrono::milliseconds(GInviteAcceptDelayMs.load()));
@@ -268,6 +277,8 @@ bool Handle_S_INVITE_NOTIFICATION(PacketSessionRef& session, Protocol::S_INVITE_
 
 bool Handle_S_INVITE_RESPONSE(PacketSessionRef& session, Protocol::S_INVITE_RESPONSE& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_INVITE_RESPONSE, pkt.success(), pkt.error_msg());
+
 	if (!pkt.success())
 	{
 		cout << "[Client] Join failed: " << pkt.error_msg() << endl;
@@ -293,6 +304,7 @@ bool Handle_S_ROOM_MEMBER_LEAVE(PacketSessionRef& session, Protocol::S_ROOM_MEMB
 bool Handle_S_READY(PacketSessionRef& session, Protocol::S_READY& pkt)
 {
 	static_pointer_cast<ServerSession>(session)->OnReadyChanged(pkt.player_id(), pkt.is_ready());
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_READY, pkt.is_ready(), "", static_cast<int64>(pkt.player_id()));
 
 	cout << "[Room] Player " << pkt.player_id()
 		<< (pkt.is_ready() ? " is ready" : " cancelled ready") << endl;
@@ -301,6 +313,8 @@ bool Handle_S_READY(PacketSessionRef& session, Protocol::S_READY& pkt)
 
 bool Handle_S_START_ROOM(PacketSessionRef& session, Protocol::S_START_ROOM& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_START_ROOM, pkt.success(), pkt.error_msg());
+
 	if (!pkt.success())
 	{
 		cout << "[Client] Start room failed123123: " << pkt.error_msg() << endl;
@@ -397,6 +411,8 @@ bool Handle_S_GET_CLEAR_INFO(PacketSessionRef& session, Protocol::S_GET_CLEAR_IN
 
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 {
+	static_pointer_cast<ServerSession>(session)->SetRecvResult(PKT_S_ENTER_GAME, pkt.success());
+
 	if (!pkt.success())
 	{
 		cout << "[Client] Enter game failed!" << endl;
