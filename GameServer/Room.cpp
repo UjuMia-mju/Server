@@ -255,19 +255,43 @@ bool Room::CanStartGame()
 	return true;
 }
 
-void Room::StartGame()
+// 시작 조건의 최종 판정은 여기(작업 큐 안)에서 한다.
+// 핸들러에서 확인한 뒤 큐에 들어오기 전에 SetReady(false)나 새 멤버 입장이 먼저 실행될 수 있기 때문
+void Room::StartGame(GameSessionRef requester)
 {
+	string errorMsg;
+	uint64 ownerId = 0;
 	{
 		WRITE_LOCK;
-		if (_isPlaying) return;
-		_isPlaying = true;
+		PlayerRef player = requester->GetPlayer();
+		if (player == nullptr || player->playerId != _ownerId)
+			errorMsg = "Only room owner can start game";
+		else if (CanStartGame() == false)
+			errorMsg = "Not all players are ready";
+		else if (_isPlaying)
+			errorMsg = "Game already started";
+		else
+			_isPlaying = true;
+
+		ownerId = _ownerId;
+	}
+
+	if (errorMsg.empty() == false)
+	{
+		std::cout << "Start room failed: " << errorMsg << " - Room " << _roomId << endl;
+
+		Protocol::S_START_ROOM errorPkt;
+		errorPkt.set_success(false);
+		errorPkt.set_error_msg(errorMsg);
+		requester->Send(ClientPacketHandler::MakeSendBuffer(errorPkt));
+		return;
 	}
 
 	Protocol::S_START_ROOM gameStartPkt;
 	gameStartPkt.set_success(true);
 
-	xvector<StageClearInfo> clearStages; 
-	GStageManager.GetMyStageClearInfo(_ownerId, clearStages);
+	xvector<StageClearInfo> clearStages;
+	GStageManager.GetMyStageClearInfo(ownerId, clearStages);
 
 	auto hostClearStages = gameStartPkt.mutable_host_clear_stages();
 	for (const auto& clearStage : clearStages)

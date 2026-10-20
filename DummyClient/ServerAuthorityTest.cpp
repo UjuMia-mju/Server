@@ -11,6 +11,7 @@ using namespace TestPhase;
 // =========================================================
 static const int32 CLIENT_COUNT = 100;		// 접속 인원 (최대 100, DB 계정 수)
 static const int32 ENTER_ITERATIONS = 50;	// enter: 방 20개 x 50회 = 동시 입장 경합 1000건
+static const int32 START_ITERATIONS = 40;	// start: 방 25개 x 40회 = 시작/레디 취소 경합 1000건
 static const auto RESPONSE_TIMEOUT = 10s;		// 응답 하나를 기다리는 최대 시간
 static const bool VERBOSE = false;			// true면 패킷 핸들러의 cout 로그도 출력
 
@@ -177,6 +178,105 @@ static ScenarioResult RunEnterRace(const vector<Client>& clients, ostream& out)
 }
 
 // =========================================================
+// [start] 방장의 C_START_ROOM과 멤버의 C_READY(false)를 동시에 보냄 (작업 2)
+//   그룹 4명: [0] 방장, [1] 레디 취소하는 멤버, [2][3] 멤버
+//   방장이 받은 순서로 판정 (둘 다 방 작업 큐에서 보내므로 처리 순서 그대로 도착)
+//   - S_START_ROOM(성공) -> S_READY(false) : 시작 시점에 전원 준비 상태였음 (통과)
+//   - S_READY(false) -> S_START_ROOM(실패) : 레디 취소가 먼저 처리돼서 시작 거절 (통과)
+//   - S_READY(false) -> S_START_ROOM(성공) : 준비 안 된 사람이 있는데 시작됨 (실패)
+// =========================================================
+static ScenarioResult RunStartReadyRace(const vector<Client>& clients, ostream& out)
+{
+	ScenarioResult result;
+	result.name = "start";
+
+	auto groups = MakeGroups(clients, 4);
+	auto hosts = Hosts(groups);
+	auto everyone = AllMembers(groups);
+	int32 started = 0;
+	int32 rejected = 0;
+
+	for (int32 iter = 1; iter <= START_ITERATIONS; iter++)
+	{
+		ClearRecv(everyone);
+
+		if (CreateRooms(hosts) == false)
+		{
+			result.timedOut = true;
+			out << "  [start] timeout: create room (iter " << iter << ")" << endl;
+			break;
+		}
+
+		vector<pair<Client, uint64>> entries;
+		for (auto& group : groups)
+			for (auto& guest : group.Guests())
+				entries.push_back({ guest, group.Host()->GetRoomId() });
+
+		if (EnterRooms(entries) == false)
+		{
+			result.timedOut = true;
+			out << "  [start] timeout: enter room (iter " << iter << ")" << endl;
+			break;
+		}
+
+		// 전원 레디 -> 방장이 4명분 S_READY를 받으면 준비 완료
+		for (auto& client : everyone)
+			client->SendReady(true);
+
+		if (WaitUntil([&]() { return all_of(hosts.begin(), hosts.end(), [](const Client& c) { return RecvCount(c, PKT_S_READY) >= 4; }); }) == false)
+		{
+			result.timedOut = true;
+			out << "  [start] timeout: all ready (iter " << iter << ")" << endl;
+			break;
+		}
+
+		// 시작과 레디 취소를 동시에
+		ClearRecv(hosts);
+		for (auto& group : groups)
+		{
+			group.Host()->SendStartRoom();
+			group.members[1]->SendReady(false);
+		}
+
+		if (WaitUntil([&]() { return all_of(hosts.begin(), hosts.end(), [](const Client& c) {
+			return RecvCount(c, PKT_S_START_ROOM) > 0 && RecvCount(c, PKT_S_READY) > 0; }); }) == false)
+		{
+			result.timedOut = true;
+			out << "  [start] timeout: start / ready(false) response (iter " << iter << ")" << endl;
+			break;
+		}
+
+		for (auto& group : groups)
+		{
+			RecvRecord start = group.Host()->GetRecv(PKT_S_START_ROOM);
+			RecvRecord ready = group.Host()->GetRecv(PKT_S_READY);
+			bool readyCancelledFirst = ready.lastSeq < start.lastSeq;
+
+			result.total++;
+			if (start.success && readyCancelledFirst)
+			{
+				result.Fail("iter " + to_string(iter) + " room " + to_string(group.Host()->GetRoomId())
+					+ ": game started after S_READY(false)");
+				continue;
+			}
+
+			result.passed++;
+			(start.success ? started : rejected)++;
+		}
+
+		if (CloseRooms(hosts, everyone) == false)
+		{
+			result.timedOut = true;
+			out << "  [start] timeout: close room (iter " << iter << ")" << endl;
+			break;
+		}
+	}
+
+	out << "  [start] started " << started << " / rejected (not all ready) " << rejected << endl;
+	return result;
+}
+
+// =========================================================
 // [invite] 초대를 받은 뒤 방장이 게임 시작 -> 수락 (작업 1)
 //   그룹 3명: [0] A = 초대하는 방장 (혼자 있는 방 RA)
 //             [1] C = 초대받는 사람 (자기 방 RC의 방장)
@@ -326,6 +426,8 @@ int32 ServerAuthorityTest::Run(const vector<string>& scenarios)
 		results.push_back(RunEnterRace(clients, out));
 	if (wants("invite"))
 		results.push_back(RunInviteWhilePlaying(clients, out));
+	if (wants("start"))
+		results.push_back(RunStartReadyRace(clients, out));
 
 	Report(results, out);
 

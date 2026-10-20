@@ -658,6 +658,7 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 	// 방에 있는지 체크
 	CHECK_AUTH_ROOM(session, OUT room, SendStartRoomError);
 
+	// 아래 두 검사는 빠른 실패용. 최종 판정은 Room::StartGame(작업 큐 안)에서 다시 한다
 	// 방장인지 확인
 	if (room->GetOwnerId() != gameSession->GetPlayer()->playerId)
 	{
@@ -675,9 +676,9 @@ bool Handle_C_START_ROOM(PacketSessionRef& session, Protocol::C_START_ROOM& pkt)
 	}
 
 	// 게임 시작
-	room->DoAsync(&Room::StartGame);
+	room->DoAsync(&Room::StartGame, gameSession);
 
-	std::cout << "Room " << room->GetRoomId() << " game started by " << gameSession->GetPlayer()->name << endl;
+	std::cout << "Room " << room->GetRoomId() << " start requested by " << gameSession->GetPlayer()->name << endl;
 
 	return true;
 }

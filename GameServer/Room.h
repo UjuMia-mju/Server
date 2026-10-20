@@ -21,7 +21,7 @@ public:
 	void LeaveLobby(PlayerRef player);      // 방 퇴장
 	void SetReady(uint64 playerId, bool isReady);  // 준비 상태
 	bool CanStartGame();
-	void StartGame();                       // 게임 시작
+	void StartGame(GameSessionRef requester); // 게임 시작 (방장/전원 준비/중복 시작을 큐 안에서 최종 확인)
 	void MakeEnterRoomPacket(Protocol::S_ENTER_ROOM& pkt);
 	
 	// ========== 게임 시작 후, 스테이지 진행 관련 ==========
